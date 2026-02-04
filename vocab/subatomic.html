@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subatomic Explained - Printable Handout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .info-section {
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+        }
+        /* Print-specific styles */
+        @media print {
+            body {
+                font-family: 'Times New Roman', serif;
+                background-color: #ffffff;
+                color: #000000;
+            }
+            .info-section {
+                border: 1px solid #cccccc;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 0;
+                page-break-inside: avoid;
+            }
+            h1, h2, h3, p, li, strong, text {
+                color: #000000 !important;
+            }
+            .info-section, .bg-white {
+                background-color: #ffffff !important;
+            }
+            svg {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl">
+
+        <!-- Header Section -->
+        <header class="text-center mb-6 p-4 info-section bg-white">
+            <h1 class="text-4xl font-bold text-slate-900">Subatomic</h1>
+        </header>
+
+        <!-- Word Breakdown Section -->
+        <div class="info-section bg-yellow-100">
+            <h2 class="text-2xl font-bold text-yellow-900 mb-4">Breaking Down the Word</h2>
+            <div class="flex items-center justify-center text-2xl font-semibold mb-4 bg-yellow-50 p-3 rounded-lg">
+                <span class="text-amber-700">Sub-</span><span class="text-slate-500 mx-2">+</span><span class="text-amber-700">Atomic</span>
+            </div>
+            <div class="space-y-3 text-yellow-800">
+                <p><strong class="font-semibold text-yellow-900">Sub-:</strong> A Latin prefix meaning <strong class="font-semibold">"under," "below," or "smaller than."</strong> (Think of "submarine" or "subway").</p>
+                <p><strong class="font-semibold text-yellow-900">Atomic:</strong> Relating to the atom.</p>
+            </div>
+            <hr class="my-4 border-yellow-300">
+            <p class="text-center font-semibold text-yellow-900">So, "subatomic" describes anything that is smaller than an atom or found inside it.</p>
+        </div>
+
+        <!-- The Core Idea -->
+        <div class="info-section bg-blue-100">
+            <h2 class="text-2xl font-bold text-blue-900 mb-3">The Core Idea: Smaller than Small</h2>
+            <p class="text-blue-800 mb-4">
+                For a long time, scientists thought the atom was the smallest possible thing. We now know that atoms are actually built from even smaller pieces. These pieces are called <strong class="font-semibold">subatomic particles</strong>. The three main ones are protons, neutrons, and electrons.
+            </p>
+            <div class="w-full">
+                 <svg viewBox="0 0 100 60" class="w-full max-w-lg mx-auto" aria-labelledby="subatomic-title">
+                    <title id="subatomic-title">A hierarchy diagram showing an atom breaking down into protons, neutrons, and electrons.</title>
+                    
+                    <!-- Top Level: The Atom -->
+                    <text x="50" y="5" font-size="4" font-weight="bold" text-anchor="middle" fill="#475569">The Whole Atom</text>
+                    <circle cx="50" cy="15" r="8" fill="none" stroke="#94a3b8" stroke-width="1"/>
+                    <ellipse cx="50" cy="15" rx="8" ry="3" fill="none" stroke="#94a3b8" stroke-width="0.5" transform="rotate(45 50 15)"/>
+                    <ellipse cx="50" cy="15" rx="8" ry="3" fill="none" stroke="#94a3b8" stroke-width="0.5" transform="rotate(-45 50 15)"/>
+                    <circle cx="50" cy="15" r="2" fill="#1e3a8a"/> <!-- Nucleus dot -->
+
+                    <!-- Arrows branching down -->
+                    <path d="M 50 25 L 50 30 L 20 30 L 20 35" stroke="#4b5563" stroke-width="1.5" fill="none" marker-end="url(#arrow-down)"/>
+                    <path d="M 50 25 L 50 35" stroke="#4b5563" stroke-width="1.5" fill="none" marker-end="url(#arrow-down)"/>
+                    <path d="M 50 25 L 50 30 L 80 30 L 80 35" stroke="#4b5563" stroke-width="1.5" fill="none" marker-end="url(#arrow-down)"/>
+
+                    <!-- Level 2: The Parts -->
+                    <!-- Proton -->
+                    <circle cx="20" cy="42" r="5" fill="#ef4444"/>
+                    <text x="20" y="44" font-size="6" font-weight="bold" text-anchor="middle" fill="white">+</text>
+                    <text x="20" y="52" font-size="3.5" font-weight="bold" text-anchor="middle" fill="#b91c1c">Proton</text>
+                    <text x="20" y="56" font-size="3" text-anchor="middle" fill="#b91c1c">(Positive)</text>
+
+                    <!-- Neutron -->
+                    <circle cx="50" cy="42" r="5" fill="#3b82f6"/>
+                    <text x="50" y="44" font-size="6" font-weight="bold" text-anchor="middle" fill="white">0</text>
+                    <text x="50" y="52" font-size="3.5" font-weight="bold" text-anchor="middle" fill="#1e40af">Neutron</text>
+                    <text x="50" y="56" font-size="3" text-anchor="middle" fill="#1e40af">(Neutral)</text>
+
+                    <!-- Electron -->
+                    <circle cx="80" cy="42" r="3" fill="#eab308"/>
+                    <text x="80" y="44" font-size="6" font-weight="bold" text-anchor="middle" fill="#854d0e">-</text>
+                    <text x="80" y="52" font-size="3.5" font-weight="bold" text-anchor="middle" fill="#854d0e">Electron</text>
+                    <text x="80" y="56" font-size="3" text-anchor="middle" fill="#854d0e">(Negative)</text>
+
+                    <defs>
+                        <marker id="arrow-down" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse">
+                          <path d="M 0 0 L 10 5 L 0 10 z" fill="#4b5563" />
+                        </marker>
+                    </defs>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Key Concepts -->
+        <div class="info-section bg-emerald-100">
+            <h2 class="text-2xl font-bold text-emerald-900 mb-3">Levels of Matter</h2>
+            <p class="text-emerald-800 mb-4">
+               Understanding "subatomic" means understanding the hierarchy of scale.
+            </p>
+            <div class="space-y-4">
+                <div class="bg-emerald-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-emerald-900 text-lg">1. Macroscopic (Big)</h3>
+                    <p class="text-emerald-800 mt-1">Things you can see with your eyes (rocks, water, people). These are made of <strong class="font-semibold">Compounds</strong> and <strong class="font-semibold">Molecules</strong>.</p>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-emerald-900 text-lg">2. Atomic (Microscopic)</h3>
+                    <p class="text-emerald-800 mt-1">The individual building blocks of matter (Carbon atom, Oxygen atom). They define the elements.</p>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-emerald-900 text-lg">3. Subatomic (Quantum)</h3>
+                    <p class="text-emerald-800 mt-1">The parts <em>inside</em> the atom. This is where the rules of physics get weird (Quantum Mechanics). Protons and Neutrons live here.</p>
+                </div>
+                 <div class="bg-emerald-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-emerald-900 text-lg">4. Elementary (Fundamental)</h3>
+                    <p class="text-emerald-800 mt-1">We can go even deeper! Protons and Neutrons are made of even smaller particles called <strong class="font-semibold">Quarks</strong>. Electrons and Quarks are currently thought to be the smallest possible things.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading in Context -->
+        <div class="info-section bg-slate-100">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Reading in Context: Smashing Atoms at CERN</h2>
+            <div class="space-y-4 text-slate-700">
+                <p>Deep underground in Europe lies the Large Hadron Collider (LHC), the biggest machine ever built. Its job is to study the <strong class="font-semibold text-slate-900">subatomic</strong> world. Scientists speed up beams of protons until they are moving almost at the speed of light, and then crash them into each other.</p>
+                <p>Why smash them? By breaking these particles apart with incredible energy, scientists can briefly create and observe rare <strong class="font-semibold text-slate-900">subatomic</strong> particles that haven't existed naturally since the Big Bang. This helps physicists answer fundamental questions about how the universe works, such as "What gives matter mass?" and "What is dark matter?" It turns out that the tiniest <strong class="font-semibold text-slate-900">subatomic</strong> pieces hold the biggest secrets of the galaxy.</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>
