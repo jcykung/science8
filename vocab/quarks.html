@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Quarks Explained - Printable Handout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .info-section {
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                font-family: 'Times New Roman', serif;
+                background-color: #ffffff;
+                color: #000000;
+            }
+
+            .info-section {
+                border: 1px solid #cccccc;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 0;
+                page-break-inside: avoid;
+            }
+
+            h1,
+            h2,
+            h3,
+            p,
+            li,
+            strong,
+            text {
+                color: #000000 !important;
+            }
+
+            .info-section,
+            .bg-white {
+                background-color: #ffffff !important;
+            }
+
+            svg {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl">
+
+        <!-- Header Section -->
+        <header class="text-center mb-6 p-4 info-section bg-white">
+            <h1 class="text-4xl font-bold text-slate-900">Quarks</h1>
+        </header>
+
+        <!-- Word Breakdown Section -->
+        <div class="info-section bg-yellow-100">
+            <h2 class="text-2xl font-bold text-yellow-900 mb-4">Origin of the Word</h2>
+            <div class="flex items-center justify-center text-2xl font-semibold mb-4 bg-yellow-50 p-3 rounded-lg">
+                <span class="text-amber-700">"Three quarks for Muster Mark!"</span>
+            </div>
+            <div class="space-y-3 text-yellow-800">
+                <p>Unlike most scientific terms, "quark" does not come from Latin or Greek! It comes from a line in the
+                    book <em>Finnegans Wake</em> by James Joyce.</p>
+                <p>Physicist Murray Gell-Mann chose the name in 1964 because protons and neutrons are made of <strong
+                        class="font-semibold text-yellow-900">three</strong> parts, matching the "Three quarks" in the
+                    quote.</p>
+            </div>
+            <hr class="my-4 border-yellow-300">
+            <p class="text-center font-semibold text-yellow-900">A quark is a fundamental constituent of matter.</p>
+        </div>
+
+        <!-- The Core Idea -->
+        <div class="info-section bg-blue-100">
+            <h2 class="text-2xl font-bold text-blue-900 mb-3">The Core Idea: Building the Builders</h2>
+            <p class="text-blue-800 mb-4">
+                We used to think Protons and Neutrons were the smallest particles in the nucleus. But they aren't! They
+                are actually composite particles made of even smaller, truly fundamental particles called <strong
+                    class="font-semibold">quarks</strong> glued together.
+            </p>
+            <div class="w-full">
+                <svg viewBox="0 0 100 60" class="w-full max-w-lg mx-auto" aria-labelledby="quark-title">
+                    <title id="quark-title">A diagram showing the quark composition of a Proton and a Neutron.</title>
+
+                    <!-- Proton Side -->
+                    <circle cx="25" cy="30" r="18" fill="white" stroke="#ef4444" stroke-width="1.5" />
+                    <text x="25" y="10" font-size="4" font-weight="bold" text-anchor="middle" fill="#b91c1c">PROTON
+                        (+1)</text>
+
+                    <!-- Proton Quarks -->
+                    <circle cx="25" cy="22" r="5" fill="#fca5a5" stroke="#b91c1c" />
+                    <text x="25" y="23.5" font-size="3" font-weight="bold" text-anchor="middle" fill="#7f1d1d">u</text>
+
+                    <circle cx="17" cy="36" r="5" fill="#fca5a5" stroke="#b91c1c" />
+                    <text x="17" y="37.5" font-size="3" font-weight="bold" text-anchor="middle" fill="#7f1d1d">u</text>
+
+                    <circle cx="33" cy="36" r="5" fill="#93c5fd" stroke="#1e3a8a" />
+                    <text x="33" y="37.5" font-size="3" font-weight="bold" text-anchor="middle" fill="#1e3a8a">d</text>
+
+                    <!-- Proton Math -->
+                    <text x="25" y="55" font-size="3" text-anchor="middle" fill="#4b5563">2 Up + 1 Down = +1
+                        Charge</text>
+
+                    <!-- Neutron Side -->
+                    <circle cx="75" cy="30" r="18" fill="white" stroke="#3b82f6" stroke-width="1.5" />
+                    <text x="75" y="10" font-size="4" font-weight="bold" text-anchor="middle" fill="#1d4ed8">NEUTRON
+                        (0)</text>
+
+                    <!-- Neutron Quarks -->
+                    <circle cx="75" cy="22" r="5" fill="#fca5a5" stroke="#b91c1c" />
+                    <text x="75" y="23.5" font-size="3" font-weight="bold" text-anchor="middle" fill="#7f1d1d">u</text>
+
+                    <circle cx="67" cy="36" r="5" fill="#93c5fd" stroke="#1e3a8a" />
+                    <text x="67" y="37.5" font-size="3" font-weight="bold" text-anchor="middle" fill="#1e3a8a">d</text>
+
+                    <circle cx="83" cy="36" r="5" fill="#93c5fd" stroke="#1e3a8a" />
+                    <text x="83" y="37.5" font-size="3" font-weight="bold" text-anchor="middle" fill="#1e3a8a">d</text>
+
+                    <!-- Neutron Math -->
+                    <text x="75" y="55" font-size="3" text-anchor="middle" fill="#4b5563">1 Up + 2 Down = 0
+                        Charge</text>
+
+                    <!-- Legend -->
+                    <text x="50" y="30" font-size="6" text-anchor="middle" font-weight="bold" fill="#4b5563">vs.</text>
+                </svg>
+            </div>
+        </div>
+
+        <!-- Key Concepts -->
+        <div class="info-section bg-emerald-100">
+            <h2 class="text-2xl font-bold text-emerald-900 mb-3">Strange Rules of the Quantum World</h2>
+            <p class="text-emerald-800 mb-4">
+                Quarks behave differently than anything in our daily life.
+            </p>
+            <div class="space-y-4">
+                <div class="bg-emerald-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-emerald-900 text-lg">1. Flavors</h3>
+                    <p class="text-emerald-800 mt-1">Quarks come in six types, which physicists call "flavors": <strong
+                            class="font-semibold">Up, Down, Charm, Strange, Top, and Bottom</strong>. Normal matter
+                        (like us) is mostly made of just Up and Down quarks.</p>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-emerald-900 text-lg">2. Fractional Charge</h3>
+                    <p class="text-emerald-800 mt-1">Unlike electrons (-1) or protons (+1), quarks have partial charges.
+                        <br>• <strong class="font-semibold">Up (u)</strong> quark = +2/3 charge.
+                        <br>• <strong class="font-semibold">Down (d)</strong> quark = -1/3 charge.
+                    </p>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-lg">
+                    <h3 class="font-bold text-emerald-900 text-lg">3. Confinement</h3>
+                    <p class="text-emerald-800 mt-1">You can never find a quark all by itself. The force holding them
+                        together is so strong that if you try to pull them apart, the energy creates new quarks instead
+                        of separating them. They are always found in groups.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading in Context -->
+        <div class="info-section bg-slate-100">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Reading in Context: The Recipe for Everything</h2>
+            <div class="space-y-4 text-slate-700">
+                <p>Imagine you are baking a cake. You need ingredients like flour, sugar, and eggs. If you look at the
+                    universe as a giant bakery, what are the basic ingredients?</p>
+                <p>For a long time, we thought the ingredients were atoms. Then we realized atoms were made of protons,
+                    neutrons, and electrons. Now, we know the recipe is even simpler. Almost all normal matter in the
+                    universe—stars, planets, puppies, and pizza—is made of just three things: <strong
+                        class="font-semibold text-slate-900">Up Quarks</strong>, <strong
+                        class="font-semibold text-slate-900">Down Quarks</strong>, and <strong
+                        class="font-semibold text-slate-900">Electrons</strong>. By simply mixing these three
+                    ingredients in different numbers, nature builds the entire periodic table of elements.</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>
