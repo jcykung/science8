@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Science 8: Interactive Periodic Table</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --card-bg: #ffffff;
+            --text-main: #1e293b;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .periodic-grid {
+            display: grid;
+            grid-template-columns: repeat(18, minmax(40px, 1fr));
+            gap: 4px;
+            max-width: 1300px;
+            margin: 0 auto;
+        }
+
+        .element-card {
+            aspect-ratio: 1 / 1.1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: space-between;
+            padding: 4px 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            position: relative;
+            background-color: white;
+        }
+
+        .element-card:hover {
+            transform: scale(1.25);
+            z-index: 50;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+            filter: brightness(0.95);
+        }
+
+        /* Highlight for gadget elements - CLEAN RED OUTLINE ONLY */
+        .element-card.gadget-highlight {
+            border: 3px solid #ef4444;
+            box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+        }
+
+        /* Category Colors */
+        .diatomic-nonmetal {
+            background-color: #dcfce7;
+        }
+
+        .noble-gas {
+            background-color: #f1f5f9;
+        }
+
+        .alkali-metal {
+            background-color: #fee2e2;
+        }
+
+        .alkaline-earth-metal {
+            background-color: #ffedd5;
+        }
+
+        .metalloid {
+            background-color: #fef9c3;
+        }
+
+        .polyatomic-nonmetal {
+            background-color: #dcfce7;
+        }
+
+        .transition-metal {
+            background-color: #e0f2fe;
+        }
+
+        .post-transition-metal {
+            background-color: #f3e8ff;
+        }
+
+        .lanthanide {
+            background-color: #fae8ff;
+        }
+
+        .actinide {
+            background-color: #ffedfa;
+        }
+
+        .modal-overlay {
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+        }
+    </style>
+</head>
+
+<body class="p-4 md:p-8">
+
+    <header class="max-w-6xl mx-auto mb-6 text-center">
+        <h1 class="text-3xl font-bold mb-2 text-slate-800">Science 8: Interactive Periodic Table</h1>
+        <p class="text-slate-600">
+            Click an element for a subatomic particle breakdown.
+            <span
+                class="inline-block px-2 py-0.5 rounded border-2 border-red-500 text-red-600 font-bold text-sm ml-2">RED
+                OUTLINE = Found in Gadgets & Toys</span>
+        </p>
+    </header>
+
+    <div id="table-container" class="periodic-grid overflow-x-auto p-2">
+        <!-- Elements injected by JS -->
+    </div>
+
+    <!-- Legend -->
+    <div class="max-w-6xl mx-auto mt-8 flex flex-wrap justify-center gap-4 text-xs font-medium text-slate-500">
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 alkali-metal rounded"></div> Alkali
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 alkaline-earth-metal rounded"></div> Alkaline Earth
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 transition-metal rounded"></div> Transition
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 post-transition-metal rounded"></div> Post-Transition
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 metalloid rounded"></div> Metalloids
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 diatomic-nonmetal rounded"></div> Non-metals
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 noble-gas rounded"></div> Noble Gases
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 lanthanide rounded"></div> Lanthanides
+        </div>
+        <div class="flex items-center gap-1">
+            <div class="w-3 h-3 actinide rounded"></div> Actinides
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-[100]">
+        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
+            <button onclick="closeModal()"
+                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-10">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                    stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+            </button>
+
+            <div id="modal-content" class="text-center">
+                <div class="flex justify-between items-start mb-4">
+                    <div class="text-left">
+                        <div id="modal-name" class="text-2xl font-bold text-slate-800"></div>
+                        <div id="modal-category" class="text-sm text-slate-500 capitalize"></div>
+                    </div>
+                    <div id="modal-symbol" class="text-5xl font-black text-slate-700 leading-none"></div>
+                </div>
+
+                <div id="gadget-note"
+                    class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm leading-relaxed text-left">
+                    <div class="font-bold flex items-center gap-2 mb-1 uppercase tracking-tight text-xs">
+                        ⚙️ Gadget / Toy Project Note
+                    </div>
+                    <span id="gadget-text"></span>
+                </div>
+
+                <!-- Bohr Model Canvas -->
+                <div
+                    class="bg-slate-50 rounded-xl border border-slate-200 mb-4 relative flex justify-center items-center py-2 overflow-hidden">
+                    <canvas id="bohr-canvas" width="280" height="280"></canvas>
+                    <div class="absolute bottom-2 right-2 text-[0.6rem] text-slate-400">Bohr Model Representation</div>
+                </div>
+
+                <div class="grid grid-cols-3 gap-2 md:gap-4">
+                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
+                        <div class="text-blue-600 font-bold text-2xl" id="protons"></div>
+                        <div class="text-[0.6rem] uppercase font-bold tracking-widest text-blue-400 mt-1">Protons</div>
+                    </div>
+                    <div class="bg-purple-50 p-3 rounded-lg border border-purple-100">
+                        <div class="text-purple-600 font-bold text-2xl" id="electrons"></div>
+                        <div class="text-[0.6rem] uppercase font-bold tracking-widest text-purple-400 mt-1">Electrons
+                        </div>
+                    </div>
+                    <div class="bg-orange-50 p-3 rounded-lg border border-orange-100">
+                        <div class="text-orange-600 font-bold text-2xl" id="neutrons"></div>
+                        <div class="text-[0.6rem] uppercase font-bold tracking-widest text-orange-400 mt-1">Neutrons
+                        </div>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between text-sm">
+                    <div class="text-left">
+                        <span class="text-slate-400 font-bold">Atomic #:</span>
+                        <span class="font-semibold text-slate-700" id="detail-num"></span>
+                    </div>
+                    <div class="text-right">
+                        <span class="text-slate-400 font-bold">Mass:</span>
+                        <span class="font-semibold text-slate-700" id="detail-mass"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const gadgets = {
+            3: "Lithium: Used in rechargeable batteries for phones, tablets, and remote-controlled cars.",
+            6: "Carbon: The basis of plastic casings and synthetic rubber buttons in most toys.",
+            12: "Magnesium: Used in lightweight 'mag-alloy' frames for laptops and high-end camera bodies.",
+            13: "Aluminum: Common in smartphone bodies, heat sinks, and the shiny parts of toy engines.",
+            14: "Silicon: The primary material in every microchip, processor, and solar cell.",
+            26: "Iron: Found in steel screws, springs, and the structural cores of electric motors.",
+            27: "Cobalt: A vital ingredient in high-capacity rechargeable batteries and magnetic alloys.",
+            28: "Nickel: Used for anti-corrosion plating on connectors and in NiMH rechargeable batteries.",
+            29: "Copper: Essential for the wiring and circuit board traces (the 'highways' for electricity).",
+            30: "Zinc: Used in disposable batteries and to galvanize metal parts to prevent rust.",
+            31: "Gallium: Used in Gallium Nitride (GaN) power bricks and internal LED lighting components.",
+            32: "Germanium: Used in specialized transistors and fiber optic cables.",
+            47: "Silver: The best conductor; used in high-end buttons and flexible printed circuit boards.",
+            50: "Tin: The main component of solder, the 'metal glue' holding electronics together.",
+            60: "Neodymium: Used to make tiny, super-powerful magnets for speakers, motors, and hard drives.",
+            64: "Gadolinium: Often used in screen displays and specialized electronic sensors.",
+            73: "Tantalum: Used in tiny 'tantalum capacitors' that store energy inside cell phones.",
+            79: "Gold: Used to coat high-quality connectors because it never corrodes, keeping connections clear.",
+            82: "Lead: Historically used in solder; still sometimes found in weights or batteries (being phased out)."
+        };
+
+        let animationFrameId;
+
+        async function initTable() {
+            try {
+                const response = await fetch('https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json');
+                const data = await response.json();
+                const container = document.getElementById('table-container');
+
+                data.elements.forEach(el => {
+                    const div = document.createElement('div');
+                    const isGadget = !!gadgets[el.number];
+                    const categoryClass = el.category.replace(/\s+/g, '-').toLowerCase();
+
+                    div.className = `element-card ${categoryClass} ${isGadget ? 'gadget-highlight' : ''}`;
+                    div.style.gridColumn = el.xpos;
+                    div.style.gridRow = el.ypos;
+
+                    div.innerHTML = `
+                        <span class="text-[0.55rem] font-bold text-slate-500 w-full px-1">${el.number}</span>
+                        <span class="font-bold text-sm leading-none -mt-1">${el.symbol}</span>
+                        <span class="text-[0.5rem] text-slate-600 truncate px-1 pb-0.5">${el.atomic_mass.toFixed(2)}</span>
+                    `;
+
+                    div.onclick = () => showElement(el);
+                    container.appendChild(div);
+                });
+            } catch (err) {
+                console.error("Failed to load table data:", err);
+            }
+        }
+
+        function showElement(el) {
+            const gadgetNote = gadgets[el.number];
+
+            document.getElementById('modal-symbol').textContent = el.symbol;
+            document.getElementById('modal-name').textContent = el.name;
+            document.getElementById('modal-category').textContent = el.category;
+            document.getElementById('detail-num').textContent = el.number;
+            document.getElementById('detail-mass').textContent = el.atomic_mass.toFixed(4) + " u";
+
+            document.getElementById('protons').textContent = el.number;
+            document.getElementById('electrons').textContent = el.number;
+            document.getElementById('neutrons').textContent = Math.round(el.atomic_mass - el.number);
+
+            const gadgetBox = document.getElementById('gadget-note');
+            if (gadgetNote) {
+                gadgetBox.classList.remove('hidden');
+                document.getElementById('gadget-text').textContent = gadgetNote;
+            } else {
+                gadgetBox.classList.add('hidden');
+            }
+
+            document.getElementById('modal').classList.remove('hidden');
+
+            // Start Animation
+            startBohrAnimation(el);
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.add('hidden');
+            cancelAnimationFrame(animationFrameId); // Stop animation
+        }
+
+        window.onclick = (e) => { if (e.target.id === 'modal') closeModal(); };
+
+        // --- Bohr Animation Logic ---
+        function startBohrAnimation(element) {
+            const canvas = document.getElementById('bohr-canvas');
+            const ctx = canvas.getContext('2d');
+            const centerX = canvas.width / 2;
+            const centerY = canvas.height / 2;
+
+            // Get electron shells (fallback for first 20 if missing, though JSON usually has them)
+            // JSON structure from Bowserinator usually includes "shells": [2, 8, ...]
+            let shells = element.shells || calculateShells(element.number);
+
+            // Configuration
+            const nucleusRadius = 20;
+            const maxRadius = Math.min(centerX, centerY) - 10;
+            const spacing = (maxRadius - nucleusRadius) / (shells.length || 1);
+
+            function animate(time) {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+                // Draw Nucleus
+                ctx.beginPath();
+                ctx.arc(centerX, centerY, nucleusRadius, 0, 2 * Math.PI);
+                ctx.fillStyle = '#1e293b'; // Slate-800
+                ctx.fill();
+                ctx.fillStyle = 'white';
+                ctx.font = 'bold 12px Arial';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(element.symbol, centerX, centerY);
+
+                // Draw Shells & Electrons
+                shells.forEach((electronCount, shellIndex) => {
+                    const radius = nucleusRadius + (spacing * (shellIndex + 1));
+
+                    // Draw Shell Ring
+                    ctx.beginPath();
+                    ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
+                    ctx.strokeStyle = '#cbd5e1'; // Slate-300
+                    ctx.lineWidth = 1;
+                    ctx.stroke();
+
+                    // Draw Electrons
+                    const speed = 0.0005 * (shellIndex + 1); // Outer shells move differently? Actually physics is complex, lets just visually separate speeds
+                    const angularSpeed = (time * (0.002 - (shellIndex * 0.0002))); // Inner shells faster
+
+                    for (let i = 0; i < electronCount; i++) {
+                        const angle = angularSpeed + ((Math.PI * 2) / electronCount) * i;
+                        const ex = centerX + Math.cos(angle) * radius;
+                        const ey = centerY + Math.sin(angle) * radius;
+
+                        ctx.beginPath();
+                        ctx.arc(ex, ey, 4, 0, 2 * Math.PI);
+                        ctx.fillStyle = '#8b5cf6'; // Purple-500
+                        ctx.fill();
+                    }
+                });
+
+                animationFrameId = requestAnimationFrame(animate);
+            }
+
+            // Cancel previous before starting new (just in case)
+            cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(animate);
+        }
+
+        // Simple fallback calculator for K-20 if shells data is missing in JSON
+        function calculateShells(atomicNumber) {
+            const shells = [];
+            let remaining = atomicNumber;
+            const capacity = [2, 8, 8, 18, 18, 32, 32]; // Simplified model for lower elements
+
+            for (let cap of capacity) {
+                if (remaining <= 0) break;
+                let take = Math.min(remaining, cap);
+                shells.push(take);
+                remaining -= take;
+            }
+            return shells;
+        }
+
+        initTable();
+    </script>
+</body>
+
+</html>
