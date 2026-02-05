@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Science 8: Interactive Periodic Table</title>
+    <title>Interactive Periodic Table</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -17,42 +17,70 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            overflow-x: hidden;
+            /* Prevents page-level horizontal scrolling */
+            height: 100vh;
+            /* Target full viewport height */
+            display: flex;
+            flex-direction: column;
         }
 
         .periodic-grid {
             display: grid;
-            grid-template-columns: repeat(18, minmax(40px, 1fr));
-            gap: 4px;
+            /* Reduced column width to make table more compact */
+            grid-template-columns: repeat(18, minmax(38px, 1fr));
+            gap: 2px;
+            /* Tighter gap */
+            min-width: 700px;
+            /* Ensure table doesn't squish too much, forces scroll on mobile */
             max-width: 1300px;
             margin: 0 auto;
         }
 
         .element-card {
-            aspect-ratio: 1 / 1.1;
+            aspect-ratio: 1 / 1.15;
             display: flex;
             flex-direction: column;
             align-items: center;
             justify-content: space-between;
-            padding: 4px 2px;
+            padding: 2px;
             border-radius: 4px;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
             border: 1px solid rgba(0, 0, 0, 0.1);
             position: relative;
             background-color: white;
+            overflow: hidden;
         }
 
-        .element-card:hover {
-            transform: scale(1.25);
-            z-index: 50;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
-            filter: brightness(0.95);
+        /* Hover effects only on devices that support hover (prevents sticky hover states on mobile) */
+        @media (hover: hover) {
+            .element-card:hover {
+                transform: scale(1.5);
+                z-index: 50;
+                box-shadow: 0 10px 20px -5px rgba(0, 0, 0, 0.2);
+                filter: brightness(1.0);
+                border-color: #94a3b8;
+            }
         }
 
-        /* Highlight for gadget elements - CLEAN RED OUTLINE ONLY */
         .element-card.gadget-highlight {
-            border: 3px solid #ef4444;
-            box-shadow: 0 0 4px rgba(239, 68, 68, 0.4);
+            border: 2px solid #ef4444;
+            /* Slightly thinner border for compact look */
+            box-shadow: 0 0 3px rgba(239, 68, 68, 0.4);
+        }
+
+        .element-card.search-match {
+            background-color: #fef08a;
+            border-color: #eab308;
+            transform: scale(1.1);
+            z-index: 40;
+            box-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
+        }
+
+        .element-card.dimmed {
+            opacity: 0.25;
+            filter: grayscale(100%);
         }
 
         /* Category Colors */
@@ -100,143 +128,243 @@
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(4px);
         }
+
+        /* Custom scrollbar for table container to hint at scrolling */
+        #table-container::-webkit-scrollbar {
+            height: 6px;
+        }
+
+        #table-container::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        #table-container::-webkit-scrollbar-thumb {
+            background-color: rgba(148, 163, 184, 0.5);
+            border-radius: 20px;
+        }
     </style>
 </head>
 
-<body class="p-4 md:p-8">
+<body class="p-2 overflow-y-auto">
 
-    <header class="max-w-6xl mx-auto mb-6 text-center">
-        <h1 class="text-3xl font-bold mb-2 text-slate-800">Science 8: Interactive Periodic Table</h1>
-        <p class="text-slate-600">
-            Click an element for a subatomic particle breakdown.
-            <span
-                class="inline-block px-2 py-0.5 rounded border-2 border-red-500 text-red-600 font-bold text-sm ml-2">RED
-                OUTLINE = Found in Gadgets & Toys</span>
-        </p>
+    <!-- Header Section (Compact, No Background Box) -->
+    <header class="w-full max-w-4xl mx-auto mb-2 mt-2 text-center z-20 flex-shrink-0 px-4">
+        <div class="inline-block w-full max-w-[600px]">
+            <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight mb-1">Interactive Periodic Table</h1>
+            <p class="text-xs text-slate-500 mb-3 font-medium">
+                <span
+                    class="inline-block border-2 border-red-500 text-red-600 font-bold px-1 rounded text-[10px] bg-white">RED
+                    OUTLINE</span> = Found in Gadgets & Toys
+            </p>
+
+            <!-- Search Box -->
+            <div class="relative group w-full max-w-sm mx-auto">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-400 group-focus-within:text-blue-500 transition-colors"
+                        xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M8 4a4 4 0 100 8 4 4 0 000-8zM2 8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6 6 0 012 8z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <input type="text" id="search-input"
+                    class="block w-full pl-9 pr-8 py-2 text-sm border-2 border-slate-300 rounded-full bg-white/80 placeholder-slate-400 focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-100 transition-all shadow-sm"
+                    placeholder="Search parts (e.g., 'battery', 'chip', 'magnet')...">
+
+                <button id="clear-search"
+                    class="absolute inset-y-0 right-0 pr-3 flex items-center hidden text-slate-400 hover:text-slate-600 cursor-pointer">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24"
+                        stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                            d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+        </div>
     </header>
 
-    <div id="table-container" class="periodic-grid overflow-x-auto p-2">
+    <!-- Table Container -->
+    <!-- Changed to overflow-x-auto for mobile scrolling. Added -webkit-overflow-scrolling for smooth iOS scroll. -->
+    <div id="table-container" class="periodic-grid overflow-x-auto px-4 w-full flex-grow"
+        style="-webkit-overflow-scrolling: touch;">
         <!-- Elements injected by JS -->
     </div>
 
-    <!-- Legend -->
-    <div class="max-w-6xl mx-auto mt-8 flex flex-wrap justify-center gap-4 text-xs font-medium text-slate-500">
+    <!-- Compact Legend -->
+    <div
+        class="max-w-6xl mx-auto mt-2 flex flex-wrap justify-center gap-2 md:gap-3 text-[10px] font-medium text-slate-500 relative z-10 pb-4 flex-shrink-0 px-2">
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 alkali-metal rounded"></div> Alkali
+            <div class="w-2 h-2 alkali-metal rounded"></div> Alkali
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 alkaline-earth-metal rounded"></div> Alkaline Earth
+            <div class="w-2 h-2 alkaline-earth-metal rounded"></div> Alk. Earth
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 transition-metal rounded"></div> Transition
+            <div class="w-2 h-2 transition-metal rounded"></div> Transition
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 post-transition-metal rounded"></div> Post-Transition
+            <div class="w-2 h-2 post-transition-metal rounded"></div> Post-Trans.
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 metalloid rounded"></div> Metalloids
+            <div class="w-2 h-2 metalloid rounded"></div> Metalloids
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 diatomic-nonmetal rounded"></div> Non-metals
+            <div class="w-2 h-2 diatomic-nonmetal rounded"></div> Non-metals
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 noble-gas rounded"></div> Noble Gases
+            <div class="w-2 h-2 noble-gas rounded"></div> Noble Gases
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 lanthanide rounded"></div> Lanthanides
+            <div class="w-2 h-2 lanthanide rounded"></div> Lanthanides
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 actinide rounded"></div> Actinides
+            <div class="w-2 h-2 actinide rounded"></div> Actinides
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Vertical Layout Modal (Responsive) -->
     <div id="modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-[100]">
-        <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full p-6 relative max-h-[90vh] overflow-y-auto">
+        <!-- Added max-h and overflow-y-auto for landscape phones -->
+        <div class="bg-white rounded-2xl shadow-2xl w-[90%] max-w-md p-4 md:p-6 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeModal()"
-                class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 transition-colors z-10">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24"
+                class="absolute top-4 right-4 text-slate-300 hover:text-slate-600 transition-colors z-10 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
 
             <div id="modal-content" class="text-center">
-                <div class="flex justify-between items-start mb-4">
-                    <div class="text-left">
-                        <div id="modal-name" class="text-2xl font-bold text-slate-800"></div>
-                        <div id="modal-category" class="text-sm text-slate-500 capitalize"></div>
-                    </div>
-                    <div id="modal-symbol" class="text-5xl font-black text-slate-700 leading-none"></div>
+                <!-- Header -->
+                <div class="flex flex-col items-center mb-3">
+                    <div id="modal-symbol" class="text-6xl font-black text-slate-800 leading-none mb-1"></div>
+                    <div id="modal-name" class="text-2xl font-bold text-slate-700 leading-tight"></div>
+                    <div id="modal-category" class="text-xs text-slate-400 uppercase tracking-widest mt-1"></div>
                 </div>
 
+                <!-- Gadget Note -->
                 <div id="gadget-note"
-                    class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm leading-relaxed text-left">
-                    <div class="font-bold flex items-center gap-2 mb-1 uppercase tracking-tight text-xs">
-                        ⚙️ Gadget / Toy Project Note
-                    </div>
+                    class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-left leading-relaxed shadow-sm">
+                    <span class="font-bold uppercase text-[10px] block mb-1 text-red-800 tracking-wide">⚙️ Found in
+                        Gadgets:</span>
                     <span id="gadget-text"></span>
                 </div>
 
-                <!-- Bohr Model Canvas -->
-                <div
-                    class="bg-slate-50 rounded-xl border border-slate-200 mb-4 relative flex justify-center items-center py-2 overflow-hidden">
-                    <canvas id="bohr-canvas" width="280" height="280"></canvas>
-                    <div class="absolute bottom-2 right-2 text-[0.6rem] text-slate-400">Bohr Model Representation</div>
+                <!-- Common Usage -->
+                <div class="mb-4 text-left bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Common Usage</div>
+                    <div id="common-usage" class="text-slate-700 text-sm font-medium leading-relaxed"></div>
+                    <a id="wiki-link" href="#" target="_blank"
+                        class="block mt-2 text-blue-500 hover:text-blue-700 text-xs font-semibold hover:underline">
+                        View on Wikipedia &rarr;
+                    </a>
                 </div>
 
-                <div class="grid grid-cols-3 gap-2 md:gap-4">
-                    <div class="bg-blue-50 p-3 rounded-lg border border-blue-100">
-                        <div class="text-blue-600 font-bold text-2xl" id="protons"></div>
-                        <div class="text-[0.6rem] uppercase font-bold tracking-widest text-blue-400 mt-1">Protons</div>
+                <!-- Bohr Model Canvas (Transparent Background) -->
+                <div class="mx-auto mb-4 relative w-48 h-48 flex items-center justify-center">
+                    <canvas id="bohr-canvas" width="192" height="192" class="rounded-full"></canvas>
+                </div>
+
+                <!-- Stats Grid -->
+                <div class="grid grid-cols-3 gap-3 mb-3">
+                    <div class="bg-blue-50 p-2 rounded-lg border border-blue-100">
+                        <div class="text-blue-600 font-bold text-xl leading-none" id="protons"></div>
+                        <div class="text-[10px] uppercase font-bold text-blue-400 mt-1">Protons</div>
                     </div>
-                    <div class="bg-purple-50 p-3 rounded-lg border border-purple-100">
-                        <div class="text-purple-600 font-bold text-2xl" id="electrons"></div>
-                        <div class="text-[0.6rem] uppercase font-bold tracking-widest text-purple-400 mt-1">Electrons
-                        </div>
+                    <div class="bg-purple-50 p-2 rounded-lg border border-purple-100">
+                        <div class="text-purple-600 font-bold text-xl leading-none" id="electrons"></div>
+                        <div class="text-[10px] uppercase font-bold text-purple-400 mt-1">Electrons</div>
                     </div>
-                    <div class="bg-orange-50 p-3 rounded-lg border border-orange-100">
-                        <div class="text-orange-600 font-bold text-2xl" id="neutrons"></div>
-                        <div class="text-[0.6rem] uppercase font-bold tracking-widest text-orange-400 mt-1">Neutrons
-                        </div>
+                    <div class="bg-orange-50 p-2 rounded-lg border border-orange-100">
+                        <div class="text-orange-600 font-bold text-xl leading-none" id="neutrons"></div>
+                        <div class="text-[10px] uppercase font-bold text-orange-400 mt-1">Neutrons</div>
                     </div>
                 </div>
 
-                <div class="mt-4 pt-4 border-t border-slate-100 flex justify-between text-sm">
-                    <div class="text-left">
-                        <span class="text-slate-400 font-bold">Atomic #:</span>
-                        <span class="font-semibold text-slate-700" id="detail-num"></span>
-                    </div>
-                    <div class="text-right">
-                        <span class="text-slate-400 font-bold">Mass:</span>
-                        <span class="font-semibold text-slate-700" id="detail-mass"></span>
-                    </div>
+                <!-- Footer Stats -->
+                <div class="flex justify-between text-xs text-slate-500 border-t border-slate-100 pt-3 px-1">
+                    <span>Atomic No: <b id="detail-num" class="text-slate-700"></b></span>
+                    <span>Mass: <b id="detail-mass" class="text-slate-700"></b></span>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
+        // Expanded Gadgets List
         const gadgets = {
-            3: "Lithium: Used in rechargeable batteries for phones, tablets, and remote-controlled cars.",
-            6: "Carbon: The basis of plastic casings and synthetic rubber buttons in most toys.",
-            12: "Magnesium: Used in lightweight 'mag-alloy' frames for laptops and high-end camera bodies.",
-            13: "Aluminum: Common in smartphone bodies, heat sinks, and the shiny parts of toy engines.",
-            14: "Silicon: The primary material in every microchip, processor, and solar cell.",
-            26: "Iron: Found in steel screws, springs, and the structural cores of electric motors.",
-            27: "Cobalt: A vital ingredient in high-capacity rechargeable batteries and magnetic alloys.",
-            28: "Nickel: Used for anti-corrosion plating on connectors and in NiMH rechargeable batteries.",
-            29: "Copper: Essential for the wiring and circuit board traces (the 'highways' for electricity).",
-            30: "Zinc: Used in disposable batteries and to galvanize metal parts to prevent rust.",
-            31: "Gallium: Used in Gallium Nitride (GaN) power bricks and internal LED lighting components.",
-            32: "Germanium: Used in specialized transistors and fiber optic cables.",
-            47: "Silver: The best conductor; used in high-end buttons and flexible printed circuit boards.",
-            50: "Tin: The main component of solder, the 'metal glue' holding electronics together.",
-            60: "Neodymium: Used to make tiny, super-powerful magnets for speakers, motors, and hard drives.",
-            64: "Gadolinium: Often used in screen displays and specialized electronic sensors.",
-            73: "Tantalum: Used in tiny 'tantalum capacitors' that store energy inside cell phones.",
-            79: "Gold: Used to coat high-quality connectors because it never corrodes, keeping connections clear.",
-            82: "Lead: Historically used in solder; still sometimes found in weights or batteries (being phased out)."
+            3: "Lithium: Rechargeable batteries for phones, tablets, and RC cars.",
+            5: "Boron: Neodymium Super Magnets (NdFeB) in motors/speakers.",
+            6: "Carbon: Plastic casings and synthetic rubber buttons.",
+            7: "Nitrogen: Strong Nylon gears inside RC cars.",
+            12: "Magnesium: Lightweight 'mag-alloy' frames for laptops.",
+            13: "Aluminum: Smartphone bodies, heat sinks, and motor casings.",
+            14: "Silicon: The microchips and processors.",
+            15: "Phosphorus: LEDs and striking strips for toy caps.",
+            18: "Argon: Gas inside light bulbs.",
+            22: "Titanium: High-strength casings for premium tech.",
+            24: "Chromium: Shiny 'chrome' plating on plastic bumpers.",
+            25: "Manganese: Inside standard alkaline AA/AAA batteries.",
+            26: "Iron: Battery springs, steel screws, motor cores.",
+            27: "Cobalt: High-capacity rechargeable batteries.",
+            28: "Nickel: Connectors and NiMH rechargeable batteries.",
+            29: "Copper: Wiring and green circuit board traces.",
+            30: "Zinc: Disposable batteries and galvanized metal.",
+            31: "Gallium: GaN power bricks and LEDs.",
+            32: "Germanium: Transistors and sensors.",
+            33: "Arsenic: Red light in older LEDs.",
+            39: "Yttrium: Yellow coating on white LEDs.",
+            47: "Silver: High-end buttons and flexible circuits.",
+            49: "Indium: Transparent touchscreens.",
+            50: "Tin: Solder (metal glue for circuits).",
+            51: "Antimony: Flame retardant plastic.",
+            56: "Barium: Tiny ceramic capacitors.",
+            60: "Neodymium: Super-powerful magnets.",
+            63: "Europium: Red color in screens.",
+            64: "Gadolinium: Screen displays.",
+            65: "Terbium: Green color in screens.",
+            66: "Dysprosium: Heat-resistant magnets.",
+            73: "Tantalum: Capacitors in cell phones.",
+            74: "Tungsten: Light bulb filaments.",
+            78: "Platinum: Hard drive coatings.",
+            79: "Gold: Non-corroding connectors.",
+            82: "Lead: Older solder and weights."
+        };
+
+        const commonUsages = {
+            1: "Rocket fuel, Stars", 2: "Balloons", 3: "Batteries", 4: "Aerospace, Gems",
+            5: "Soap, Glass", 6: "Life, Diamonds", 7: "Atmosphere",
+            8: "Breathing", 9: "Toothpaste", 10: "Signs",
+            11: "Salt", 12: "Flares, Alloys", 13: "Cans, Planes",
+            14: "Chips, Glass", 15: "Matches", 16: "Tires",
+            17: "Pools", 18: "Bulbs", 19: "Bananas",
+            20: "Bones", 21: "Bikes", 22: "Aerospace",
+            23: "Tools", 24: "Stainless Steel", 25: "Batteries",
+            26: "Steel, Magnets", 27: "Magnets, Blue Glass", 28: "Coins",
+            29: "Wires", 30: "Brass", 31: "LEDs",
+            32: "Fiber Optics", 33: "LEDs", 34: "Copiers",
+            35: "Film", 36: "Flashlights", 37: "GPS",
+            38: "Fireworks", 39: "Lasers", 40: "Fake Diamonds",
+            41: "MRI", 42: "Tools", 43: "Medical Imaging",
+            44: "Pens", 45: "Headlights", 46: "Pollution Control",
+            47: "Jewelry", 48: "Batteries", 49: "Touchscreens",
+            50: "Solder, Cans", 51: "Car Batteries", 52: "Solar",
+            53: "Disinfectant", 54: "Lights", 55: "Atomic Clocks",
+            56: "X-rays", 57: "Lenses", 58: "Lighters",
+            59: "Magnets", 60: "Magnets", 61: "Paint",
+            62: "Magnets", 63: "TV Red", 64: "MRI",
+            65: "TV Green", 66: "EV Magnets", 67: "Lasers",
+            68: "Fiber Optics", 69: "X-rays", 70: "Lasers",
+            71: "Cancer Therapy", 72: "Nuclear Rods", 73: "Capacitors",
+            74: "Filaments", 75: "Jet Engines", 76: "Pen Tips",
+            77: "Spark Plugs", 78: "Jewelry", 79: "Jewelry",
+            80: "Thermometers", 81: "Poison", 82: "Weights",
+            83: "Medicine", 84: "Brushes", 85: "Medicine",
+            86: "Medicine", 87: "Research", 88: "Old Paint",
+            89: "Medicine", 90: "Lanterns", 91: "Research",
+            92: "Nuclear Power", 93: "Detectors", 94: "Fuel",
+            95: "Smoke Detectors", 96: "Rovers", 97: "Research",
+            98: "Detectors", 99: "Research"
         };
 
         let animationFrameId;
@@ -255,14 +383,28 @@
                     div.className = `element-card ${categoryClass} ${isGadget ? 'gadget-highlight' : ''}`;
                     div.style.gridColumn = el.xpos;
                     div.style.gridRow = el.ypos;
+                    div.setAttribute('data-number', el.number);
 
+                    // Adjusted font sizes for compact view
                     div.innerHTML = `
-                        <span class="text-[0.55rem] font-bold text-slate-500 w-full px-1">${el.number}</span>
-                        <span class="font-bold text-sm leading-none -mt-1">${el.symbol}</span>
-                        <span class="text-[0.5rem] text-slate-600 truncate px-1 pb-0.5">${el.atomic_mass.toFixed(2)}</span>
+                        <span class="text-[0.55rem] font-bold text-slate-500 w-full px-0.5">${el.number}</span>
+                        <span class="font-bold text-base leading-none -mt-0.5">${el.symbol}</span>
+                        <span class="text-[0.45rem] text-slate-600 truncate px-0.5 pb-0.5">${el.atomic_mass.toFixed(2)}</span>
                     `;
 
-                    div.onclick = () => showElement(el);
+                    // CLICK LOGIC: Check search state before showing
+                    div.onclick = (e) => {
+                        e.stopPropagation(); // Stop click from hitting background listener
+
+                        const searchInput = document.getElementById('search-input');
+                        // If search is active AND this card is NOT a match
+                        if (searchInput.value.trim().length > 0 && !div.classList.contains('search-match')) {
+                            resetSearch(); // Just reset, don't open modal
+                        } else {
+                            showElement(el); // Proceed normally
+                        }
+                    };
+
                     container.appendChild(div);
                 });
             } catch (err) {
@@ -270,14 +412,100 @@
             }
         }
 
+        // --- Improved Search Logic ---
+        function getSearchVariations(term) {
+            const variations = [term];
+            if (term.endsWith('y')) variations.push(term.slice(0, -1) + 'ies');
+            if (term.endsWith('ies')) variations.push(term.slice(0, -3) + 'y');
+            if (term.endsWith('s') && !term.endsWith('ss')) variations.push(term.slice(0, -1));
+            if (!term.endsWith('s')) variations.push(term + 's');
+            return variations;
+        }
+
+        const searchInput = document.getElementById('search-input');
+        const clearButton = document.getElementById('clear-search');
+
+        function performSearch() {
+            const rawTerm = searchInput.value.toLowerCase().trim();
+            const cards = document.querySelectorAll('.element-card');
+
+            // Show/Hide Clear Button
+            if (rawTerm.length > 0) {
+                clearButton.classList.remove('hidden');
+            } else {
+                clearButton.classList.add('hidden');
+                cards.forEach(card => card.classList.remove('search-match', 'dimmed'));
+                return;
+            }
+
+            const searchTerms = getSearchVariations(rawTerm);
+            const matchedNumbers = new Set();
+
+            const hasMatch = (text) => {
+                if (!text) return false;
+                const lowerText = text.toLowerCase();
+                return searchTerms.some(term => lowerText.includes(term));
+            };
+
+            // Search Data Sources
+            Object.keys(gadgets).forEach(num => {
+                if (hasMatch(gadgets[num])) matchedNumbers.add(parseInt(num));
+            });
+
+            Object.keys(commonUsages).forEach(num => {
+                if (hasMatch(commonUsages[num])) matchedNumbers.add(parseInt(num));
+            });
+
+            // Apply styles
+            cards.forEach(card => {
+                const num = parseInt(card.getAttribute('data-number'));
+                if (matchedNumbers.has(num)) {
+                    card.classList.add('search-match');
+                    card.classList.remove('dimmed');
+                } else {
+                    card.classList.remove('search-match');
+                    card.classList.add('dimmed');
+                }
+            });
+        }
+
+        function resetSearch() {
+            searchInput.value = '';
+            performSearch();
+        }
+
+        // Background Click Listener to Clear Search
+        document.addEventListener('click', (e) => {
+            // If clicking inside search input/header or inside the modal, do nothing
+            if (e.target.closest('header') || e.target.closest('#modal')) return;
+
+            // If search is active, clear it
+            if (searchInput.value.trim().length > 0) {
+                resetSearch();
+            }
+        });
+
+        searchInput.addEventListener('input', performSearch);
+
+        // Clear Button Logic
+        clearButton.addEventListener('click', () => {
+            resetSearch();
+            searchInput.focus();
+        });
+
         function showElement(el) {
             const gadgetNote = gadgets[el.number];
+            const usage = commonUsages[el.number] || "Research";
 
             document.getElementById('modal-symbol').textContent = el.symbol;
             document.getElementById('modal-name').textContent = el.name;
             document.getElementById('modal-category').textContent = el.category;
             document.getElementById('detail-num').textContent = el.number;
             document.getElementById('detail-mass').textContent = el.atomic_mass.toFixed(4) + " u";
+            document.getElementById('common-usage').textContent = usage;
+
+            const wikiLink = document.getElementById('wiki-link');
+            wikiLink.href = `https://en.wikipedia.org/wiki/${el.name}`;
 
             document.getElementById('protons').textContent = el.number;
             document.getElementById('electrons').textContent = el.number;
@@ -292,41 +520,43 @@
             }
 
             document.getElementById('modal').classList.remove('hidden');
-
-            // Start Animation
             startBohrAnimation(el);
         }
 
         function closeModal() {
             document.getElementById('modal').classList.add('hidden');
-            cancelAnimationFrame(animationFrameId); // Stop animation
+            cancelAnimationFrame(animationFrameId);
         }
 
         window.onclick = (e) => { if (e.target.id === 'modal') closeModal(); };
 
-        // --- Bohr Animation Logic ---
+        // --- Original Bohr Model (Text Nucleus) ---
         function startBohrAnimation(element) {
             const canvas = document.getElementById('bohr-canvas');
             const ctx = canvas.getContext('2d');
             const centerX = canvas.width / 2;
             const centerY = canvas.height / 2;
 
-            // Get electron shells (fallback for first 20 if missing, though JSON usually has them)
-            // JSON structure from Bowserinator usually includes "shells": [2, 8, ...]
             let shells = element.shells || calculateShells(element.number);
 
-            // Configuration
-            const nucleusRadius = 20;
-            const maxRadius = Math.min(centerX, centerY) - 10;
-            const spacing = (maxRadius - nucleusRadius) / (shells.length || 1);
+            // Layout Calculation
+            const nucleusRadius = 14;
+            const maxRadius = (Math.min(canvas.width, canvas.height) / 2) - 8;
+            const shellStartRadius = nucleusRadius + 15;
+
+            // Spacing logic: Distribute remaining space evenly for each shell
+            // Using (shellIndex + 1) ensures the shells spread outwards to fill the canvas
+            // rather than starting bunching near the nucleus.
+            const availableSpace = maxRadius - shellStartRadius;
+            const spacing = availableSpace / shells.length;
 
             function animate(time) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Draw Nucleus
+                // Draw Nucleus (Black Circle with Text)
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, nucleusRadius, 0, 2 * Math.PI);
-                ctx.fillStyle = '#1e293b'; // Slate-800
+                ctx.fillStyle = '#1e293b';
                 ctx.fill();
                 ctx.fillStyle = 'white';
                 ctx.font = 'bold 12px Arial';
@@ -336,18 +566,19 @@
 
                 // Draw Shells & Electrons
                 shells.forEach((electronCount, shellIndex) => {
-                    const radius = nucleusRadius + (spacing * (shellIndex + 1));
+                    // Calculate radius to maximize space
+                    // shellIndex starts at 0. We add 1 so the first shell isn't at startRadius but spaced out.
+                    const radius = shellStartRadius + (spacing * (shellIndex + 0.5));
 
-                    // Draw Shell Ring
+                    // Shell Ring
                     ctx.beginPath();
                     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
-                    ctx.strokeStyle = '#cbd5e1'; // Slate-300
+                    ctx.strokeStyle = '#cbd5e1';
                     ctx.lineWidth = 1;
                     ctx.stroke();
 
-                    // Draw Electrons
-                    const speed = 0.0005 * (shellIndex + 1); // Outer shells move differently? Actually physics is complex, lets just visually separate speeds
-                    const angularSpeed = (time * (0.002 - (shellIndex * 0.0002))); // Inner shells faster
+                    // Electrons
+                    const angularSpeed = (time * (0.002 - (shellIndex * 0.0002)));
 
                     for (let i = 0; i < electronCount; i++) {
                         const angle = angularSpeed + ((Math.PI * 2) / electronCount) * i;
@@ -355,26 +586,21 @@
                         const ey = centerY + Math.sin(angle) * radius;
 
                         ctx.beginPath();
-                        ctx.arc(ex, ey, 4, 0, 2 * Math.PI);
-                        ctx.fillStyle = '#8b5cf6'; // Purple-500
+                        ctx.arc(ex, ey, 3.5, 0, 2 * Math.PI);
+                        ctx.fillStyle = '#8b5cf6';
                         ctx.fill();
                     }
                 });
-
                 animationFrameId = requestAnimationFrame(animate);
             }
-
-            // Cancel previous before starting new (just in case)
             cancelAnimationFrame(animationFrameId);
             animationFrameId = requestAnimationFrame(animate);
         }
 
-        // Simple fallback calculator for K-20 if shells data is missing in JSON
         function calculateShells(atomicNumber) {
             const shells = [];
             let remaining = atomicNumber;
-            const capacity = [2, 8, 8, 18, 18, 32, 32]; // Simplified model for lower elements
-
+            const capacity = [2, 8, 8, 18, 18, 32, 32];
             for (let cap of capacity) {
                 if (remaining <= 0) break;
                 let take = Math.min(remaining, cap);
