@@ -17,18 +17,15 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow: hidden;
-            /* Prevent body scroll, handle in containers */
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+            /* Removed fixed height and overflow:hidden to allow natural scrolling */
+            min-height: 100vh;
+            margin: 0;
         }
 
         .periodic-grid {
             display: grid;
             grid-template-columns: repeat(18, minmax(38px, 1fr));
             gap: 2px;
-            /* Min-width ensures the grid maintains shape and triggers scroll on wrapper */
             min-width: 800px;
             margin: 0 auto;
             padding-bottom: 20px;
@@ -143,7 +140,7 @@
 <body class="p-2">
 
     <!-- Header Section -->
-    <header class="w-full max-w-4xl mx-auto mb-2 mt-2 text-center z-20 flex-shrink-0 px-4">
+    <header class="w-full max-w-4xl mx-auto mb-2 mt-2 text-center z-20 px-4">
         <div class="inline-block w-full max-w-[600px]">
             <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight mb-1">Interactive Periodic Table</h1>
             <p class="text-xs text-slate-500 mb-3 font-medium">
@@ -179,9 +176,8 @@
     </header>
 
     <!-- Scroll Wrapper -->
-    <div class="scroll-container w-full flex-grow overflow-x-auto overflow-y-hidden px-2 md:px-4"
-        style="-webkit-overflow-scrolling: touch;">
-        <!-- The Grid itself (min-width forces scroll on small screens) -->
+    <div class="scroll-container w-full overflow-x-auto px-2 md:px-4" style="-webkit-overflow-scrolling: touch;">
+        <!-- The Grid itself -->
         <div id="element-grid" class="periodic-grid">
             <!-- Elements injected by JS -->
         </div>
@@ -189,7 +185,7 @@
 
     <!-- Compact Legend -->
     <div
-        class="max-w-6xl mx-auto mt-2 flex flex-wrap justify-center gap-2 md:gap-3 text-[10px] font-medium text-slate-500 relative z-10 pb-4 flex-shrink-0 px-2">
+        class="max-w-6xl mx-auto mt-4 flex flex-wrap justify-center gap-2 md:gap-3 text-[10px] font-medium text-slate-500 pb-8 px-2">
         <div class="flex items-center gap-1">
             <div class="w-2 h-2 alkali-metal rounded"></div> Alkali
         </div>
@@ -250,10 +246,10 @@
                 <div class="mb-4 text-left bg-slate-50 p-3 rounded-lg border border-slate-100">
                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Common Usage</div>
                     <div id="common-usage" class="text-slate-700 text-sm font-medium leading-relaxed"></div>
-                    <!-- Increased size and added rel="noopener" for mobile link reliability -->
+                    <!-- Removed arrow from link -->
                     <a id="wiki-link" href="#" target="_blank" rel="noopener noreferrer"
                         class="inline-block mt-3 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 text-sm font-bold rounded-full transition-colors">
-                        Read on Wikipedia &rarr;
+                        Read on Wikipedia
                     </a>
                 </div>
 
