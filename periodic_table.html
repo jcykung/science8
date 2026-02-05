@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive Periodic Table</title>
+    <title>Science 8: Interactive Periodic Table</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         :root {
@@ -17,24 +17,21 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            overflow-x: hidden;
-            /* Prevents page-level horizontal scrolling */
+            overflow: hidden;
+            /* Prevent body scroll, handle in containers */
             height: 100vh;
-            /* Target full viewport height */
             display: flex;
             flex-direction: column;
         }
 
         .periodic-grid {
             display: grid;
-            /* Reduced column width to make table more compact */
             grid-template-columns: repeat(18, minmax(38px, 1fr));
             gap: 2px;
-            /* Tighter gap */
-            min-width: 700px;
-            /* Ensure table doesn't squish too much, forces scroll on mobile */
-            max-width: 1300px;
+            /* Min-width ensures the grid maintains shape and triggers scroll on wrapper */
+            min-width: 800px;
             margin: 0 auto;
+            padding-bottom: 20px;
         }
 
         .element-card {
@@ -53,7 +50,6 @@
             overflow: hidden;
         }
 
-        /* Hover effects only on devices that support hover (prevents sticky hover states on mobile) */
         @media (hover: hover) {
             .element-card:hover {
                 transform: scale(1.5);
@@ -66,7 +62,6 @@
 
         .element-card.gadget-highlight {
             border: 2px solid #ef4444;
-            /* Slightly thinner border for compact look */
             box-shadow: 0 0 3px rgba(239, 68, 68, 0.4);
         }
 
@@ -129,25 +124,25 @@
             backdrop-filter: blur(4px);
         }
 
-        /* Custom scrollbar for table container to hint at scrolling */
-        #table-container::-webkit-scrollbar {
-            height: 6px;
+        /* Scrollbar Styling */
+        .scroll-container::-webkit-scrollbar {
+            height: 8px;
         }
 
-        #table-container::-webkit-scrollbar-track {
-            background: transparent;
+        .scroll-container::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.05);
         }
 
-        #table-container::-webkit-scrollbar-thumb {
+        .scroll-container::-webkit-scrollbar-thumb {
             background-color: rgba(148, 163, 184, 0.5);
-            border-radius: 20px;
+            border-radius: 10px;
         }
     </style>
 </head>
 
-<body class="p-2 overflow-y-auto">
+<body class="p-2">
 
-    <!-- Header Section (Compact, No Background Box) -->
+    <!-- Header Section -->
     <header class="w-full max-w-4xl mx-auto mb-2 mt-2 text-center z-20 flex-shrink-0 px-4">
         <div class="inline-block w-full max-w-[600px]">
             <h1 class="text-xl md:text-2xl font-bold text-slate-800 leading-tight mb-1">Interactive Periodic Table</h1>
@@ -183,11 +178,13 @@
         </div>
     </header>
 
-    <!-- Table Container -->
-    <!-- Changed to overflow-x-auto for mobile scrolling. Added -webkit-overflow-scrolling for smooth iOS scroll. -->
-    <div id="table-container" class="periodic-grid overflow-x-auto px-4 w-full flex-grow"
+    <!-- Scroll Wrapper -->
+    <div class="scroll-container w-full flex-grow overflow-x-auto overflow-y-hidden px-2 md:px-4"
         style="-webkit-overflow-scrolling: touch;">
-        <!-- Elements injected by JS -->
+        <!-- The Grid itself (min-width forces scroll on small screens) -->
+        <div id="element-grid" class="periodic-grid">
+            <!-- Elements injected by JS -->
+        </div>
     </div>
 
     <!-- Compact Legend -->
@@ -222,19 +219,18 @@
         </div>
     </div>
 
-    <!-- Vertical Layout Modal (Responsive) -->
+    <!-- Modal -->
     <div id="modal" class="hidden fixed inset-0 modal-overlay flex items-center justify-center p-4 z-[100]">
-        <!-- Added max-h and overflow-y-auto for landscape phones -->
-        <div class="bg-white rounded-2xl shadow-2xl w-[90%] max-w-md p-4 md:p-6 relative max-h-[90vh] overflow-y-auto">
+        <div class="bg-white rounded-2xl shadow-2xl w-[95%] max-w-md p-5 relative max-h-[90vh] overflow-y-auto">
             <button onclick="closeModal()"
-                class="absolute top-4 right-4 text-slate-300 hover:text-slate-600 transition-colors z-10 p-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-7 w-7" fill="none" viewBox="0 0 24 24"
+                class="absolute top-3 right-3 text-slate-400 hover:text-slate-600 transition-colors z-10 p-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-8 w-8" fill="none" viewBox="0 0 24 24"
                     stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                 </svg>
             </button>
 
-            <div id="modal-content" class="text-center">
+            <div id="modal-content" class="text-center pt-2">
                 <!-- Header -->
                 <div class="flex flex-col items-center mb-3">
                     <div id="modal-symbol" class="text-6xl font-black text-slate-800 leading-none mb-1"></div>
@@ -254,13 +250,14 @@
                 <div class="mb-4 text-left bg-slate-50 p-3 rounded-lg border border-slate-100">
                     <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Common Usage</div>
                     <div id="common-usage" class="text-slate-700 text-sm font-medium leading-relaxed"></div>
-                    <a id="wiki-link" href="#" target="_blank"
-                        class="block mt-2 text-blue-500 hover:text-blue-700 text-xs font-semibold hover:underline">
-                        View on Wikipedia &rarr;
+                    <!-- Increased size and added rel="noopener" for mobile link reliability -->
+                    <a id="wiki-link" href="#" target="_blank" rel="noopener noreferrer"
+                        class="inline-block mt-3 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 text-sm font-bold rounded-full transition-colors">
+                        Read on Wikipedia &rarr;
                     </a>
                 </div>
 
-                <!-- Bohr Model Canvas (Transparent Background) -->
+                <!-- Bohr Model Canvas -->
                 <div class="mx-auto mb-4 relative w-48 h-48 flex items-center justify-center">
                     <canvas id="bohr-canvas" width="192" height="192" class="rounded-full"></canvas>
                 </div>
@@ -291,7 +288,6 @@
     </div>
 
     <script>
-        // Expanded Gadgets List
         const gadgets = {
             3: "Lithium: Rechargeable batteries for phones, tablets, and RC cars.",
             5: "Boron: Neodymium Super Magnets (NdFeB) in motors/speakers.",
@@ -373,7 +369,8 @@
             try {
                 const response = await fetch('https://raw.githubusercontent.com/Bowserinator/Periodic-Table-JSON/master/PeriodicTableJSON.json');
                 const data = await response.json();
-                const container = document.getElementById('table-container');
+                // Target the new wrapper's inner grid
+                const container = document.getElementById('element-grid');
 
                 data.elements.forEach(el => {
                     const div = document.createElement('div');
@@ -385,23 +382,20 @@
                     div.style.gridRow = el.ypos;
                     div.setAttribute('data-number', el.number);
 
-                    // Adjusted font sizes for compact view
                     div.innerHTML = `
                         <span class="text-[0.55rem] font-bold text-slate-500 w-full px-0.5">${el.number}</span>
                         <span class="font-bold text-base leading-none -mt-0.5">${el.symbol}</span>
                         <span class="text-[0.45rem] text-slate-600 truncate px-0.5 pb-0.5">${el.atomic_mass.toFixed(2)}</span>
                     `;
 
-                    // CLICK LOGIC: Check search state before showing
                     div.onclick = (e) => {
-                        e.stopPropagation(); // Stop click from hitting background listener
+                        e.stopPropagation();
 
                         const searchInput = document.getElementById('search-input');
-                        // If search is active AND this card is NOT a match
                         if (searchInput.value.trim().length > 0 && !div.classList.contains('search-match')) {
-                            resetSearch(); // Just reset, don't open modal
+                            resetSearch();
                         } else {
-                            showElement(el); // Proceed normally
+                            showElement(el);
                         }
                     };
 
@@ -412,7 +406,6 @@
             }
         }
 
-        // --- Improved Search Logic ---
         function getSearchVariations(term) {
             const variations = [term];
             if (term.endsWith('y')) variations.push(term.slice(0, -1) + 'ies');
@@ -429,7 +422,6 @@
             const rawTerm = searchInput.value.toLowerCase().trim();
             const cards = document.querySelectorAll('.element-card');
 
-            // Show/Hide Clear Button
             if (rawTerm.length > 0) {
                 clearButton.classList.remove('hidden');
             } else {
@@ -447,7 +439,6 @@
                 return searchTerms.some(term => lowerText.includes(term));
             };
 
-            // Search Data Sources
             Object.keys(gadgets).forEach(num => {
                 if (hasMatch(gadgets[num])) matchedNumbers.add(parseInt(num));
             });
@@ -456,7 +447,6 @@
                 if (hasMatch(commonUsages[num])) matchedNumbers.add(parseInt(num));
             });
 
-            // Apply styles
             cards.forEach(card => {
                 const num = parseInt(card.getAttribute('data-number'));
                 if (matchedNumbers.has(num)) {
@@ -474,12 +464,8 @@
             performSearch();
         }
 
-        // Background Click Listener to Clear Search
         document.addEventListener('click', (e) => {
-            // If clicking inside search input/header or inside the modal, do nothing
             if (e.target.closest('header') || e.target.closest('#modal')) return;
-
-            // If search is active, clear it
             if (searchInput.value.trim().length > 0) {
                 resetSearch();
             }
@@ -487,7 +473,6 @@
 
         searchInput.addEventListener('input', performSearch);
 
-        // Clear Button Logic
         clearButton.addEventListener('click', () => {
             resetSearch();
             searchInput.focus();
@@ -530,7 +515,6 @@
 
         window.onclick = (e) => { if (e.target.id === 'modal') closeModal(); };
 
-        // --- Original Bohr Model (Text Nucleus) ---
         function startBohrAnimation(element) {
             const canvas = document.getElementById('bohr-canvas');
             const ctx = canvas.getContext('2d');
@@ -539,21 +523,16 @@
 
             let shells = element.shells || calculateShells(element.number);
 
-            // Layout Calculation
             const nucleusRadius = 14;
             const maxRadius = (Math.min(canvas.width, canvas.height) / 2) - 8;
             const shellStartRadius = nucleusRadius + 15;
 
-            // Spacing logic: Distribute remaining space evenly for each shell
-            // Using (shellIndex + 1) ensures the shells spread outwards to fill the canvas
-            // rather than starting bunching near the nucleus.
             const availableSpace = maxRadius - shellStartRadius;
             const spacing = availableSpace / shells.length;
 
             function animate(time) {
                 ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-                // Draw Nucleus (Black Circle with Text)
                 ctx.beginPath();
                 ctx.arc(centerX, centerY, nucleusRadius, 0, 2 * Math.PI);
                 ctx.fillStyle = '#1e293b';
@@ -564,20 +543,15 @@
                 ctx.textBaseline = 'middle';
                 ctx.fillText(element.symbol, centerX, centerY);
 
-                // Draw Shells & Electrons
                 shells.forEach((electronCount, shellIndex) => {
-                    // Calculate radius to maximize space
-                    // shellIndex starts at 0. We add 1 so the first shell isn't at startRadius but spaced out.
                     const radius = shellStartRadius + (spacing * (shellIndex + 0.5));
 
-                    // Shell Ring
                     ctx.beginPath();
                     ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
                     ctx.strokeStyle = '#cbd5e1';
                     ctx.lineWidth = 1;
                     ctx.stroke();
 
-                    // Electrons
                     const angularSpeed = (time * (0.002 - (shellIndex * 0.0002)));
 
                     for (let i = 0; i < electronCount; i++) {
