@@ -17,7 +17,6 @@
             background-color: var(--bg-color);
             color: var(--text-main);
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            /* Removed fixed height and overflow:hidden to allow natural scrolling */
             min-height: 100vh;
             margin: 0;
         }
@@ -27,15 +26,12 @@
             grid-template-columns: repeat(18, minmax(38px, 1fr));
             gap: 2px;
             min-width: 800px;
-            /* Added max-width to prevent cards from becoming huge on desktop */
             max-width: 1100px;
             margin: 0 auto;
-            /* Added padding-top to prevent top row hover clipping */
             padding: 40px 0 20px 0;
         }
 
         .element-card {
-            /* Slightly reduced aspect ratio height to save vertical space */
             aspect-ratio: 1 / 1.1;
             display: flex;
             flex-direction: column;
@@ -72,6 +68,13 @@
             transform: scale(1.1);
             z-index: 40;
             box-shadow: 0 0 10px rgba(234, 179, 8, 0.6);
+        }
+
+        .element-card.group-highlight {
+            transform: scale(1.05);
+            z-index: 30;
+            box-shadow: 0 0 8px rgba(59, 130, 246, 0.5);
+            border-color: #3b82f6;
         }
 
         .element-card.dimmed {
@@ -123,6 +126,18 @@
         .modal-overlay {
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(4px);
+        }
+
+        .legend-item {
+            cursor: pointer;
+            transition: transform 0.1s;
+            padding: 4px 8px;
+            border-radius: 4px;
+        }
+
+        .legend-item:hover {
+            background-color: #e2e8f0;
+            transform: scale(1.05);
         }
 
         /* Scrollbar Styling */
@@ -187,34 +202,35 @@
         </div>
     </div>
 
-    <!-- Compact Legend -->
+    <!-- Compact Legend with Click Events -->
     <div
-        class="max-w-6xl mx-auto mt-4 flex flex-wrap justify-center gap-2 md:gap-3 text-[10px] font-medium text-slate-500 pb-8 px-2">
-        <div class="flex items-center gap-1">
+        class="max-w-6xl mx-auto mt-4 flex flex-wrap justify-center gap-1 md:gap-2 text-[10px] font-medium text-slate-500 pb-8 px-2">
+        <div class="legend-item flex items-center gap-1" onclick="showGroup('alkali-metal', 'Alkali Metals')">
             <div class="w-2 h-2 alkali-metal rounded"></div> Alkali
         </div>
-        <div class="flex items-center gap-1">
+        <div class="legend-item flex items-center gap-1" onclick="showGroup('alkaline-earth-metal', 'Alkaline Earth')">
             <div class="w-2 h-2 alkaline-earth-metal rounded"></div> Alk. Earth
         </div>
-        <div class="flex items-center gap-1">
+        <div class="legend-item flex items-center gap-1" onclick="showGroup('transition-metal', 'Transition Metals')">
             <div class="w-2 h-2 transition-metal rounded"></div> Transition
         </div>
-        <div class="flex items-center gap-1">
+        <div class="legend-item flex items-center gap-1"
+            onclick="showGroup('post-transition-metal', 'Post-Transition')">
             <div class="w-2 h-2 post-transition-metal rounded"></div> Post-Trans.
         </div>
-        <div class="flex items-center gap-1">
+        <div class="legend-item flex items-center gap-1" onclick="showGroup('metalloid', 'Metalloids')">
             <div class="w-2 h-2 metalloid rounded"></div> Metalloids
         </div>
-        <div class="flex items-center gap-1">
+        <div class="legend-item flex items-center gap-1" onclick="showGroup('diatomic-nonmetal', 'Non-metals')">
             <div class="w-2 h-2 diatomic-nonmetal rounded"></div> Non-metals
         </div>
-        <div class="flex items-center gap-1">
+        <div class="legend-item flex items-center gap-1" onclick="showGroup('noble-gas', 'Noble Gases')">
             <div class="w-2 h-2 noble-gas rounded"></div> Noble Gases
         </div>
-        <div class="flex items-center gap-1">
+        <div class="legend-item flex items-center gap-1" onclick="showGroup('lanthanide', 'Lanthanides')">
             <div class="w-2 h-2 lanthanide rounded"></div> Lanthanides
         </div>
-        <div class="flex items-center gap-1">
+        <div class="legend-item flex items-center gap-1" onclick="showGroup('actinide', 'Actinides')">
             <div class="w-2 h-2 actinide rounded"></div> Actinides
         </div>
     </div>
@@ -231,58 +247,74 @@
             </button>
 
             <div id="modal-content" class="text-center pt-2">
-                <!-- Header -->
-                <div class="flex flex-col items-center mb-3">
-                    <div id="modal-symbol" class="text-6xl font-black text-slate-800 leading-none mb-1"></div>
-                    <div id="modal-name" class="text-2xl font-bold text-slate-700 leading-tight"></div>
-                    <div id="modal-category" class="text-xs text-slate-400 uppercase tracking-widest mt-1"></div>
-                </div>
 
-                <!-- Gadget Note -->
-                <div id="gadget-note"
-                    class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-left leading-relaxed shadow-sm">
-                    <span class="font-bold uppercase text-[10px] block mb-1 text-red-800 tracking-wide">⚙️ Found in
-                        Gadgets:</span>
-                    <span id="gadget-text"></span>
-                </div>
-
-                <!-- Common Usage -->
-                <div class="mb-4 text-left bg-slate-50 p-3 rounded-lg border border-slate-100">
-                    <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Common Usage</div>
-                    <div id="common-usage" class="text-slate-700 text-sm font-medium leading-relaxed"></div>
-                    <!-- Removed arrow from link -->
-                    <a id="wiki-link" href="#" target="_blank" rel="noopener noreferrer"
-                        class="inline-block mt-3 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 text-sm font-bold rounded-full transition-colors">
-                        Read on Wikipedia
-                    </a>
-                </div>
-
-                <!-- Bohr Model Canvas -->
-                <div class="mx-auto mb-4 relative w-48 h-48 flex items-center justify-center">
-                    <canvas id="bohr-canvas" width="192" height="192" class="rounded-full"></canvas>
-                </div>
-
-                <!-- Stats Grid -->
-                <div class="grid grid-cols-3 gap-3 mb-3">
-                    <div class="bg-blue-50 p-2 rounded-lg border border-blue-100">
-                        <div class="text-blue-600 font-bold text-xl leading-none" id="protons"></div>
-                        <div class="text-[10px] uppercase font-bold text-blue-400 mt-1">Protons</div>
+                <!-- Element View Container -->
+                <div id="element-view">
+                    <!-- Header -->
+                    <div class="flex flex-col items-center mb-3">
+                        <div id="modal-symbol" class="text-6xl font-black text-slate-800 leading-none mb-1"></div>
+                        <div id="modal-name" class="text-2xl font-bold text-slate-700 leading-tight"></div>
+                        <div id="modal-category" class="text-xs text-slate-400 uppercase tracking-widest mt-1"></div>
                     </div>
-                    <div class="bg-purple-50 p-2 rounded-lg border border-purple-100">
-                        <div class="text-purple-600 font-bold text-xl leading-none" id="electrons"></div>
-                        <div class="text-[10px] uppercase font-bold text-purple-400 mt-1">Electrons</div>
+
+                    <!-- Gadget Note -->
+                    <div id="gadget-note"
+                        class="hidden mb-4 p-3 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm text-left leading-relaxed shadow-sm">
+                        <span class="font-bold uppercase text-[10px] block mb-1 text-red-800 tracking-wide">⚙️ Found in
+                            Gadgets:</span>
+                        <span id="gadget-text"></span>
                     </div>
-                    <div class="bg-orange-50 p-2 rounded-lg border border-orange-100">
-                        <div class="text-orange-600 font-bold text-xl leading-none" id="neutrons"></div>
-                        <div class="text-[10px] uppercase font-bold text-orange-400 mt-1">Neutrons</div>
+
+                    <!-- Common Usage -->
+                    <div class="mb-4 text-left bg-slate-50 p-3 rounded-lg border border-slate-100">
+                        <div class="text-[10px] font-bold text-slate-400 uppercase tracking-wide mb-1">Common Usage
+                        </div>
+                        <div id="common-usage" class="text-slate-700 text-sm font-medium leading-relaxed"></div>
+                        <a id="wiki-link" href="#" target="_blank" rel="noopener noreferrer"
+                            class="inline-block mt-3 px-4 py-2 bg-blue-50 text-blue-600 hover:bg-blue-100 hover:text-blue-800 text-sm font-bold rounded-full transition-colors">
+                            Read on Wikipedia
+                        </a>
+                    </div>
+
+                    <!-- Bohr Model Canvas -->
+                    <div class="mx-auto mb-4 relative w-48 h-48 flex items-center justify-center">
+                        <canvas id="bohr-canvas" width="192" height="192" class="rounded-full"></canvas>
+                    </div>
+
+                    <!-- Stats Grid -->
+                    <div class="grid grid-cols-3 gap-3 mb-3">
+                        <div class="bg-blue-50 p-2 rounded-lg border border-blue-100">
+                            <div class="text-blue-600 font-bold text-xl leading-none" id="protons"></div>
+                            <div class="text-[10px] uppercase font-bold text-blue-400 mt-1">Protons</div>
+                        </div>
+                        <div class="bg-purple-50 p-2 rounded-lg border border-purple-100">
+                            <div class="text-purple-600 font-bold text-xl leading-none" id="electrons"></div>
+                            <div class="text-[10px] uppercase font-bold text-purple-400 mt-1">Electrons</div>
+                        </div>
+                        <div class="bg-orange-50 p-2 rounded-lg border border-orange-100">
+                            <div class="text-orange-600 font-bold text-xl leading-none" id="neutrons"></div>
+                            <div class="text-[10px] uppercase font-bold text-orange-400 mt-1">Neutrons</div>
+                        </div>
+                    </div>
+
+                    <!-- Footer Stats -->
+                    <div class="flex justify-between text-xs text-slate-500 border-t border-slate-100 pt-3 px-1">
+                        <span>Atomic No: <b id="detail-num" class="text-slate-700"></b></span>
+                        <span>Mass: <b id="detail-mass" class="text-slate-700"></b></span>
                     </div>
                 </div>
 
-                <!-- Footer Stats -->
-                <div class="flex justify-between text-xs text-slate-500 border-t border-slate-100 pt-3 px-1">
-                    <span>Atomic No: <b id="detail-num" class="text-slate-700"></b></span>
-                    <span>Mass: <b id="detail-mass" class="text-slate-700"></b></span>
+                <!-- Group View Container (Hidden by default) -->
+                <div id="group-view" class="hidden text-left">
+                    <h2 id="group-title" class="text-3xl font-bold text-slate-800 mb-4 text-center"></h2>
+                    <div class="bg-slate-50 p-5 rounded-xl border border-slate-100 shadow-inner">
+                        <p id="group-desc" class="text-slate-700 text-lg leading-relaxed"></p>
+                    </div>
+                    <div class="mt-6 text-center text-sm text-slate-400 italic">
+                        Click on specific elements in this group to see more details.
+                    </div>
                 </div>
+
             </div>
         </div>
     </div>
@@ -328,39 +360,52 @@
         };
 
         const commonUsages = {
-            1: "Rocket fuel, Stars", 2: "Balloons", 3: "Batteries", 4: "Aerospace, Gems",
-            5: "Soap, Glass", 6: "Life, Diamonds", 7: "Atmosphere",
-            8: "Breathing", 9: "Toothpaste", 10: "Signs",
-            11: "Salt", 12: "Flares, Alloys", 13: "Cans, Planes",
-            14: "Chips, Glass", 15: "Matches", 16: "Tires",
-            17: "Pools", 18: "Bulbs", 19: "Bananas",
-            20: "Bones", 21: "Bikes", 22: "Aerospace",
-            23: "Tools", 24: "Stainless Steel", 25: "Batteries",
-            26: "Steel, Magnets", 27: "Magnets, Blue Glass", 28: "Coins",
-            29: "Wires", 30: "Brass", 31: "LEDs",
-            32: "Fiber Optics", 33: "LEDs", 34: "Copiers",
-            35: "Film", 36: "Flashlights", 37: "GPS",
-            38: "Fireworks", 39: "Lasers", 40: "Fake Diamonds",
-            41: "MRI", 42: "Tools", 43: "Medical Imaging",
-            44: "Pens", 45: "Headlights", 46: "Pollution Control",
-            47: "Jewelry", 48: "Batteries", 49: "Touchscreens",
-            50: "Solder, Cans", 51: "Car Batteries", 52: "Solar",
-            53: "Disinfectant", 54: "Lights", 55: "Atomic Clocks",
-            56: "X-rays", 57: "Lenses", 58: "Lighters",
-            59: "Magnets", 60: "Magnets", 61: "Paint",
-            62: "Magnets", 63: "TV Red", 64: "MRI",
-            65: "TV Green", 66: "EV Magnets", 67: "Lasers",
-            68: "Fiber Optics", 69: "X-rays", 70: "Lasers",
-            71: "Cancer Therapy", 72: "Nuclear Rods", 73: "Capacitors",
-            74: "Filaments", 75: "Jet Engines", 76: "Pen Tips",
-            77: "Spark Plugs", 78: "Jewelry", 79: "Jewelry",
-            80: "Thermometers", 81: "Poison", 82: "Weights",
-            83: "Medicine", 84: "Brushes", 85: "Medicine",
-            86: "Medicine", 87: "Research", 88: "Old Paint",
-            89: "Medicine", 90: "Lanterns", 91: "Research",
-            92: "Nuclear Power", 93: "Detectors", 94: "Fuel",
-            95: "Smoke Detectors", 96: "Rovers", 97: "Research",
-            98: "Detectors", 99: "Research"
+            1: "Rocket fuel, stars, water, ammonia production.", 2: "Balloons, cooling MRI machines, deep-sea diving tanks.", 3: "Rechargeable batteries, mood stabilizing medication.", 4: "Aerospace components, x-ray windows, emeralds.",
+            5: "Borax soap, heat-resistant glass (Pyrex), plant nutrients.", 6: "Basis of life (DNA), diamonds, graphite pencils, plastics.", 7: "78% of atmosphere, fertilizers, explosives, nylon.",
+            8: "Respiration, combustion, steel making, water treatment.", 9: "Toothpaste (fluoride), Teflon (non-stick pans), etching glass.", 10: "Orange-red neon signs, high-voltage indicators, lasers.",
+            11: "Table salt (NaCl), street lights, nerve function.", 12: "Flares, fireworks, lightweight alloys for cars.", 13: "Soda cans, airplanes, high-voltage power lines.",
+            14: "Computer chips, solar cells, glass, silicone.", 15: "Matches, fertilizers, detergents, LEDs.", 16: "Car tires (vulcanization), sulfuric acid, gunpowder.",
+            17: "Pool disinfectants, PVC pipes, bleach.", 18: "Incandescent light bulbs, thermal insulation windows.", 19: "Bananas (nutrition), soap, fertilizers.",
+            20: "Bones, teeth, cement, plaster, chalk.", 21: "Bicycle frames, aerospace alloys, stadium lights.", 22: "Aerospace, joint replacements, white paint pigment.",
+            23: "High-speed steel tools, springs, jet engines.", 24: "Stainless steel, chrome plating, dyes/pigments.", 25: "Batteries, steel production, drink cans.",
+            26: "Steel structures, magnets, blood (hemoglobin).", 27: "Strong magnets, blue glass/ceramics, rechargeable batteries.", 28: "Coins, stainless steel, rechargeable batteries.",
+            29: "Electrical wires, plumbing pipes, coins, motors.", 30: "Galvanized steel (rust protection), brass, sunscreen.", 31: "Blue LEDs, semiconductors, high-speed chargers.",
+            32: "Fiber optics, night-vision lenses, transistors.", 33: "LEDs, semiconductors, wood preservatives.", 34: "Photocopiers, red glass, solar cells.",
+            35: "Flame retardants, photographic film, hot tub sanitizer.", 36: "High-speed photography flash, fluorescent bulbs.", 37: "GPS Atomic clocks, vacuum tubes.",
+            38: "Red fireworks, flares, glow-in-the-dark paint.", 39: "Red LEDs, camera lenses, superconductors.", 40: "Fake diamonds (Cubic Zirconia), nuclear piping.",
+            41: "MRI magnets, welding rods, jet engines.", 42: "Cutting tools, lubricants, missile parts.", 43: "Medical imaging (Tracers), radioactive diagnostics.",
+            44: "Electrical contacts, wear-resistant fountain pen tips.", 45: "Searchlight reflectors, jewelry plating.", 46: "Car pollution control (Catalytic converters).",
+            47: "Jewelry, silverware, best electrical conductor.", 48: "Rechargeable batteries (NiCd), yellow paint pigments.", 49: "Transparent conductors for touchscreens.",
+            50: "Solder for electronics, food cans, bronze.", 51: "Car batteries, flame retardants, bullets.", 52: "Solar panels, thermo-electric coolers.",
+            53: "Disinfectants, thyroid health, photography.", 54: "High-intensity cinema lights, ion engines.", 55: "Most accurate atomic clocks, GPS satellites.",
+            56: "Medical imaging (Barium swallows), green fireworks.", 57: "Camera lenses, hybrid car batteries.", 58: "Lighter flints, glass polishing.",
+            59: "Safety goggles, yellow glass.", 60: "Strongest permanent magnets (headphones, motors).", 61: "Luminous paint dials, nuclear batteries.",
+            62: "Magnets, cancer treatment drugs.", 63: "Red phosphors in TV screens and monitors.", 64: "MRI contrast agents, data storage.",
+            65: "Green phosphors in TV screens and monitors.", 66: "Lasers, heat-resistant magnets for EVs.", 67: "Laser surgery, nuclear control rods.",
+            68: "Fiber optic signal amplifiers, pink glass.", 69: "Portable X-ray machines.", 70: "Fiber lasers, stress gauges.",
+            71: "PET scan detectors, high-refractive lenses.", 72: "Nuclear control rods, plasma cutting tips.", 73: "Capacitors in mobile phones and game consoles.",
+            74: "Light bulb filaments, tungsten carbide tools.", 75: "Jet engine blades, fountain pen points.", 76: "Fountain pen tips, electrical contacts.",
+            77: "Spark plugs, crucible containers.", 78: "Jewelry, catalytic converters, chemotherapy.", 79: "Jewelry, non-corroding electronics connectors.",
+            80: "Thermometers, barometers, fluorescent lamps.", 81: " Infrared detectors, low-melting glass.", 82: "Car batteries, radiation shielding weights.",
+            83: "Pepto-Bismol, fire sprinklers, cosmetics.", 84: "Anti-static brushes for film.", 85: "Radioactive cancer treatment.",
+            86: "Radioactive gas (health hazard), cancer treatment.", 87: "Highly radioactive, scientific research only.", 88: "Glow-in-the-dark paint (historical), cancer treatment.",
+            89: "Radioactive heat source, cancer treatment.", 90: "Camping lantern mantles, welding electrodes.", 91: "Scientific research.",
+            92: "Nuclear power fuel, colorful glass (historical).", 93: "Neutron detectors.", 94: "Spacecraft fuel (RTGs), nuclear weapons.",
+            95: "Household smoke detectors.", 96: "Mars rover analysis instruments.", 97: "Scientific research.",
+            98: "Portable metal detectors, oil well logging.", 99: "Scientific research (created in labs)."
+        };
+
+        const groupDescriptions = {
+            "alkali-metal": "Very soft metals that are extremely reactive, especially with water (they explode!). They are never found pure in nature.",
+            "alkaline-earth-metal": "Reactive, silvery-white metals. They burn with bright colorful flames, making them essential for fireworks.",
+            "transition-metal": "Hard, durable metals with high melting points. They conduct electricity well and include famous metals like Gold, Iron, and Copper.",
+            "post-transition-metal": "Softer and brittle metals with lower melting points than transition metals. Includes Aluminum, Tin, and Lead.",
+            "metalloid": "The 'in-between' elements. They look like metals but are brittle. They are semiconductors, making them critical for computer chips.",
+            "diatomic-nonmetal": "Elements that don't conduct electricity or heat well. Many are gases essential for life, like Oxygen and Nitrogen.",
+            "polyatomic-nonmetal": "Solid non-metals that form complex structures. Includes Carbon (diamonds/life) and Sulfur.",
+            "noble-gas": "Colorless, odorless gases that rarely react with anything. They glow brightly when electricity passes through them (Neon signs).",
+            "lanthanide": "The 'Rare Earth' metals. They are silvery-white and crucial for modern tech like smartphones, lasers, and strong magnets.",
+            "actinide": "Heavy, unstable, and radioactive metals. Uranium and Plutonium are used for nuclear energy."
         };
 
         let animationFrameId;
@@ -380,6 +425,7 @@
                     div.style.gridColumn = el.xpos;
                     div.style.gridRow = el.ypos;
                     div.setAttribute('data-number', el.number);
+                    div.setAttribute('data-category', categoryClass); // Helper for group highlighting
 
                     div.innerHTML = `
                         <span class="text-[0.55rem] font-bold text-slate-500 w-full px-0.5">${el.number}</span>
@@ -391,8 +437,12 @@
                         e.stopPropagation();
 
                         const searchInput = document.getElementById('search-input');
-                        if (searchInput.value.trim().length > 0 && !div.classList.contains('search-match')) {
-                            resetSearch();
+                        // Check if search is active or group highlight is active
+                        const isSearchActive = searchInput.value.trim().length > 0;
+                        const isGroupActive = document.querySelectorAll('.element-card.dimmed').length > 0;
+
+                        if ((isSearchActive || isGroupActive) && div.classList.contains('dimmed')) {
+                            resetView();
                         } else {
                             showElement(el);
                         }
@@ -402,6 +452,37 @@
                 });
             } catch (err) {
                 console.error("Failed to load table data:", err);
+            }
+        }
+
+        // --- Group Highlight Logic ---
+        function showGroup(categoryClass, groupName) {
+            resetView(); // Clear previous states
+
+            const cards = document.querySelectorAll('.element-card');
+            let hasMatch = false;
+
+            cards.forEach(card => {
+                if (card.getAttribute('data-category').includes(categoryClass)) {
+                    card.classList.add('group-highlight');
+                    card.classList.remove('dimmed');
+                    hasMatch = true;
+                } else {
+                    card.classList.add('dimmed');
+                    card.classList.remove('group-highlight');
+                }
+            });
+
+            if (hasMatch) {
+                // Open Modal in Group Mode
+                const modal = document.getElementById('modal');
+                document.getElementById('element-view').classList.add('hidden');
+                document.getElementById('group-view').classList.remove('hidden');
+
+                document.getElementById('group-title').textContent = groupName;
+                document.getElementById('group-desc').textContent = groupDescriptions[categoryClass] || "A group of elements with similar properties.";
+
+                modal.classList.remove('hidden');
             }
         }
 
@@ -420,6 +501,9 @@
         function performSearch() {
             const rawTerm = searchInput.value.toLowerCase().trim();
             const cards = document.querySelectorAll('.element-card');
+
+            // Reset group highlights when searching
+            cards.forEach(card => card.classList.remove('group-highlight'));
 
             if (rawTerm.length > 0) {
                 clearButton.classList.remove('hidden');
@@ -458,28 +542,40 @@
             });
         }
 
-        function resetSearch() {
+        function resetView() {
             searchInput.value = '';
-            performSearch();
+            clearButton.classList.add('hidden');
+
+            const cards = document.querySelectorAll('.element-card');
+            cards.forEach(card => {
+                card.classList.remove('search-match', 'dimmed', 'group-highlight');
+            });
         }
 
         document.addEventListener('click', (e) => {
-            if (e.target.closest('header') || e.target.closest('#modal')) return;
-            if (searchInput.value.trim().length > 0) {
-                resetSearch();
+            if (e.target.closest('header') || e.target.closest('#modal') || e.target.closest('.legend-item')) return;
+
+            // If highlighted state exists, clear it
+            const hasHighlights = document.querySelector('.dimmed');
+            if (hasHighlights) {
+                resetView();
             }
         });
 
         searchInput.addEventListener('input', performSearch);
 
         clearButton.addEventListener('click', () => {
-            resetSearch();
+            resetView();
             searchInput.focus();
         });
 
         function showElement(el) {
             const gadgetNote = gadgets[el.number];
-            const usage = commonUsages[el.number] || "Research";
+            const usage = commonUsages[el.number] || "Scientific research and industrial applications.";
+
+            // Toggle Views
+            document.getElementById('element-view').classList.remove('hidden');
+            document.getElementById('group-view').classList.add('hidden');
 
             document.getElementById('modal-symbol').textContent = el.symbol;
             document.getElementById('modal-name').textContent = el.name;
