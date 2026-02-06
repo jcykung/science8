@@ -28,8 +28,8 @@
             min-width: 800px;
             max-width: 1100px;
             margin: 0 auto;
-            /* Increased bottom padding to 80px to prevent hover jitter at the bottom */
-            padding: 40px 0 80px 0;
+            /* Reduced bottom padding to 20px as requested */
+            padding: 40px 0 20px 0;
         }
 
         .element-card {
@@ -234,7 +234,7 @@
         <div class="legend-item flex items-center gap-1.5" onclick="showGroup('metals', 'Metals')">
             <div class="w-3 h-3 metal-generic rounded border border-slate-300"></div> Metals
         </div>
-        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('nonmetal', 'Non-metals')">
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('nonmetal', 'Non-Metals')">
             <div class="w-3 h-3 base-nonmetal rounded border border-slate-300"></div> Non-Metals
         </div>
         <div class="legend-item flex items-center gap-1.5" onclick="showGroup('metalloid', 'Metalloids')">
@@ -245,16 +245,18 @@
         <div class="w-px bg-slate-300 mx-1"></div>
 
         <!-- Specific Groups -->
-        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('alkali-metal', 'Alkali')">
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('alkali-metal', 'Alkali Metals')">
             <div class="w-3 h-3 alkali-metal rounded border border-slate-300"></div> Alkali
         </div>
-        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('alkaline-earth-metal', 'Alk. Earth')">
+        <div class="legend-item flex items-center gap-1.5"
+            onclick="showGroup('alkaline-earth-metal', 'Alkaline Earth Metals')">
             <div class="w-3 h-3 alkaline-earth-metal rounded border border-slate-300"></div> Alk. Earth
         </div>
-        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('transition-metal', 'Transition')">
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('transition-metal', 'Transition Metals')">
             <div class="w-3 h-3 transition-metal rounded border border-slate-300"></div> Transition
         </div>
-        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('post-transition-metal', 'Post-Trans.')">
+        <div class="legend-item flex items-center gap-1.5"
+            onclick="showGroup('post-transition-metal', 'Post-Transition Metals')">
             <div class="w-3 h-3 post-transition-metal rounded border border-slate-300"></div> Post-Trans.
         </div>
         <div class="legend-item flex items-center gap-1.5" onclick="showGroup('halogens', 'Halogens')">
