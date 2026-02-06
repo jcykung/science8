@@ -9,7 +9,6 @@
     <style>
         :root {
             --bg-color: #f8fafc;
-            /* Reverted to original lighter background */
             --card-bg: #ffffff;
             --text-main: #1e293b;
         }
@@ -29,7 +28,8 @@
             min-width: 800px;
             max-width: 1100px;
             margin: 0 auto;
-            padding: 40px 0 20px 0;
+            /* Increased bottom padding to 60px to prevent hover jitter/overlap at the bottom */
+            padding: 40px 0 60px 0;
         }
 
         .element-card {
@@ -124,6 +124,15 @@
             background-color: #ffedfa;
         }
 
+        /* Generic Metal/Halogen colors for Legend Swatches only */
+        .metal-generic {
+            background-color: #e2e8f0;
+        }
+
+        .halogen-generic {
+            background-color: #ccfbf1;
+        }
+
         .modal-overlay {
             background: rgba(0, 0, 0, 0.6);
             backdrop-filter: blur(4px);
@@ -132,12 +141,15 @@
         .legend-item {
             cursor: pointer;
             transition: transform 0.1s;
-            padding: 4px 8px;
+            padding: 3px 6px;
+            /* Tighter padding */
             border-radius: 4px;
             background-color: white;
             box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
             border: 1px solid rgba(0, 0, 0, 0.05);
             white-space: nowrap;
+            font-size: 0.65rem;
+            /* Slightly smaller text to fit all */
         }
 
         .legend-item:hover {
@@ -201,35 +213,46 @@
     </header>
 
     <!-- Scroll Wrapper -->
-    <div class="scroll-container w-full overflow-x-auto px-2 md:px-4" style="-webkit-overflow-scrolling: touch;">
+    <!-- Added overflow-y-hidden to prevent vertical scrollbars on the table itself -->
+    <div class="scroll-container w-full overflow-x-auto overflow-y-hidden px-2 md:px-4"
+        style="-webkit-overflow-scrolling: touch;">
         <!-- The Grid itself -->
         <div id="element-grid" class="periodic-grid">
             <!-- Elements injected by JS -->
         </div>
     </div>
 
-    <!-- Improved Legend with Click Events -->
-    <div
-        class="max-w-[1200px] mx-auto mt-2 flex flex-wrap justify-center gap-1.5 text-[10px] font-semibold text-slate-700 pb-8 px-2">
-        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('alkali-metal', 'Alkali Metals')">
-            <div class="w-3 h-3 alkali-metal rounded border border-slate-300"></div> Alkali
+    <!-- Improved Legend with Click Events - Single Line Layout -->
+    <div class="max-w-[1200px] mx-auto mt-2 flex flex-nowrap justify-center gap-1 overflow-x-auto pb-8 px-2 w-full">
+        <!-- Broad Categories -->
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('metals', 'Metals')">
+            <div class="w-3 h-3 metal-generic rounded border border-slate-300"></div> Metals
         </div>
-        <div class="legend-item flex items-center gap-1.5"
-            onclick="showGroup('alkaline-earth-metal', 'Alkaline Earth')">
-            <div class="w-3 h-3 alkaline-earth-metal rounded border border-slate-300"></div> Alk. Earth
-        </div>
-        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('transition-metal', 'Transition Metals')">
-            <div class="w-3 h-3 transition-metal rounded border border-slate-300"></div> Transition
-        </div>
-        <div class="legend-item flex items-center gap-1.5"
-            onclick="showGroup('post-transition-metal', 'Post-Transition')">
-            <div class="w-3 h-3 post-transition-metal rounded border border-slate-300"></div> Post-Trans.
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('nonmetal', 'Non-metals')">
+            <div class="w-3 h-3 diatomic-nonmetal rounded border border-slate-300"></div> Non-Metals
         </div>
         <div class="legend-item flex items-center gap-1.5" onclick="showGroup('metalloid', 'Metalloids')">
             <div class="w-3 h-3 metalloid rounded border border-slate-300"></div> Metalloids
         </div>
-        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('diatomic-nonmetal', 'Non-metals')">
-            <div class="w-3 h-3 diatomic-nonmetal rounded border border-slate-300"></div> Non-metals
+
+        <!-- Divider -->
+        <div class="w-px bg-slate-300 mx-1"></div>
+
+        <!-- Specific Groups -->
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('alkali-metal', 'Alkali')">
+            <div class="w-3 h-3 alkali-metal rounded border border-slate-300"></div> Alkali
+        </div>
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('alkaline-earth-metal', 'Alk. Earth')">
+            <div class="w-3 h-3 alkaline-earth-metal rounded border border-slate-300"></div> Alk. Earth
+        </div>
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('transition-metal', 'Transition')">
+            <div class="w-3 h-3 transition-metal rounded border border-slate-300"></div> Transition
+        </div>
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('post-transition-metal', 'Post-Trans.')">
+            <div class="w-3 h-3 post-transition-metal rounded border border-slate-300"></div> Post-Trans.
+        </div>
+        <div class="legend-item flex items-center gap-1.5" onclick="showGroup('halogens', 'Halogens')">
+            <div class="w-3 h-3 halogen-generic rounded border border-slate-300"></div> Halogens
         </div>
         <div class="legend-item flex items-center gap-1.5" onclick="showGroup('noble-gas', 'Noble Gases')">
             <div class="w-3 h-3 noble-gas rounded border border-slate-300"></div> Noble Gases
@@ -403,17 +426,54 @@
         };
 
         const groupDescriptions = {
-            "alkali-metal": "Very soft metals that are extremely reactive, especially with water (they explode!). They are never found pure in nature.",
-            "alkaline-earth-metal": "Reactive, silvery-white metals. They burn with bright colorful flames, making them essential for fireworks.",
+            "metals": "Metals are typically shiny, conductive, and malleable. This broad group includes Alkali, Alkaline Earth, Transition, Post-Transition metals, Lanthanides, and Actinides.",
+            "nonmetal": "Non-metals are poor conductors of heat and electricity. This group includes gases (like Oxygen), solids (like Carbon), Halogens, and Noble Gases.",
+            "halogens": "Group 17. Highly reactive non-metals (Fluorine, Chlorine, Bromine, Iodine, Astatine). They love to react with Alkali metals to form salts.",
+            "alkali-metal": "Group 1. Very soft metals that are extremely reactive, especially with water. They are never found pure in nature.",
+            "alkaline-earth-metal": "Group 2. Reactive, silvery-white metals. They burn with bright colorful flames, making them essential for fireworks.",
             "transition-metal": "Hard, durable metals with high melting points. They conduct electricity well and include famous metals like Gold, Iron, and Copper.",
             "post-transition-metal": "Softer and brittle metals with lower melting points than transition metals. Includes Aluminum, Tin, and Lead.",
             "metalloid": "The 'in-between' elements. They look like metals but are brittle. They are semiconductors, making them critical for computer chips.",
-            "diatomic-nonmetal": "Elements that don't conduct electricity or heat well. Many are gases essential for life, like Oxygen and Nitrogen.",
-            "polyatomic-nonmetal": "Solid non-metals that form complex structures. Includes Carbon (diamonds/life) and Sulfur.",
-            "noble-gas": "Colorless, odorless gases that rarely react with anything. They glow brightly when electricity passes through them (Neon signs).",
+            "noble-gas": "Group 18. Colorless, odorless gases that rarely react with anything. They glow brightly when electricity passes through them.",
             "lanthanide": "The 'Rare Earth' metals. They are silvery-white and crucial for modern tech like smartphones, lasers, and strong magnets.",
             "actinide": "Heavy, unstable, and radioactive metals. Uranium and Plutonium are used for nuclear energy."
         };
+
+        // Explicit Atomic Number Lists for Perfect Grouping
+        const elementGroups = {
+            "alkali-metal": [3, 11, 19, 37, 55, 87],
+            "alkaline-earth-metal": [4, 12, 20, 38, 56, 88],
+            "transition-metal": [
+                21, 22, 23, 24, 25, 26, 27, 28, 29, 30,
+                39, 40, 41, 42, 43, 44, 45, 46, 47, 48,
+                72, 73, 74, 75, 76, 77, 78, 79, 80,
+                104, 105, 106, 107, 108, 109, 110, 111, 112
+            ],
+            "post-transition-metal": [13, 31, 49, 50, 81, 82, 83, 113, 114, 115, 116],
+            "metalloid": [5, 14, 32, 33, 51, 52, 84], // Using B, Si, Ge, As, Sb, Te, Po standard
+            "halogens": [9, 17, 35, 53, 85, 117],
+            "noble-gas": [2, 10, 18, 36, 54, 86, 118],
+            "lanthanide": [57, 58, 59, 60, 61, 62, 63, 64, 65, 66, 67, 68, 69, 70, 71],
+            "actinide": [89, 90, 91, 92, 93, 94, 95, 96, 97, 98, 99, 100, 101, 102, 103],
+            // Base non-metals (excluding halogens/noble gases for composition)
+            "base-nonmetal": [1, 6, 7, 8, 15, 16, 34]
+        };
+
+        // Construct composite groups dynamically
+        elementGroups["nonmetal"] = [
+            ...elementGroups["base-nonmetal"],
+            ...elementGroups["halogens"],
+            ...elementGroups["noble-gas"]
+        ];
+
+        elementGroups["metals"] = [
+            ...elementGroups["alkali-metal"],
+            ...elementGroups["alkaline-earth-metal"],
+            ...elementGroups["transition-metal"],
+            ...elementGroups["post-transition-metal"],
+            ...elementGroups["lanthanide"],
+            ...elementGroups["actinide"]
+        ];
 
         let animationFrameId;
 
@@ -432,7 +492,6 @@
                     div.style.gridColumn = el.xpos;
                     div.style.gridRow = el.ypos;
                     div.setAttribute('data-number', el.number);
-                    div.setAttribute('data-category', categoryClass); // Helper for group highlighting
 
                     div.innerHTML = `
                         <span class="text-[0.55rem] font-bold text-slate-500 w-full px-0.5">${el.number}</span>
@@ -444,7 +503,6 @@
                         e.stopPropagation();
 
                         const searchInput = document.getElementById('search-input');
-                        // Check if search is active or group highlight is active
                         const isSearchActive = searchInput.value.trim().length > 0;
                         const isGroupActive = document.querySelectorAll('.element-card.dimmed').length > 0;
 
@@ -462,15 +520,18 @@
             }
         }
 
-        // --- Group Highlight Logic ---
-        function showGroup(categoryClass, groupName) {
-            resetView(); // Clear previous states
+        // --- Explicit Group Highlight Logic ---
+        function showGroup(groupKey, groupName) {
+            resetView();
 
             const cards = document.querySelectorAll('.element-card');
+            const targetNumbers = new Set(elementGroups[groupKey]);
             let hasMatch = false;
 
             cards.forEach(card => {
-                if (card.getAttribute('data-category').includes(categoryClass)) {
+                const num = parseInt(card.getAttribute('data-number'));
+
+                if (targetNumbers.has(num)) {
                     card.classList.add('group-highlight');
                     card.classList.remove('dimmed');
                     hasMatch = true;
@@ -481,13 +542,12 @@
             });
 
             if (hasMatch) {
-                // Open Modal in Group Mode
                 const modal = document.getElementById('modal');
                 document.getElementById('element-view').classList.add('hidden');
                 document.getElementById('group-view').classList.remove('hidden');
 
                 document.getElementById('group-title').textContent = groupName;
-                document.getElementById('group-desc').textContent = groupDescriptions[categoryClass] || "A group of elements with similar properties.";
+                document.getElementById('group-desc').textContent = groupDescriptions[groupKey] || "A group of elements with similar properties.";
 
                 modal.classList.remove('hidden');
             }
@@ -509,7 +569,6 @@
             const rawTerm = searchInput.value.toLowerCase().trim();
             const cards = document.querySelectorAll('.element-card');
 
-            // Reset group highlights when searching
             cards.forEach(card => card.classList.remove('group-highlight'));
 
             if (rawTerm.length > 0) {
@@ -562,7 +621,6 @@
         document.addEventListener('click', (e) => {
             if (e.target.closest('header') || e.target.closest('#modal') || e.target.closest('.legend-item')) return;
 
-            // If highlighted state exists, clear it
             const hasHighlights = document.querySelector('.dimmed');
             if (hasHighlights) {
                 resetView();
@@ -580,7 +638,6 @@
             const gadgetNote = gadgets[el.number];
             const usage = commonUsages[el.number] || "Scientific research and industrial applications.";
 
-            // Toggle Views
             document.getElementById('element-view').classList.remove('hidden');
             document.getElementById('group-view').classList.add('hidden');
 
