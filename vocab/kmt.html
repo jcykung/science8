@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en-CA">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kinetic Molecular Theory - Printable Handout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        .info-section {
+            border: 1px solid #e2e8f0;
+            margin-bottom: 1.5rem;
+            padding: 1.5rem;
+            border-radius: 0.75rem;
+        }
+
+        /* Print-specific styles */
+        @media print {
+            body {
+                font-family: 'Times New Roman', serif;
+                background-color: #ffffff;
+                color: #000000;
+            }
+
+            .info-section {
+                border: 1px solid #cccccc;
+                padding: 1rem;
+                margin-bottom: 1rem;
+                border-radius: 0;
+                page-break-inside: avoid;
+            }
+
+            h1,
+            h2,
+            h3,
+            p,
+            li,
+            strong,
+            text {
+                color: #000000 !important;
+            }
+
+            .info-section,
+            .bg-white {
+                background-color: #ffffff !important;
+            }
+
+            svg {
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+        }
+    </style>
+</head>
+
+<body class="bg-slate-50 text-slate-800">
+
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+
+        <!-- Header Section -->
+        <header class="text-center mb-6 p-4 info-section bg-white">
+            <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">Kinetic Molecular Theory</h1>
+            <p class="text-slate-500 mt-2 font-medium">The Science of Moving Particles</p>
+        </header>
+
+        <!-- Word Breakdown Section -->
+        <div class="info-section bg-yellow-100">
+            <h2 class="text-2xl font-bold text-yellow-900 mb-4">Breaking Down the Name</h2>
+            <div class="flex flex-col md:flex-row gap-4 mb-4">
+                <div class="flex-1 bg-yellow-50 p-3 rounded-lg border border-yellow-200 shadow-sm">
+                    <strong class="text-amber-700 text-lg block mb-1">Kinetic</strong>
+                    <span class="text-yellow-800 text-sm">From the Greek <em>kinētikos</em> (moving). This tells us that
+                        the theory relates to motion.</span>
+                </div>
+                <div class="flex-1 bg-yellow-50 p-3 rounded-lg border border-yellow-200 shadow-sm">
+                    <strong class="text-amber-700 text-lg block mb-1">Molecular</strong>
+                    <span class="text-yellow-800 text-sm">From the Latin <em>moles</em> (mass) with a diminutive suffix.
+                        It literally means a "tiny mass" or particle.</span>
+                </div>
+                <div class="flex-1 bg-yellow-50 p-3 rounded-lg border border-yellow-200 shadow-sm">
+                    <strong class="text-amber-700 text-lg block mb-1">Theory</strong>
+                    <span class="text-yellow-800 text-sm">From the Greek <em>theōria</em> (viewing). In science, it is a
+                        highly-tested explanation of how nature works.</span>
+                </div>
+            </div>
+            <div class="text-yellow-900 mt-4 text-center bg-yellow-200/50 p-3 rounded-lg border border-yellow-300">
+                <p>Put together, the <strong>Kinetic Molecular Theory (KMT)</strong> is the well-tested scientific
+                    explanation that all matter is made of tiny particles (masses) that are <em>always in motion</em>.
+                </p>
+            </div>
+        </div>
+
+        <!-- The Core Idea -->
+        <div class="info-section bg-blue-100">
+            <h2 class="text-2xl font-bold text-blue-900 mb-3">The Core Idea: States of Matter</h2>
+            <p class="text-blue-800 mb-4">
+                The way particles move determines whether a substance is a solid, liquid, or gas. The hotter the
+                substance, the faster the particles move!
+            </p>
+            <div class="w-full bg-white p-4 rounded-xl border border-blue-200">
+                <svg viewBox="0 0 120 45" class="w-full h-auto" aria-labelledby="kmt-title">
+                    <title id="kmt-title">Diagram showing particle motion in solids, liquids, and gases.</title>
+
+                    <!-- Solid -->
+                    <rect x="5" y="5" w="30" h="30" fill="#eff6ff" stroke="#3b82f6" stroke-width="1" rx="2" />
+                    <text x="20" y="42" font-size="4" font-weight="bold" text-anchor="middle" fill="#1e3a8a">SOLID
+                        (Coldest)</text>
+                    <!-- Solid Particles (Grid) -->
+                    <g fill="#3b82f6">
+                        <circle cx="12" cy="12" r="2.5" />
+                        <circle cx="20" cy="12" r="2.5" />
+                        <circle cx="28" cy="12" r="2.5" />
+                        <circle cx="12" cy="20" r="2.5" />
+                        <circle cx="20" cy="20" r="2.5" />
+                        <circle cx="28" cy="20" r="2.5" />
+                        <circle cx="12" cy="28" r="2.5" />
+                        <circle cx="20" cy="28" r="2.5" />
+                        <circle cx="28" cy="28" r="2.5" />
+                    </g>
+                    <!-- Vibration marks -->
+                    <path d="M10,10 Q11,12 10,14" stroke="#93c5fd" fill="none" stroke-width="0.5" />
+                    <path d="M22,26 Q23,28 22,30" stroke="#93c5fd" fill="none" stroke-width="0.5" />
+
+                    <!-- Liquid -->
+                    <rect x="45" y="5" w="30" h="30" fill="#eff6ff" stroke="#3b82f6" stroke-width="1" rx="2" />
+                    <text x="60" y="42" font-size="4" font-weight="bold" text-anchor="middle" fill="#1e3a8a">LIQUID
+                        (Warmer)</text>
+                    <!-- Liquid Particles (Loose at bottom) -->
+                    <g fill="#3b82f6">
+                        <circle cx="49" cy="28" r="2.5" />
+                        <circle cx="55" cy="26" r="2.5" />
+                        <circle cx="62" cy="29" r="2.5" />
+                        <circle cx="68" cy="25" r="2.5" />
+                        <circle cx="51" cy="21" r="2.5" />
+                        <circle cx="59" cy="20" r="2.5" />
+                        <circle cx="66" cy="18" r="2.5" />
+                        <circle cx="54" cy="15" r="2.5" />
+                    </g>
+                    <!-- Short motion arrows -->
+                    <g stroke="#60a5fa" stroke-width="0.8" fill="none">
+                        <path d="M49,28 L46,26" marker-end="url(#arrow)" />
+                        <path d="M62,29 L65,31" />
+                        <path d="M59,20 L62,17" />
+                        <path d="M54,15 L52,12" />
+                    </g>
+
+                    <!-- Gas -->
+                    <rect x="85" y="5" w="30" h="30" fill="#eff6ff" stroke="#3b82f6" stroke-width="1" rx="2" />
+                    <text x="100" y="42" font-size="4" font-weight="bold" text-anchor="middle" fill="#1e3a8a">GAS
+                        (Hottest)</text>
+                    <!-- Gas Particles (Spread out) -->
+                    <g fill="#3b82f6">
+                        <circle cx="92" cy="10" r="2.5" />
+                        <circle cx="108" cy="15" r="2.5" />
+                        <circle cx="95" cy="28" r="2.5" />
+                        <circle cx="110" cy="30" r="2.5" />
+                    </g>
+                    <!-- Long motion arrows -->
+                    <g stroke="#2563eb" stroke-width="1" fill="none">
+                        <line x1="92" y1="10" x2="86" y2="6" />
+                        <line x1="108" y1="15" x2="114" y2="10" />
+                        <line x1="95" y1="28" x2="90" y2="33" />
+                        <line x1="110" y1="30" x2="102" y2="25" />
+                    </g>
+                </svg>
+            </div>
+            <p class="text-blue-800 mt-3 text-sm text-center">
+                <strong>Solid:</strong> Vibrate in place. <strong>Liquid:</strong> Slide past each other.
+                <strong>Gas:</strong> Bounce around rapidly.
+            </p>
+        </div>
+
+        <!-- Key Concepts -->
+        <div class="info-section bg-emerald-100">
+            <h2 class="text-2xl font-bold text-emerald-900 mb-4">The 4 Parts of the KMT</h2>
+            <div class="space-y-4">
+                <div class="bg-emerald-50 p-4 rounded-lg flex gap-4 items-center border border-emerald-200">
+                    <div
+                        class="bg-emerald-200 text-emerald-900 font-bold text-lg rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+                        1</div>
+                    <h3 class="font-semibold text-emerald-900 text-lg">Everything is made of particles.</h3>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-lg flex gap-4 items-center border border-emerald-200">
+                    <div
+                        class="bg-emerald-200 text-emerald-900 font-bold text-lg rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+                        2</div>
+                    <h3 class="font-semibold text-emerald-900 text-lg">The particles are always moving.</h3>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-lg flex gap-4 items-center border border-emerald-200">
+                    <div
+                        class="bg-emerald-200 text-emerald-900 font-bold text-lg rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+                        3</div>
+                    <h3 class="font-semibold text-emerald-900 text-lg">There are spaces between the particles.</h3>
+                </div>
+                <div class="bg-emerald-50 p-4 rounded-lg flex gap-4 items-center border border-emerald-200">
+                    <div
+                        class="bg-emerald-200 text-emerald-900 font-bold text-lg rounded-full w-10 h-10 flex items-center justify-center shrink-0">
+                        4</div>
+                    <h3 class="font-semibold text-emerald-900 text-lg">Energy makes particles move faster and further
+                        apart.</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Reading in Context -->
+        <div class="info-section bg-slate-100">
+            <h2 class="text-2xl font-bold text-slate-900 mb-4">Reading in Context: Why Do Balloons Shrink in the Cold?
+            </h2>
+            <div class="space-y-4 text-slate-700">
+                <p>Have you ever taken a helium balloon outside on a freezing winter day, only to watch it shrivel up?
+                    Did the helium escape? No!</p>
+                <p>The <strong>Kinetic Molecular Theory</strong> explains this perfectly. Inside the warm house, the gas
+                    particles are hot, meaning they have a lot of energy and are moving very fast. They constantly crash
+                    hard against the inside of the balloon, pushing the rubber outward and keeping it inflated.</p>
+                <p>When you step into the cold, the particles lose energy. According to part 4 of the KMT, lower energy
+                    means the particles slow down and take up less space. Because they are moving slower, they don't hit
+                    the inside of the balloon as hard or as often. With less outward pressure, the rubber balloon
+                    shrinks down. Bring it back inside, and as the particles heat up and speed up, the balloon will
+                    re-inflate!</p>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+
+</html>

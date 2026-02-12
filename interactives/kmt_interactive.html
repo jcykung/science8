@@ -1,0 +1,1009 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="referrer" content="strict-origin-when-cross-origin">
+    <title>KMT Interactive</title>
+
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+
+    <!-- React & ReactDOM -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+
+    <!-- Babel -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&family=Space+Grotesk:wght@500;700&display=swap');
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        h1,
+        h2,
+        h3,
+        .brand-font {
+            font-family: 'Space Grotesk', sans-serif;
+        }
+
+        /* Range Slider Styling */
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 24px;
+            width: 24px;
+            border-radius: 50%;
+            background: var(--thumb-bg, #ffffff);
+            cursor: pointer;
+            margin-top: -10px;
+            box-shadow: var(--thumb-shadow, 0 2px 5px rgba(0, 0, 0, 0.2));
+            border: 2px solid var(--thumb-border, #6366f1);
+            transition: all 0.2s ease;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            border-radius: 2px;
+        }
+
+        input[type=range]:focus {
+            outline: none;
+        }
+
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useRef } = React;
+
+        // --- ICONS ---
+        const Icons = {
+            Beaker: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M4.5 3h15" /><path d="M6 3v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V3" /><path d="M6 14h12" /></svg>,
+            Thermometer: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M14 14.76V3.5a2.5 2.5 0 0 0-5 0v11.26a4.5 4.5 0 1 0 5 0z" /></svg>,
+            Fire: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M8.5 14.5A2.5 2.5 0 0 0 11 12c0-1.38-.5-2-1-3-1.072-2.143-.224-4.054 2-6 .5 2.5 2 4.9 4 6.5 2 1.6 3 3.5 3 5.5a7 7 0 1 1-14 0c0-1.1.2-2.2.6-3.3.7 2.4 2.9 3.8 2.9 3.8z" /></svg>,
+            Atom: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="1" /><path d="M20.2 20.2c2.04-2.03.02-7.36-4.5-11.9-4.54-4.52-9.87-6.54-11.9-4.5-2.04 2.03-.02 7.36 4.5 11.9 4.54 4.52 9.87 6.54 11.9 4.5Z" /><path d="M15.7 15.7c4.52-4.54 6.54-9.87 4.5-11.9-2.03-2.04-7.36-.02-11.9 4.5-4.52 4.54-6.54 9.87-4.5 11.9 2.03 2.04 7.36.02 11.9-4.5Z" /></svg>,
+            Refresh: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8" /><path d="M21 3v5h-5" /><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16" /><path d="M8 16H3v5" /></svg>,
+            Calculator: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><rect x="4" y="2" width="16" height="20" rx="2" /><line x1="8" y1="6" x2="16" y2="6" /><line x1="16" y1="14" x2="16" y2="18" /><path d="M16 10h.01" /><path d="M12 10h.01" /><path d="M8 10h.01" /><path d="M12 14h.01" /><path d="M8 14h.01" /><path d="M12 18h.01" /><path d="M8 18h.01" /></svg>,
+            Triangle: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><path d="M3 17h18a2 2 0 0 0 1.8-2.8L13.8 3.2a2 2 0 0 0-3.6 0L1.2 14.2A2 2 0 0 0 3 17z" /></svg>,
+            Info: (props) => <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}><circle cx="12" cy="12" r="10" /><line x1="12" y1="16" x2="12" y2="12" /><line x1="12" y1="8" x2="12.01" y2="8" /></svg>
+        };
+
+        // --- KMT SIMULATOR (Physics Engine Remake) ---
+        const KMTSimulation = () => {
+            const [temp, setTemp] = useState(-20);
+            const canvasRef = useRef(null);
+            const particlesRef = useRef([]);
+            const reqRef = useRef();
+
+            // --- CONSTANTS ---
+            const PARTICLE_RADIUS = 7;
+            const PARTICLE_COUNT = 168; // Increased to fill bottom third
+            const CONTAINER_WIDTH = 400;
+            const CONTAINER_HEIGHT = 350;
+
+            // --- INITIALIZATION ---
+            // Calculate Hexagonal Lattice Points for the Solid State
+            const latticePoints = useRef([]);
+
+            useEffect(() => {
+                const cols = 24; // Wider to fill container width
+                const rows = Math.ceil(PARTICLE_COUNT / cols);
+                const spacingX = PARTICLE_RADIUS * 2.2; // Slightly spaced horizontally
+                const spacingY = PARTICLE_RADIUS * 1.9; // Tighter vertical packing for hex grid
+
+                // Center the block at the bottom
+                const blockWidth = (cols - 1) * spacingX;
+                const startX = (CONTAINER_WIDTH - blockWidth) / 2;
+
+                // Position so the bottom row touches the floor
+                const startY = CONTAINER_HEIGHT - ((rows - 1) * spacingY) - PARTICLE_RADIUS - 4;
+
+                const points = [];
+                for (let i = 0; i < PARTICLE_COUNT; i++) {
+                    const col = i % cols;
+                    const row = Math.floor(i / cols);
+                    const xOffset = (row % 2 === 0) ? 0 : spacingX / 2;
+                    points.push({
+                        x: startX + (col * spacingX) + xOffset,
+                        y: startY + (row * spacingY)
+                    });
+                }
+                latticePoints.current = points;
+
+                // Create particles at these home positions initially
+                particlesRef.current = points.map(pt => ({
+                    x: pt.x,
+                    y: pt.y,
+                    vx: 0,
+                    vy: 0,
+                    homeX: pt.x,
+                    homeY: pt.y
+                }));
+            }, []);
+
+            // --- MAIN PHYSICS LOOP ---
+            useEffect(() => {
+                const animate = () => {
+                    const canvas = canvasRef.current;
+                    if (!canvas) return;
+                    const ctx = canvas.getContext('2d');
+
+                    ctx.clearRect(0, 0, CONTAINER_WIDTH, CONTAINER_HEIGHT);
+
+                    // --- DRAW CONTAINER ---
+                    ctx.fillStyle = "#f1f5f9";
+                    ctx.fillRect(0, 0, CONTAINER_WIDTH, CONTAINER_HEIGHT);
+                    ctx.strokeStyle = "#cbd5e1";
+                    ctx.lineWidth = 4;
+                    ctx.strokeRect(0, 0, CONTAINER_WIDTH, CONTAINER_HEIGHT);
+
+                    // --- STATE DETERMINATION ---
+                    // Temp < 0: Solid (Lattice Mode)
+                    // 0 <= Temp < 100: Liquid (Gravity + Repulsion)
+                    // Temp >= 100: Gas (No Gravity + High Speed)
+
+                    const isSolid = temp < 0;
+                    const isGas = temp >= 100;
+
+                    // --- PHYSICS SETTINGS ---
+                    const gravity = isGas ? 0 : (isSolid ? 0 : 0.05); // Lowered gravity so liquid isn't crushed
+                    const friction = isSolid ? 0.6 : (isGas ? 1.0 : 0.98); // Smooth sliding for liquid
+                    // Vibration speed increases with temp
+                    const vibration = 0.5 + (temp + 50) * 0.03;
+
+                    particlesRef.current.forEach((p, i) => {
+
+                        // 1. INTEGRATION (Move Particles)
+                        if (isSolid) {
+                            // SOLID MODE: Spring Force towards Home Position
+                            // The colder it is, the stiffer the spring (holds shape better)
+                            const stiffness = 0.1;
+                            const dx = p.homeX - p.x;
+                            const dy = p.homeY - p.y;
+
+                            p.vx += dx * stiffness;
+                            p.vy += dy * stiffness;
+
+                            // Apply Heavy Damping to stop oscillations from going wild
+                            p.vx *= 0.7;
+                            p.vy *= 0.7;
+
+                            // Add Thermal Jitter (Vibration in place)
+                            if (temp > -273) {
+                                p.vx += (Math.random() - 0.5) * vibration * 0.5;
+                                p.vy += (Math.random() - 0.5) * vibration * 0.5;
+                            }
+
+                        } else {
+                            // LIQUID / GAS MODE
+                            p.vy += gravity;
+                            p.vx *= friction;
+                            p.vy *= friction;
+
+                            // Thermal Motion
+                            const speed = isGas ? vibration * 0.4 : vibration * 0.28; // High speed for liquid fluidity
+                            p.vx += (Math.random() - 0.5) * speed;
+                            p.vy += (Math.random() - 0.5) * speed;
+                        }
+
+                        p.x += p.vx;
+                        p.y += p.vy;
+
+                        // 2. BOUNDARY CHECKS (Safety Clamp)
+                        // Prevents particles from disappearing
+                        const r = PARTICLE_RADIUS;
+                        let hitWall = false;
+
+                        if (p.x < r) { p.x = r; p.vx *= -0.8; hitWall = true; }
+                        if (p.x > CONTAINER_WIDTH - r) { p.x = CONTAINER_WIDTH - r; p.vx *= -0.8; hitWall = true; }
+                        if (p.y < r) { p.y = r; p.vy *= -0.8; hitWall = true; }
+                        if (p.y > CONTAINER_HEIGHT - r) {
+                            p.y = CONTAINER_HEIGHT - r;
+                            p.vy *= (isGas ? -0.8 : -0.5); // Better bounce off the floor for liquid
+                            hitWall = true;
+                        }
+
+                        // 3. PARTICLE COLLISION (Repulsion)
+                        // Only strictly necessary in Liquid/Gas to maintain volume
+                        // In Solid, the lattice keeps them apart mostly, but we keep it for transition safety
+                        if (!isSolid) {
+                            for (let j = i + 1; j < particlesRef.current.length; j++) {
+                                const p2 = particlesRef.current[j];
+                                const dx = p2.x - p.x;
+                                const dy = p2.y - p.y;
+                                const distSq = dx * dx + dy * dy;
+                                const minDist = r * 2.15; // Allow slight overlap so liquids can slide past
+
+                                if (distSq < minDist * minDist && distSq > 0) {
+                                    const dist = Math.sqrt(distSq);
+                                    const overlap = minDist - dist;
+                                    const nx = dx / dist;
+                                    const ny = dy / dist;
+
+                                    // Move apart
+                                    const force = overlap * 0.5; // Stiff repulsion
+                                    p.x -= nx * force;
+                                    p.y -= ny * force;
+                                    p2.x += nx * force;
+                                    p2.y += ny * force;
+
+                                    // Exchange momentum (Bounce)
+                                    const dvx = p.vx - p2.vx;
+                                    const dvy = p.vy - p2.vy;
+                                    const dot = dvx * nx + dvy * ny;
+
+                                    if (dot > 0) {
+                                        // Only bounce if moving towards each other
+                                        // Gas = elastic (1.0), Liquid = inelastic (0.6 for more fluidity)
+                                        const restitution = isGas ? 0.9 : 0.6;
+                                        const impulse = dot * restitution;
+
+                                        p.vx -= impulse * nx;
+                                        p.vy -= impulse * ny;
+                                        p2.vx += impulse * nx;
+                                        p2.vy += impulse * ny;
+                                    }
+                                }
+                            }
+                        }
+
+                        // --- DRAW PARTICLE ---
+                        if (Number.isFinite(p.x) && Number.isFinite(p.y)) {
+                            const gradient = ctx.createRadialGradient(p.x - 2, p.y - 2, 0, p.x, p.y, r);
+
+                            // Color maps temperature: White (0 or less) to Red (100 or more)
+                            const tempRatio = Math.max(0, Math.min(temp / 100, 1));
+                            const gb = Math.floor(255 * (1 - tempRatio)); // Green and Blue channels
+
+                            gradient.addColorStop(0, '#ffffff'); // bright center
+                            gradient.addColorStop(1, `rgb(255, ${gb}, ${gb})`);
+
+                            ctx.beginPath();
+                            ctx.arc(p.x, p.y, r, 0, Math.PI * 2);
+                            ctx.fillStyle = gradient;
+                            ctx.fill();
+                            ctx.strokeStyle = "rgba(0,0,0,0.1)";
+                            ctx.stroke();
+                        }
+                    });
+
+                    reqRef.current = requestAnimationFrame(animate);
+                };
+
+                reqRef.current = requestAnimationFrame(animate);
+                return () => cancelAnimationFrame(reqRef.current);
+            }, [temp]); // Re-bind when temperature changes to update physics constants
+
+            // --- INTERACTION ---
+            const handleSliderChange = (e) => {
+                const newTemp = Number(e.target.value);
+
+                // If we are freezing (Going from Liquid -> Solid), we need to reset/pull particles
+                // back to their lattice homes to form the block.
+                // We do this by snapping position if the delta is large, or letting physics do it 
+                // (Physics loop handles the 'spring to home' when isSolid becomes true)
+                setTemp(newTemp);
+            };
+
+            const getPhaseLabel = (t) => {
+                if (t < 0) return { text: "Solid (Ice)", color: "text-cyan-600" };
+                if (t < 100) return { text: "Liquid (Water)", color: "text-blue-600" };
+                return { text: "Gas (Steam)", color: "text-slate-500" };
+            };
+            const label = getPhaseLabel(temp);
+
+            // Calculate slider thumb effects based on energy (temperature)
+            let thumbShadow = '0 2px 5px rgba(0,0,0,0.2)';
+            let thumbBorder = '#6366f1';
+            let thumbBg = '#ffffff';
+            let emoji = null;
+
+            if (temp >= 100) {
+                // Fire glow effect
+                thumbShadow = '0 -3px 15px rgba(239, 68, 68, 0.8), 0 -6px 20px rgba(245, 158, 11, 0.6), 0 0 10px rgba(239, 68, 68, 0.5) inset';
+                thumbBorder = '#ef4444';
+                thumbBg = '#fef2f2';
+                emoji = '🔥';
+            } else if (temp <= 0) {
+                // Frost glow effect
+                thumbShadow = '0 0 15px rgba(56, 189, 248, 0.8), 0 0 25px rgba(224, 242, 254, 0.6), 0 0 10px rgba(56, 189, 248, 0.5) inset';
+                thumbBorder = '#38bdf8';
+                thumbBg = '#f0f9ff';
+                emoji = '❄️';
+            } else {
+                // Liquid wet dripping effect
+                thumbShadow = '0 8px 15px rgba(59, 130, 246, 0.6), 0 2px 4px rgba(59, 130, 246, 0.4) inset';
+                thumbBorder = '#3b82f6';
+                thumbBg = '#eff6ff';
+                emoji = '💧';
+            }
+
+            // Calculate exact thumb position percentage to attach the floating emoji
+            const percent = ((temp + 20) / 120) * 100;
+            const thumbPos = `calc(${percent}% + ${12 - (percent * 0.24)}px)`;
+
+            return (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 h-full">
+                    {/* Simulator Canvas Area */}
+                    <div className="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden flex flex-col">
+                        <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+                            <h3 className="font-bold text-slate-700 flex items-center gap-2">
+                                <Icons.Beaker className="text-indigo-500" /> Phase Simulator
+                            </h3>
+                            <div className="px-3 py-1 bg-white border border-slate-200 rounded-full text-sm font-mono font-bold text-slate-600">
+                                {temp}°C
+                            </div>
+                        </div>
+
+                        <div className="relative flex-grow bg-slate-50 flex justify-center p-4">
+                            <canvas
+                                ref={canvasRef}
+                                width={CONTAINER_WIDTH}
+                                height={CONTAINER_HEIGHT}
+                                className="bg-white rounded-lg shadow-inner border border-slate-300"
+                            />
+                            <div className={`absolute top-6 left-6 bg-white/90 backdrop-blur px-3 py-1 rounded-md text-sm font-bold border border-slate-200 ${label.color}`}>
+                                {label.text}
+                            </div>
+                        </div>
+
+                        <div className="p-6 bg-white border-t border-slate-100">
+                            <div className="flex justify-between text-xs font-bold text-slate-400 mb-6">
+                                <span>-20°C</span>
+                                <span>0°C</span>
+                                <span>100°C</span>
+                            </div>
+
+                            <div
+                                className="relative w-full mb-4"
+                                style={{
+                                    '--thumb-shadow': thumbShadow,
+                                    '--thumb-border': thumbBorder,
+                                    '--thumb-bg': thumbBg
+                                }}
+                            >
+                                {emoji && (
+                                    <div
+                                        className="absolute -top-8 -translate-x-1/2 pointer-events-none text-3xl z-20 animate-bounce"
+                                        style={{ left: thumbPos, filter: 'drop-shadow(0px 4px 6px rgba(0,0,0,0.3))' }}
+                                    >
+                                        {emoji}
+                                    </div>
+                                )}
+                                <input
+                                    type="range"
+                                    min="-20"
+                                    max="100"
+                                    value={temp}
+                                    onChange={handleSliderChange}
+                                    className="w-full relative z-10"
+                                    style={{
+                                        // 17% is ~0°C, 100% is 100°C on a scale from -20 to 100
+                                        background: `linear-gradient(to right, #e0f2fe 0%, #3b82f6 17%, #f59e0b 60%, #ef4444 100%)`
+                                    }}
+                                />
+                            </div>
+
+                            <p className="text-center text-sm text-slate-500 mt-6">
+                                Drag the slider to add or remove <span className="font-bold text-indigo-600">Heat Energy</span>
+                            </p>
+                        </div>
+                    </div>
+
+                    {/* KMT Principles Panel */}
+                    <div className="bg-slate-900 text-white rounded-2xl p-6 shadow-xl flex flex-col justify-center">
+                        <h3 className="text-xl font-bold mb-6 flex items-center gap-2 brand-font text-indigo-300">
+                            <Icons.Info /> The Kinetic Molecular Theory
+                        </h3>
+
+                        <div className="space-y-4">
+                            {/* Point 1 */}
+                            <div className="flex gap-4 items-start p-3 rounded-xl bg-slate-800 border border-slate-700">
+                                <div className="bg-indigo-500 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">1</div>
+                                <div>
+                                    <p className="font-bold text-indigo-200">Made of Particles</p>
+                                    <p className="text-xs text-slate-400 mt-1">Look at the blue spheres. All matter is made of these tiny particles.</p>
+                                </div>
+                            </div>
+
+                            {/* Point 2 */}
+                            <div className={`flex gap-4 items-start p-3 rounded-xl border transition-all duration-500 ${temp < 0 ? 'bg-indigo-900/50 border-indigo-500 ring-1 ring-indigo-500' : 'bg-slate-800 border-slate-700'}`}>
+                                <div className="bg-indigo-500 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">2</div>
+                                <div>
+                                    <p className="font-bold text-indigo-200">Always Moving</p>
+                                    <p className="text-xs text-slate-400 mt-1">Even in the <strong>Solid</strong> state, notice how the particles are vibrating!</p>
+                                </div>
+                            </div>
+
+                            {/* Point 3 */}
+                            <div className={`flex gap-4 items-start p-3 rounded-xl border transition-all duration-500 ${temp >= 100 ? 'bg-indigo-900/50 border-indigo-500 ring-1 ring-indigo-500' : 'bg-slate-800 border-slate-700'}`}>
+                                <div className="bg-indigo-500 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">3</div>
+                                <div>
+                                    <p className="font-bold text-indigo-200">Empty Spaces</p>
+                                    <p className="text-xs text-slate-400 mt-1">Particles don't touch perfectly. There is empty space between them (especially in Gas).</p>
+                                </div>
+                            </div>
+
+                            {/* Point 4 */}
+                            <div className={`flex gap-4 items-start p-3 rounded-xl border transition-all duration-500 ${temp > 20 ? 'bg-indigo-900/50 border-indigo-500 ring-1 ring-indigo-500' : 'bg-slate-800 border-slate-700'}`}>
+                                <div className="bg-indigo-500 w-8 h-8 rounded-full flex items-center justify-center font-bold text-sm flex-shrink-0">4</div>
+                                <div>
+                                    <p className="font-bold text-indigo-200">Energy = Movement</p>
+                                    <p className="text-xs text-slate-400 mt-1">As you add <strong>Energy</strong>, particles move faster and spread apart.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 2. NEW Phase Changes Explorer (Completely Redone)
+        const StatesAndPhases = () => {
+            const [activeTx, setActiveTx] = useState('melting');
+
+            const txData = {
+                melting: {
+                    id: 'melting', name: 'Melting', from: 'Solid', to: 'Liquid',
+                    heat: 'Added', type: 'Endothermic', color: 'red',
+                    desc: 'Particles absorb heat energy, vibrate faster, and break out of their rigid, fixed positions to slide past one another.',
+                    example: 'Ice melting into a puddle on a warm day.',
+                    icons: ['🧊', '💧']
+                },
+                freezing: {
+                    id: 'freezing', name: 'Freezing', from: 'Liquid', to: 'Solid',
+                    heat: 'Removed', type: 'Exothermic', color: 'blue',
+                    desc: 'Particles lose heat energy, slow down, and lock tightly together into a rigid lattice structure.',
+                    example: 'Water turning into ice cubes in the freezer.',
+                    icons: ['💧', '🧊']
+                },
+                evaporation: {
+                    id: 'evaporation', name: 'Evaporation', from: 'Liquid', to: 'Gas',
+                    heat: 'Added', type: 'Endothermic', color: 'red',
+                    desc: 'Particles gain enough energy to completely overcome attractive forces, breaking free to fly apart in all directions.',
+                    example: 'A puddle drying up in the hot sun.',
+                    icons: ['💧', '☁️']
+                },
+                condensation: {
+                    id: 'condensation', name: 'Condensation', from: 'Gas', to: 'Liquid',
+                    heat: 'Removed', type: 'Exothermic', color: 'blue',
+                    desc: 'Fast-moving gas particles lose energy, slow down, and group together to form a liquid pool.',
+                    example: 'Water droplets forming on the outside of a cold glass.',
+                    icons: ['☁️', '💧']
+                },
+                sublimation: {
+                    id: 'sublimation', name: 'Sublimation', from: 'Solid', to: 'Gas',
+                    heat: 'Added', type: 'Endothermic', color: 'red',
+                    desc: 'Particles gain so much energy so quickly that they skip the liquid phase entirely and fly apart as a gas.',
+                    example: 'Dry ice (solid CO₂) turning directly into spooky cold fog.',
+                    icons: ['🧊', '🌫️']
+                },
+                deposition: {
+                    id: 'deposition', name: 'Deposition', from: 'Gas', to: 'Solid',
+                    heat: 'Removed', type: 'Exothermic', color: 'blue',
+                    desc: 'Gas particles lose a massive amount of energy instantly, locking straight into a rigid solid structure.',
+                    example: 'Frost forming directly onto a cold window on a winter night.',
+                    icons: ['🌫️', '❄️']
+                }
+            };
+
+            const current = txData[activeTx];
+
+            const StateBubble = ({ name, emoji, bg }) => {
+                const isFocused = current.from === name || current.to === name;
+                return (
+                    <div className={`flex flex-col items-center justify-center w-24 h-24 md:w-28 md:h-28 rounded-full border-4 shadow-lg transition-all duration-300 z-10 
+                        ${isFocused ? `scale-110 ${bg} border-slate-300 shadow-xl` : 'scale-95 bg-slate-50 border-slate-200 opacity-60 grayscale-[0.5]'}`}>
+                        <span className="text-3xl md:text-4xl mb-1">{emoji}</span>
+                        <span className="font-bold text-slate-800 text-sm">{name}</span>
+                    </div>
+                );
+            };
+
+            const TxButton = ({ txKey, label, direction, isSubDep }) => {
+                const isActive = activeTx === txKey;
+                const data = txData[txKey];
+                const baseColor = data.color === 'red' ? 'text-red-600 hover:bg-red-50 border-red-200 hover:border-red-400' : 'text-blue-600 hover:bg-blue-50 border-blue-200 hover:border-blue-400';
+                const activeColor = data.color === 'red' ? 'bg-red-100 border-red-500 shadow-md ring-2 ring-red-200 opacity-100' : 'bg-blue-100 border-blue-500 shadow-md ring-2 ring-blue-200 opacity-100';
+
+                return (
+                    <button
+                        onClick={() => setActiveTx(txKey)}
+                        className={`font-bold text-xs md:text-sm px-3 py-1.5 rounded-full border-2 transition-all duration-300 whitespace-nowrap z-20
+                            ${isActive ? activeColor : `bg-white opacity-40 hover:opacity-100 ${baseColor}`}
+                            ${isSubDep ? 'absolute' : 'relative'}
+                        `}
+                        style={isSubDep ? (txKey === 'sublimation' ? { top: '-18px' } : { bottom: '-18px' }) : {}}
+                    >
+                        {direction === 'left' && <span className="mr-1">◄</span>}
+                        {label}
+                        {direction === 'right' && <span className="ml-1">►</span>}
+                    </button>
+                );
+            };
+
+            return (
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-full min-h-[550px] overflow-hidden">
+
+                    {/* TOP: Interactive Diagram */}
+                    <div className="bg-slate-50 border-b border-slate-200 p-6 md:p-10 flex flex-col items-center justify-center relative overflow-x-auto no-scrollbar">
+                        <div className="min-w-[600px] relative flex flex-col items-center justify-center py-12">
+
+                            {/* Sublimation Arc (Top) */}
+                            <div className="absolute top-0 w-[65%] h-28 border-t-4 border-dashed border-slate-300 rounded-t-full flex justify-center transition-all duration-300" style={{ borderColor: activeTx === 'sublimation' ? '#ef4444' : '' }}>
+                                <TxButton txKey="sublimation" label="Sublimation" direction="right" isSubDep={true} />
+                            </div>
+
+                            {/* Main Horizontal Flow */}
+                            <div className="flex items-center justify-between w-full relative z-10">
+
+                                <StateBubble name="Solid" emoji="🧊" bg="bg-indigo-100" />
+
+                                <div className="flex flex-col gap-3 items-center relative">
+                                    {/* Connecting Line */}
+                                    <div className="absolute top-1/2 left-[-30px] right-[-30px] h-1 bg-slate-200 -z-10 transform -translate-y-1/2"></div>
+                                    <TxButton txKey="melting" label="Melting" direction="right" />
+                                    <TxButton txKey="freezing" label="Freezing" direction="left" />
+                                </div>
+
+                                <StateBubble name="Liquid" emoji="💧" bg="bg-blue-100" />
+
+                                <div className="flex flex-col gap-3 items-center relative">
+                                    {/* Connecting Line */}
+                                    <div className="absolute top-1/2 left-[-30px] right-[-30px] h-1 bg-slate-200 -z-10 transform -translate-y-1/2"></div>
+                                    <TxButton txKey="evaporation" label="Evaporation" direction="right" />
+                                    <TxButton txKey="condensation" label="Condensation" direction="left" />
+                                </div>
+
+                                <StateBubble name="Gas" emoji="☁️" bg="bg-green-100" />
+
+                            </div>
+
+                            {/* Deposition Arc (Bottom) */}
+                            <div className="absolute bottom-0 w-[65%] h-28 border-b-4 border-dashed border-slate-300 rounded-b-full flex justify-center transition-all duration-300" style={{ borderColor: activeTx === 'deposition' ? '#3b82f6' : '' }}>
+                                <TxButton txKey="deposition" label="Deposition" direction="left" isSubDep={true} />
+                            </div>
+
+                        </div>
+                    </div>
+
+                    {/* BOTTOM: Detail Panel */}
+                    <div className="flex-grow p-6 md:p-8 flex flex-col justify-center">
+                        <div className={`p-6 rounded-2xl border shadow-sm transition-all duration-500 flex flex-col md:flex-row gap-6 items-center
+                            ${current.color === 'red' ? 'bg-red-50 border-red-100' : 'bg-blue-50 border-blue-100'}`}>
+
+                            {/* Text Info */}
+                            <div className="flex-1">
+                                <div className="flex items-center gap-3 mb-2">
+                                    <h3 className="text-2xl font-bold text-slate-800 brand-font">{current.name}</h3>
+                                    <div className={`px-3 py-1 rounded-full text-xs font-bold flex items-center gap-1 shadow-sm
+                                        ${current.color === 'red' ? 'bg-red-500 text-white' : 'bg-blue-500 text-white'}`}>
+                                        {current.color === 'red' ? '🔥' : '❄️'} Heat {current.heat}
+                                    </div>
+                                </div>
+
+                                <div className="text-sm font-semibold text-slate-500 mb-4 uppercase tracking-wide">
+                                    {current.from} ➔ {current.to}
+                                </div>
+
+                                <p className="text-slate-700 leading-relaxed mb-4">
+                                    {current.desc}
+                                </p>
+
+                                <div className="bg-white/60 p-3 rounded-lg border border-slate-200 text-sm text-slate-600">
+                                    <span className="font-bold text-slate-800">Example:</span> {current.example}
+                                </div>
+                            </div>
+
+                            {/* Mini Visualizer */}
+                            <div className="flex-shrink-0 w-full md:w-48 h-32 bg-white rounded-xl shadow-inner border border-slate-200 flex items-center justify-center gap-4 text-4xl">
+                                <span className="animate-bounce" style={{ animationDuration: '2s' }}>{current.icons[0]}</span>
+                                <span className="text-slate-300 text-2xl">➔</span>
+                                <span className="animate-pulse" style={{ animationDuration: '2s' }}>{current.icons[1]}</span>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // 3. NEW Real World Animated Scenarios Practice
+        const allScenarios = [
+            {
+                id: 1, title: "The Sweaty Drink", visual: "condensation", answer: "Condensation", color: "blue",
+                options: ["Evaporation", "Condensation", "Melting", "Sublimation"],
+                desc: "You take a cold can of soda out of the fridge on a hot summer day. Soon, little water droplets appear on the outside of the can.",
+                explanation: "Gas ➔ Liquid! Water vapor (gas) in the warm air hits the cold can, loses energy, slows down, and groups together to form liquid water droplets."
+            },
+            {
+                id: 2, title: "The Disappearing Puddle", visual: "evaporation", answer: "It evaporated", color: "red",
+                options: ["It melted", "It froze", "It evaporated", "It sublimated"],
+                desc: "After a rainstorm, the sun comes out and a puddle on the sidewalk slowly disappears over a few hours. Where did the liquid water go?",
+                explanation: "Liquid ➔ Gas! The sun added heat energy to the liquid water, causing the particles to move faster, break apart, and escape into the air as an invisible gas."
+            },
+            {
+                id: 3, title: "Spooky Concert Fog", visual: "sublimation", answer: "Sublimation", color: "red",
+                options: ["Condensation", "Deposition", "Melting", "Sublimation"],
+                desc: "At a concert, the crew uses 'dry ice' (solid carbon dioxide) to create a low-lying, spooky fog. The solid chunks turn directly into a gas without ever leaving a wet puddle.",
+                explanation: "Solid ➔ Gas! The solid carbon dioxide absorbs heat energy rapidly from the air, completely skipping the liquid phase to fly apart as a gas."
+            },
+            {
+                id: 4, title: "Frosty Windows", visual: "deposition", answer: "Deposition", color: "blue",
+                options: ["Freezing", "Deposition", "Condensation", "Sublimation"],
+                desc: "On a very cold winter night, invisible water vapor in the bedroom air hits the freezing window pane and instantly forms beautiful, solid ice crystals (frost).",
+                explanation: "Gas ➔ Solid! The gas particles lose a massive amount of energy to the freezing window instantly, locking straight into a solid lattice structure."
+            },
+            {
+                id: 5, title: "The Forgotten Ice Cream", visual: "melting", answer: "Melting", color: "red",
+                options: ["Evaporation", "Sublimation", "Melting", "Condensation"],
+                desc: "You buy a solid ice cream cone but get distracted talking to a friend. The hot summer air transfers energy to the treat, and it starts dripping down your hand.",
+                explanation: "Solid ➔ Liquid! Heat energy is added to the solid ice cream. The particles vibrate faster and break out of their rigid structure to flow freely."
+            },
+            {
+                id: 6, title: "Steamy Bathroom Mirror", visual: "condensation", answer: "Condensation", color: "blue",
+                options: ["Evaporation", "Sublimation", "Condensation", "Deposition"],
+                desc: "After a hot shower, you try to look in the mirror, but it's completely fogged up with tiny water droplets.",
+                explanation: "Gas ➔ Liquid! Invisible water vapor from the hot shower hits the cool mirror, loses heat energy, and clumps together into liquid droplets."
+            },
+            {
+                id: 7, title: "Making Ice Cubes", visual: "freezing", answer: "Freezing", color: "blue",
+                options: ["Condensation", "Freezing", "Deposition", "Melting"],
+                desc: "You fill a plastic tray with tap water and put it in the freezer. A few hours later, you have solid ice.",
+                explanation: "Liquid ➔ Solid! The freezer removes heat energy from the water. The particles slow down until they lock into a rigid crystal structure."
+            },
+            {
+                id: 8, title: "Hardening Chocolate Shell", visual: "freezing", answer: "Freezing", color: "blue",
+                options: ["Condensation", "Deposition", "Melting", "Freezing"],
+                desc: "You pour warm, liquid chocolate syrup over a bowl of freezing cold ice cream. The syrup quickly turns into a hard, crunchy shell.",
+                explanation: "Liquid ➔ Solid! The warm liquid chocolate rapidly loses heat energy to the cold ice cream, causing its particles to slow down and lock into a solid state."
+            },
+            {
+                id: 9, title: "Morning Dew", visual: "condensation", answer: "Condensation", color: "blue",
+                options: ["Freezing", "Deposition", "Condensation", "Evaporation"],
+                desc: "You walk outside early in the morning and notice the grass is wet, even though it didn't rain the night before.",
+                explanation: "Gas ➔ Liquid! Cool morning temperatures cause invisible water vapor in the air to lose energy and form liquid water droplets on the grass."
+            },
+            {
+                id: 10, title: "Butter on Hot Pancakes", visual: "melting", answer: "Melting", color: "red",
+                options: ["Evaporation", "Sublimation", "Melting", "Freezing"],
+                desc: "You place a square of solid butter onto a stack of freshly cooked, hot pancakes. The butter quickly turns into a yellow liquid.",
+                explanation: "Solid ➔ Liquid! The hot pancakes transfer heat energy to the solid butter, causing its particles to vibrate fast enough to break free and flow."
+            },
+            {
+                id: 11, title: "Clothes Drying on a Line", visual: "evaporation", answer: "Evaporation", color: "red",
+                options: ["Condensation", "Sublimation", "Evaporation", "Melting"],
+                desc: "You hang wet laundry outside on a warm, windy day. A few hours later, the clothes are completely dry.",
+                explanation: "Liquid ➔ Gas! The sun and wind add energy to the liquid water trapped in the clothes, allowing the particles to escape as water vapor."
+            },
+            {
+                id: 12, title: "Frost on a Winter Leaf", visual: "deposition", answer: "Deposition", color: "blue",
+                options: ["Freezing", "Condensation", "Sublimation", "Deposition"],
+                desc: "It's a freezing morning, and the edges of a fallen leaf are coated in delicate, solid ice crystals without any liquid water present first.",
+                explanation: "Gas ➔ Solid! Water vapor in the air touched the freezing leaf and instantly locked into a solid ice structure, losing massive amounts of energy."
+            },
+            {
+                id: 13, title: "Seeing Your Breath", visual: "condensation", answer: "Condensation", color: "blue",
+                options: ["Sublimation", "Evaporation", "Condensation", "Freezing"],
+                desc: "You step outside on a cold winter day and exhale. You can suddenly see a little cloud of 'smoke' coming from your mouth.",
+                explanation: "Gas ➔ Liquid! The warm, invisible water vapor from your lungs hits the cold winter air, loses energy, and forms tiny, visible liquid droplets."
+            },
+            {
+                id: 14, title: "Freezer Frost", visual: "deposition", answer: "Deposition", color: "blue",
+                options: ["Condensation", "Freezing", "Deposition", "Sublimation"],
+                desc: "You leave the freezer door open too long on a humid day. Later, the inside of the freezer is coated in a thick layer of solid white frost.",
+                explanation: "Gas ➔ Solid! The humid, vapor-filled air entered the freezer and rapidly lost energy, turning directly into solid frost on the walls."
+            },
+            {
+                id: 15, title: "Shrinking Mothballs", visual: "sublimation", answer: "Sublimation", color: "red",
+                options: ["Melting", "Evaporation", "Sublimation", "Deposition"],
+                desc: "Your grandmother places solid, round mothballs in a closet. Over several months, they get smaller and smaller, filling the closet with a strong smell, but they never leave a liquid stain.",
+                explanation: "Solid ➔ Gas! The solid mothballs slowly absorb heat energy from the room, skipping the liquid phase and turning directly into an odorous gas."
+            },
+            {
+                id: 16, title: "Lava Cooling to Rock", visual: "freezing", answer: "Freezing", color: "blue",
+                options: ["Condensation", "Freezing", "Deposition", "Sublimation"],
+                desc: "Red-hot, flowing liquid lava erupts from a volcano. As it flows down the mountain, it turns into hard, solid black rock.",
+                explanation: "Liquid ➔ Solid! The liquid magma loses immense amounts of heat energy to the much cooler air, slowing its particles until they lock into solid rock."
+            },
+            {
+                id: 17, title: "Sweating to Cool Down", visual: "evaporation", answer: "Evaporation", color: "red",
+                options: ["Evaporation", "Condensation", "Melting", "Sublimation"],
+                desc: "After a hard run, your skin is covered in sweat. As you stand in front of a fan, the sweat disappears and your skin feels much cooler.",
+                explanation: "Liquid ➔ Gas! The liquid sweat absorbs heat energy directly from your skin. As it gains energy, the particles break free and turn into a gas, taking the heat with them!"
+            },
+            {
+                id: 18, title: "Heating Gold for Rings", visual: "melting", answer: "Melting", color: "red",
+                options: ["Sublimation", "Evaporation", "Condensation", "Melting"],
+                desc: "A jeweler takes a solid bar of gold and places it in an extremely hot furnace until it becomes a glowing, pouring fluid ready for a mold.",
+                explanation: "Solid ➔ Liquid! The furnace adds extreme heat energy to the solid gold, causing the particles to vibrate fiercely and break out of their rigid structure."
+            },
+            {
+                id: 19, title: "Dry Ice in a Cooler", visual: "sublimation", answer: "Sublimation", color: "red",
+                options: ["Melting", "Condensation", "Deposition", "Sublimation"],
+                desc: "You pack a cooler with solid dry ice (frozen CO2) to keep food cold on a trip. At the end of the trip, the cooler is empty—there is no water or liquid left at all.",
+                explanation: "Solid ➔ Gas! The dry ice absorbed heat from the warm food, gaining enough energy to fly apart as a gas entirely, bypassing the liquid phase."
+            },
+            {
+                id: 20, title: "Shrinking Snowbank", visual: "sublimation", answer: "Sublimation", color: "red",
+                options: ["Melting", "Evaporation", "Sublimation", "Condensation"],
+                desc: "During a deeply freezing, but very sunny winter week, a pile of snow gets noticeably smaller over a few days, even though the temperature never rose high enough for it to melt.",
+                explanation: "Solid ➔ Gas! The bright sunlight provided enough direct energy for some of the solid snow particles to break completely free and turn straight into water vapor."
+            }
+        ];
+
+        const ScenarioPractice = () => {
+            // Function to randomly select 5 scenarios
+            const getRandomScenarios = () => {
+                const shuffled = [...allScenarios].sort(() => 0.5 - Math.random());
+                return shuffled.slice(0, 5);
+            };
+
+            const [activeScenarios, setActiveScenarios] = useState(getRandomScenarios);
+            const [currentIdx, setCurrentIdx] = useState(0);
+            const [selectedOpt, setSelectedOpt] = useState(null);
+            const [score, setScore] = useState(0);
+
+            const current = activeScenarios[currentIdx];
+            const isAnswered = selectedOpt !== null;
+            const isCorrect = selectedOpt === current?.answer;
+
+            const handleOptionClick = (opt) => {
+                if (isAnswered) return;
+                setSelectedOpt(opt);
+                if (opt === current.answer) {
+                    setScore(s => s + 1);
+                }
+            };
+
+            const nextScenario = () => {
+                setSelectedOpt(null);
+                setCurrentIdx(prev => prev + 1);
+            };
+
+            const resetGame = () => {
+                setScore(0);
+                setCurrentIdx(0);
+                setSelectedOpt(null);
+                setActiveScenarios(getRandomScenarios()); // Get a fresh set of 5 random scenarios
+            };
+
+            // Custom Animated Visuals
+            const ScenarioVisual = ({ type }) => {
+                switch (type) {
+                    case 'condensation':
+                        return (
+                            <div className="relative text-7xl flex items-center justify-center h-40">
+                                <span className="z-10 relative">🥤</span>
+                                <span className="absolute top-4 left-1/4 text-2xl animate-pulse text-blue-400 opacity-80" style={{ animationDuration: '1s' }}>💧</span>
+                                <span className="absolute bottom-6 right-1/4 text-3xl animate-pulse text-blue-500" style={{ animationDelay: '0.5s', animationDuration: '1.5s' }}>💧</span>
+                                <span className="absolute top-1/2 right-1/3 text-xl animate-bounce text-blue-300" style={{ animationDelay: '0.2s' }}>💧</span>
+                            </div>
+                        );
+                    case 'evaporation':
+                        return (
+                            <div className="relative flex flex-col items-center justify-center h-40">
+                                <span className="absolute top-0 text-5xl text-yellow-400 animate-pulse" style={{ animationDuration: '3s' }}>☀️</span>
+                                <div className="absolute bottom-2 flex flex-col items-center">
+                                    <span className="text-4xl animate-bounce text-gray-300 opacity-70" style={{ animationDuration: '4s' }}>☁️</span>
+                                    <div className="w-20 h-6 bg-blue-400 rounded-[100%] opacity-80 mt-2"></div>
+                                </div>
+                            </div>
+                        );
+                    case 'sublimation':
+                        return (
+                            <div className="relative flex items-center justify-center h-40 gap-6">
+                                <span className="text-6xl animate-pulse" style={{ animationDuration: '0.5s' }}>🧊</span>
+                                <span className="text-3xl text-slate-300">➔</span>
+                                <div className="relative">
+                                    <span className="text-6xl animate-bounce text-gray-300 absolute -top-8 -left-4" style={{ animationDuration: '3s' }}>🌫️</span>
+                                    <span className="text-6xl animate-bounce text-gray-400" style={{ animationDuration: '2.5s', animationDelay: '0.5s' }}>🌫️</span>
+                                </div>
+                            </div>
+                        );
+                    case 'deposition':
+                        return (
+                            <div className="relative flex items-center justify-center h-40 gap-6">
+                                <div className="relative">
+                                    <span className="text-5xl text-gray-300 animate-pulse absolute -top-6 -left-4" style={{ animationDuration: '2s' }}>🌫️</span>
+                                    <span className="text-6xl text-gray-400 animate-pulse">🌫️</span>
+                                </div>
+                                <span className="text-3xl text-slate-300">➔</span>
+                                <span className="text-6xl text-cyan-200 animate-pulse" style={{ animationDuration: '1s' }}>❄️</span>
+                            </div>
+                        );
+                    case 'melting':
+                        return (
+                            <div className="relative flex flex-col items-center justify-center h-40">
+                                <span className="text-6xl animate-bounce" style={{ animationDuration: '2s' }}>🍦</span>
+                                <span className="text-3xl text-orange-200 mt-2 absolute bottom-2 animate-ping" style={{ animationDuration: '1.5s' }}>💧</span>
+                            </div>
+                        );
+                    case 'freezing':
+                        return (
+                            <div className="relative flex items-center justify-center h-40 gap-6">
+                                <span className="text-6xl animate-pulse text-blue-400" style={{ animationDuration: '1.5s' }}>💧</span>
+                                <span className="text-3xl text-slate-300">➔</span>
+                                <span className="text-6xl animate-bounce" style={{ animationDuration: '2s' }}>🧊</span>
+                            </div>
+                        );
+                    default: return null;
+                }
+            };
+
+            if (!current) {
+                return (
+                    <div className="bg-white p-8 rounded-2xl border border-slate-200 shadow-sm text-center h-full min-h-[500px] flex flex-col items-center justify-center">
+                        <div className="text-6xl mb-4">🏆</div>
+                        <h2 className="text-3xl font-bold text-slate-800 brand-font mb-2">Practice Complete!</h2>
+                        <p className="text-slate-600 mb-8 text-lg">You scored {score} out of {activeScenarios.length}.</p>
+                        <button onClick={resetGame} className="flex items-center gap-2 bg-indigo-600 text-white px-8 py-3 rounded-xl font-bold hover:bg-indigo-700 transition shadow-md hover:shadow-lg">
+                            <Icons.Refresh size={20} /> Try 5 New Scenarios
+                        </button>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="bg-white rounded-2xl border border-slate-200 shadow-sm flex flex-col h-full min-h-[550px] overflow-hidden relative">
+                    {/* Header */}
+                    <div className="bg-slate-50 border-b border-slate-200 p-4 flex justify-between items-center">
+                        <div className="font-bold text-slate-500 uppercase tracking-wider text-sm">
+                            Scenario {currentIdx + 1} of {activeScenarios.length}
+                        </div>
+                        <div className="bg-indigo-100 text-indigo-800 px-4 py-1.5 rounded-full text-sm font-bold shadow-inner">
+                            Score: {score}
+                        </div>
+                    </div>
+
+                    <div className="p-6 md:p-8 flex-grow flex flex-col lg:flex-row gap-8">
+                        {/* Left Side: Visual & Story */}
+                        <div className="flex-1 flex flex-col">
+                            <div className="bg-slate-50 rounded-2xl border border-slate-200 p-6 mb-6">
+                                <ScenarioVisual type={current.visual} />
+                            </div>
+                            <h3 className="text-2xl font-bold text-slate-800 brand-font mb-3">{current.title}</h3>
+                            <p className="text-slate-600 leading-relaxed text-lg flex-grow">
+                                {current.desc}
+                            </p>
+                        </div>
+
+                        {/* Right Side: Interaction */}
+                        <div className="flex-1 flex flex-col justify-center">
+
+                            {!isAnswered ? (
+                                <div className="space-y-3">
+                                    <p className="font-bold text-slate-700 mb-4 text-center">What is happening?</p>
+                                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                        {current.options.map(opt => (
+                                            <button
+                                                key={opt}
+                                                onClick={() => handleOptionClick(opt)}
+                                                className="p-4 rounded-xl border-2 border-slate-200 bg-white hover:border-indigo-400 hover:bg-indigo-50 text-slate-700 font-bold transition-all shadow-sm active:scale-95"
+                                            >
+                                                {opt}
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            ) : (
+                                <div className={`p-6 rounded-2xl border-2 transition-all duration-500 ${isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200'}`}>
+                                    <div className="flex items-center gap-3 mb-4">
+                                        <div className={`w-10 h-10 rounded-full flex items-center justify-center text-xl font-bold text-white shadow-md ${isCorrect ? 'bg-green-500' : 'bg-red-500'}`}>
+                                            {isCorrect ? '✓' : '✗'}
+                                        </div>
+                                        <h4 className={`text-xl font-bold ${isCorrect ? 'text-green-800' : 'text-red-800'}`}>
+                                            {isCorrect ? 'Spot On!' : `Not quite! It was ${current.answer}.`}
+                                        </h4>
+                                    </div>
+
+                                    <div className="bg-white/60 rounded-xl p-4 text-slate-700 mb-6 shadow-sm border border-white">
+                                        <span className={`inline-block px-2 py-1 rounded text-xs font-bold text-white mb-2 ${current.color === 'red' ? 'bg-red-500' : 'bg-blue-500'}`}>
+                                            {current.color === 'red' ? '🔥 Heat Added' : '❄️ Heat Removed'}
+                                        </span>
+                                        <p>{current.explanation}</p>
+                                    </div>
+
+                                    <button
+                                        onClick={nextScenario}
+                                        className={`w-full py-3 rounded-xl font-bold text-white shadow-md transition-all hover:shadow-lg active:scale-95
+                                            ${isCorrect ? 'bg-green-600 hover:bg-green-700' : 'bg-slate-800 hover:bg-slate-900'}`}
+                                    >
+                                        {currentIdx === activeScenarios.length - 1 ? 'See Final Score' : 'Next Scenario ➔'}
+                                    </button>
+                                </div>
+                            )}
+
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        // --- MAIN APP ---
+        const App = () => {
+            const [activeTab, setActiveTab] = useState(0);
+
+            const tabs = [
+                { id: 'kmt', label: 'KMT', icon: Icons.Fire, component: <KMTSimulation /> },
+                { id: 'phases', label: 'Phase Changes', icon: Icons.Triangle, component: <StatesAndPhases /> },
+                { id: 'practice', label: 'Real World Practice', icon: Icons.Atom, component: <ScenarioPractice /> },
+            ];
+
+            return (
+                <div className="min-h-screen bg-slate-50 text-slate-900 pb-12">
+                    {/* Header */}
+                    <header className="bg-indigo-700 text-white p-6 shadow-lg">
+                        <div className="max-w-6xl mx-auto flex flex-col md:flex-row justify-between items-center gap-4">
+                            <div>
+                                <h1 className="text-2xl md:text-3xl font-bold tracking-tight">KMT Interactive</h1>
+                                <p className="text-indigo-200 text-sm">Kinetic Molecular Theory & States of Matter</p>
+                            </div>
+                        </div>
+                    </header>
+
+                    {/* Navigation */}
+                    <div className="max-w-6xl mx-auto px-4 mt-6">
+                        <div className="flex overflow-x-auto pb-2 gap-2 md:gap-4 no-scrollbar">
+                            {tabs.map((tab, idx) => (
+                                <button
+                                    key={tab.id}
+                                    onClick={() => setActiveTab(idx)}
+                                    className={`flex items-center gap-2 px-5 py-3 rounded-lg font-bold transition-all whitespace-nowrap flex-shrink-0 ${activeTab === idx
+                                            ? 'bg-white text-indigo-600 shadow-md ring-1 ring-indigo-100'
+                                            : 'bg-white/50 text-slate-600 hover:bg-white hover:text-indigo-500'
+                                        }`}
+                                >
+                                    <tab.icon size={18} />
+                                    {tab.label}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+
+                    {/* Main Content Area */}
+                    <main className="max-w-6xl mx-auto px-4 mt-6">
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+                            {/* Main Interactive Tool (Takes up full width now for better view) */}
+                            <div className="md:col-span-3">
+                                <div className="h-full">
+                                    {tabs[activeTab].component}
+                                </div>
+                            </div>
+
+                        </div>
+                    </main>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+
+</html>
