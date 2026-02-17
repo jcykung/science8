@@ -1,0 +1,933 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Density Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            touch-action: none;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        canvas {
+            display: block;
+            touch-action: none;
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -6px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+            border: 2px solid white;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #cbd5e1;
+            border-radius: 2px;
+        }
+
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+            min-width: 120px;
+        }
+
+        .formula-container {
+            display: flex;
+            align-items: center;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            padding: 8px 16px;
+            border-radius: 12px;
+            gap: 12px;
+            box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .variable-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .fraction {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .numerator {
+            border-bottom: 2px solid #94a3b8;
+            padding-bottom: 2px;
+            margin-bottom: 2px;
+            text-align: center;
+            width: 100%;
+        }
+
+        .var-label {
+            font-size: 0.75rem;
+            letter-spacing: 0.02em;
+            color: #64748b;
+            font-weight: 600;
+        }
+
+        .var-value {
+            font-family: 'Courier New', monospace;
+            font-weight: bold;
+            color: #0f172a;
+        }
+
+        .equals {
+            font-size: 1.5rem;
+            color: #94a3b8;
+            font-weight: 300;
+        }
+
+        .tab-btn {
+            padding: 8px 16px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #64748b;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+        }
+
+        .tab-btn.active {
+            color: #2563eb;
+            border-bottom-color: #2563eb;
+        }
+
+        .tab-content {
+            display: none;
+            width: 100%;
+            height: 100%;
+            flex: 1;
+            position: relative;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+
+        .radio-label {
+            display: flex;
+            align-items: center;
+            font-size: 0.85rem;
+            color: #475569;
+            cursor: pointer;
+        }
+
+        .radio-label input {
+            margin-right: 8px;
+            accent-color: #2563eb;
+        }
+    </style>
+</head>
+
+<body class="bg-slate-100 h-screen flex flex-col relative">
+
+    <div class="glass-panel w-full z-20 flex flex-col">
+        <div class="bg-slate-50 border-b border-slate-200 px-6 py-3">
+            <h1 class="text-xl font-bold text-slate-800">Density Lab</h1>
+            <p class="text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed">
+                <strong>Density (D)</strong> is a measure of how much matter (m) is packed into a specific space (V).
+                High density means particles are packed tightly together. Low density means they are spread apart.
+            </p>
+        </div>
+
+        <div class="flex px-6 border-b border-slate-200 bg-white overflow-x-auto">
+            <button class="tab-btn active" onclick="switchTab('macro')">1. Macro Lab</button>
+            <button class="tab-btn" onclick="switchTab('micro')">2. Micro View</button>
+            <button class="tab-btn" onclick="switchTab('lake')">3. Lake Ecology</button>
+        </div>
+
+        <!-- 1. Macro Controls -->
+        <div id="macroControls" class="p-4 flex flex-wrap items-center justify-between gap-4">
+            <div class="formula-container">
+                <div class="variable-group">
+                    <span class="var-label text-blue-600">Density (D)</span>
+                    <span id="formulaD" class="var-value text-xl text-blue-600">0.80</span>
+                    <span class="text-[10px] text-slate-400">g/cm³</span>
+                </div>
+                <div class="equals">=</div>
+                <div class="fraction">
+                    <div class="numerator">
+                        <div class="variable-group">
+                            <span class="var-value" id="formulaM">800</span>
+                            <span class="var-label">mass (m) [g]</span>
+                        </div>
+                    </div>
+                    <div class="variable-group">
+                        <span class="var-value" id="formulaV">1000</span>
+                        <span class="var-label">Volume (V) [cm³]</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flex flex-1 flex-wrap items-end justify-center md:justify-end gap-6">
+                <div class="control-group">
+                    <div class="flex justify-between text-xs mb-2">
+                        <label class="font-bold text-slate-700">Mass (m)</label>
+                        <span id="massVal" class="font-mono text-slate-600 bg-slate-100 px-2 rounded">800 g</span>
+                    </div>
+                    <input type="range" id="massSlider" min="100" max="3000" step="50" value="800">
+                </div>
+                <div class="control-group">
+                    <div class="flex justify-between text-xs mb-2">
+                        <label class="font-bold text-slate-700">Volume (V)</label>
+                        <span id="volVal" class="font-mono text-slate-600 bg-slate-100 px-2 rounded">1000 cm³</span>
+                    </div>
+                    <input type="range" id="volSlider" min="200" max="5000" step="50" value="1000">
+                </div>
+                <div class="control-group border-l pl-6 border-slate-200">
+                    <div class="flex justify-between text-xs mb-2">
+                        <label class="font-bold text-slate-700">Density (D)</label>
+                        <span id="densityVal" class="font-bold text-blue-600 bg-blue-50 px-2 rounded">0.80 g/cm³</span>
+                    </div>
+                    <input type="range" id="densitySlider" min="0.1" max="3.0" step="0.1" value="0.8">
+                </div>
+            </div>
+
+            <div class="flex items-center gap-2 border-l pl-4">
+                <label class="text-xs font-semibold text-slate-600">Show<br>Gravity</label>
+                <input type="checkbox" id="forceToggle" class="accent-blue-600 w-4 h-4" checked>
+            </div>
+        </div>
+
+        <!-- 2. Micro Controls -->
+        <div id="microControls" class="p-4 hidden items-center justify-center gap-8 bg-blue-50/50">
+            <div class="flex flex-col items-center w-64">
+                <label class="text-sm font-bold text-slate-700 mb-1">Temperature</label>
+                <input type="range" id="tempSlider" min="-20" max="20" step="1" value="20" class="w-full">
+                <div class="flex justify-between w-full text-xs text-slate-500 mt-1 font-mono">
+                    <span>-20°C (Ice)</span>
+                    <span id="tempVal" class="font-bold text-blue-600 text-sm">20°C</span>
+                    <span>20°C (Water)</span>
+                </div>
+            </div>
+            <div class="text-sm text-slate-600 max-w-md bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
+                <strong id="phaseTitle" class="text-blue-700">Liquid Water:</strong>
+                <span id="phaseDesc">Heat energy breaks bonds. Molecules slide closer together into a tighter
+                    volume.</span>
+            </div>
+        </div>
+
+        <!-- 3. Lake Controls -->
+        <div id="lakeControls" class="p-4 hidden items-center justify-start gap-6 bg-emerald-50/50">
+            <!-- Scenario Selection -->
+            <div class="flex flex-col bg-white p-3 rounded-lg border border-emerald-100 shadow-sm w-48 shrink-0">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-2">Simulation Mode</span>
+                <div class="radio-group">
+                    <label class="radio-label">
+                        <input type="radio" name="lakeScenario" value="real" checked
+                            onchange="updateLakeScenario(this.value)">
+                        <div>
+                            <span class="block font-bold text-slate-700">Real World</span>
+                            <span class="text-[10px] text-slate-500">Ice Floats</span>
+                        </div>
+                    </label>
+                    <label class="radio-label mt-1">
+                        <input type="radio" name="lakeScenario" value="hypothetical"
+                            onchange="updateLakeScenario(this.value)">
+                        <div>
+                            <span class="block font-bold text-slate-700">Hypothetical</span>
+                            <span class="text-[10px] text-slate-500">Ice Sinks</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Temperature Slider -->
+            <div class="flex flex-col items-center w-48 shrink-0">
+                <label class="text-xs font-bold text-slate-700 mb-2">Lake Temperature</label>
+                <input type="range" id="lakeTempSlider" min="-20" max="20" step="1" value="20" class="w-full">
+                <div class="flex justify-between w-full text-[10px] text-slate-500 mt-1 font-mono">
+                    <span>-20°C</span>
+                    <span id="lakeTempVal" class="font-bold text-emerald-600 text-xs">20°C</span>
+                    <span>20°C</span>
+                </div>
+            </div>
+
+            <!-- Description Box -->
+            <div class="flex-1 bg-white p-3 px-4 rounded-lg border border-emerald-200 shadow-sm min-w-0">
+                <h3 id="lakeTitle" class="font-bold text-emerald-800 text-xs mb-1">Winter in the Lake (Real World)</h3>
+                <p id="lakeDesc" class="text-xs text-slate-600 leading-tight">
+                    Ice floats on top because it is less dense than liquid water. This layer insulates the lake,
+                    allowing aquatic life to survive the winter.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <div class="relative flex-1 w-full bg-slate-200 overflow-hidden">
+        <div id="tab-macro" class="tab-content active"><canvas id="simCanvas" class="w-full h-full"></canvas>
+            <div class="absolute bottom-6 left-6 pointer-events-none">
+                <div class="bg-white/80 backdrop-blur px-4 py-2 rounded-lg shadow-lg border border-white/50">
+                    <span class="text-xs text-slate-500 uppercase tracking-wide">Status</span>
+                    <div id="statusVal" class="text-lg font-bold text-green-600">Floating</div>
+                </div>
+            </div>
+        </div>
+        <div id="tab-micro" class="tab-content bg-slate-800"><canvas id="microCanvas" class="w-full h-full"></canvas>
+            <div class="absolute bottom-6 right-6 pointer-events-none">
+                <div
+                    class="bg-slate-900/80 text-white backdrop-blur px-4 py-3 rounded-lg shadow-lg border border-slate-700">
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-3 h-3 rounded-full bg-red-500"></div> <span class="text-xs">Oxygen</span>
+                    </div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <div class="w-2 h-2 rounded-full bg-slate-300"></div> <span class="text-xs">Hydrogen</span>
+                    </div>
+                    <div class="flex items-center gap-2">
+                        <div class="w-4 h-0 border-t-2 border-dashed border-yellow-400/50"></div> <span
+                            class="text-xs">Hydrogen Bond (H··O)</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="tab-lake" class="tab-content"><canvas id="lakeCanvas" class="w-full h-full"></canvas></div>
+    </div>
+
+    <script>
+        let currentTab = 'macro';
+
+        // --- Globals ---
+        const canvas = document.getElementById('simCanvas');
+        const ctx = canvas.getContext('2d');
+        const microCanvas = document.getElementById('microCanvas');
+        const mCtx = microCanvas.getContext('2d');
+        const lakeCanvas = document.getElementById('lakeCanvas');
+        const lCtx = lakeCanvas.getContext('2d');
+
+        // Macro UI
+        const massSlider = document.getElementById('massSlider');
+        const volSlider = document.getElementById('volSlider');
+        const densitySlider = document.getElementById('densitySlider');
+        const forceToggle = document.getElementById('forceToggle');
+        const displays = {
+            m: document.getElementById('massVal'), v: document.getElementById('volVal'), d: document.getElementById('densityVal'),
+            status: document.getElementById('statusVal'), fM: document.getElementById('formulaM'), fV: document.getElementById('formulaV'), fD: document.getElementById('formulaD')
+        };
+        const MACRO_CONFIG = { WATER_LEVEL_RATIO: 0.55, GRAVITY: 0.5, WATER_DENSITY: 1.0, DAMPING: 0.96 };
+        let width, height, waterLevel;
+        const block = { x: 0, y: 0, size: 150, vx: 0, vy: 0, density: 0.8, mass: 800, volume: 1000, isDragging: false, submergedRatio: 0 };
+        const mouse = { x: 0, y: 0, px: 0, py: 0, down: false };
+
+        // Micro UI
+        const tempSlider = document.getElementById('tempSlider');
+        const tempDisplay = document.getElementById('tempVal');
+        const phaseTitle = document.getElementById('phaseTitle');
+        const phaseDesc = document.getElementById('phaseDesc');
+        let mWidth, mHeight, molecules = [], temperature = 20, latticeBox = { x: 0, y: 0, w: 0, h: 0 };
+        const BOND_DIST = 14;
+        let currentBondAngle = 105 * (Math.PI / 180);
+
+        // Lake UI
+        const lakeTempSlider = document.getElementById('lakeTempSlider');
+        const lakeTempDisplay = document.getElementById('lakeTempVal');
+        const lakeTitle = document.getElementById('lakeTitle');
+        const lakeDesc = document.getElementById('lakeDesc');
+        let lWidth, lHeight, lakeTemp = 20, isRealWorld = true;
+        let fishArray = [], plantArray = [], iceParticles = [], accumulatedBottomIce = 0;
+
+        // --- Class Definitions ---
+        class Molecule {
+            constructor(id) {
+                this.id = id; this.x = 0; this.y = 0; this.vx = 0; this.vy = 0; this.angle = 0;
+                this.vAngle = (Math.random() - 0.5) * 0.1; this.targetX = 0; this.targetY = 0; this.targetAngle = 0;
+            }
+            getAtoms() {
+                const a1 = this.angle - currentBondAngle / 2;
+                const a2 = this.angle + currentBondAngle / 2;
+                return {
+                    o: { x: this.x, y: this.y },
+                    h1: { x: this.x + Math.cos(a1) * BOND_DIST, y: this.y + Math.sin(a1) * BOND_DIST },
+                    h2: { x: this.x + Math.cos(a2) * BOND_DIST, y: this.y + Math.sin(a2) * BOND_DIST }
+                };
+            }
+            update(w, h, temp) {
+                if (temp <= 0) {
+                    const k = 0.08, kRot = 0.15;
+                    this.vx = (this.targetX - this.x) * k; this.vy = (this.targetY - this.y) * k;
+                    let diff = this.targetAngle - this.angle;
+                    while (diff > Math.PI) diff -= Math.PI * 2; while (diff < -Math.PI) diff += Math.PI * 2;
+                    this.angle += diff * kRot;
+                    this.x += this.vx + (Math.random() - 0.5) * 0.3; this.y += this.vy + (Math.random() - 0.5) * 0.3;
+                    currentBondAngle = 120 * (Math.PI / 180);
+                } else {
+                    const noise = 0.8 + (temp * 0.05);
+                    this.vx += (Math.random() - 0.5) * noise; this.vy += (Math.random() - 0.5) * noise;
+                    this.vx *= 0.95; this.vy *= 0.95;
+                    const maxSpeed = 4.0, curSpeed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                    if (curSpeed > maxSpeed) { this.vx = (this.vx / curSpeed) * maxSpeed; this.vy = (this.vy / curSpeed) * maxSpeed; }
+                    this.angle += this.vAngle * (1 + temp * 0.05);
+                    this.x += this.vx; this.y += this.vy;
+                    currentBondAngle = 105 * (Math.PI / 180);
+                    const boxW = w * 0.45, boxH = h * 0.45, startX = (w - boxW) / 2, startY = (h - boxH) / 2, radius = 15;
+                    molecules.forEach(other => {
+                        if (other === this) return;
+                        const dx = other.x - this.x, dy = other.y - this.y, dist = Math.sqrt(dx * dx + dy * dy);
+                        if (dist < 32 && dist > 0) {
+                            const push = (32 - dist) * 0.08;
+                            this.vx -= (dx / dist) * push; this.vy -= (dy / dist) * push;
+                        }
+                    });
+                    if (this.x < startX + radius) { this.x = startX + radius; this.vx = Math.abs(this.vx); }
+                    if (this.x > startX + boxW - radius) { this.x = startX + boxW - radius; this.vx = -Math.abs(this.vx); }
+                    if (this.y < startY + radius) { this.y = startY + radius; this.vy = Math.abs(this.vy); }
+                    if (this.y > startY + boxH - radius) { this.y = startY + boxH - radius; this.vy = -Math.abs(this.vy); }
+                }
+            }
+            draw() {
+                const atoms = this.getAtoms();
+                mCtx.beginPath(); mCtx.moveTo(atoms.o.x, atoms.o.y); mCtx.lineTo(atoms.h1.x, atoms.h1.y);
+                mCtx.moveTo(atoms.o.x, atoms.o.y); mCtx.lineTo(atoms.h2.x, atoms.h2.y);
+                mCtx.strokeStyle = '#94a3b8'; mCtx.lineWidth = 3; mCtx.stroke();
+                mCtx.fillStyle = '#cbd5e1'; mCtx.beginPath(); mCtx.arc(atoms.h1.x, atoms.h1.y, 6, 0, Math.PI * 2); mCtx.fill();
+                mCtx.beginPath(); mCtx.arc(atoms.h2.x, atoms.h2.y, 6, 0, Math.PI * 2); mCtx.fill();
+                mCtx.fillStyle = '#ef4444'; mCtx.beginPath(); mCtx.arc(atoms.o.x, atoms.o.y, 10, 0, Math.PI * 2); mCtx.fill();
+            }
+        }
+
+        class Fish {
+            constructor() {
+                this.x = Math.random() * 800; this.y = 300 + Math.random() * 200;
+                this.vx = (Math.random() - 0.5) * 2; this.vy = (Math.random() - 0.5) * 0.5;
+                this.size = 20 + Math.random() * 10; this.alive = true;
+                this.color = `hsl(${Math.random() * 40 + 10}, 80%, 50%)`;
+            }
+            update(topBound, bottomBound) {
+                if (topBound >= bottomBound - 15) this.alive = false;
+                if (!this.alive) { if (this.y > topBound + 10) this.y -= 0.5; return; }
+                this.x += this.vx; this.y += this.vy;
+                if (this.x < 20 || this.x > lWidth - 20) this.vx *= -1;
+                if (this.y < topBound + 15) { this.y = topBound + 15; this.vy = Math.abs(this.vy); }
+                if (this.y > bottomBound - 15) { this.y = bottomBound - 15; this.vy = -Math.abs(this.vy); }
+            }
+            draw() {
+                lCtx.save(); lCtx.translate(this.x, this.y); if (this.vx < 0) lCtx.scale(-1, 1);
+                if (!this.alive) { lCtx.rotate(Math.PI); lCtx.filter = 'grayscale(100%)'; }
+                lCtx.fillStyle = this.color; lCtx.beginPath(); lCtx.ellipse(0, 0, this.size, this.size / 2, 0, 0, Math.PI * 2); lCtx.fill();
+                lCtx.beginPath(); lCtx.moveTo(-this.size, 0); lCtx.lineTo(-this.size - 10, -8); lCtx.lineTo(-this.size - 10, 8); lCtx.fill();
+                lCtx.fillStyle = 'white'; lCtx.beginPath(); lCtx.arc(this.size / 2, -2, 4, 0, Math.PI * 2); lCtx.fill();
+                lCtx.fillStyle = 'black'; lCtx.beginPath(); lCtx.arc(this.size / 2 + 2, -2, 2, 0, Math.PI * 2); lCtx.fill();
+                lCtx.restore();
+            }
+        }
+
+        class Plant {
+            constructor(x) { this.x = x; this.h = 60 + Math.random() * 80; }
+            draw(lakeBottom, iceTop) {
+                // If iceTop (Y coord) is less than plant top (Y coord), the ice is above the plant
+                const plantTop = lakeBottom - this.h;
+                const isFrozen = iceTop < plantTop;
+
+                lCtx.save();
+                lCtx.strokeStyle = isFrozen ? '#94a3b8' : '#15803d';
+                lCtx.lineWidth = 4;
+                lCtx.lineCap = 'round';
+                lCtx.beginPath();
+                lCtx.moveTo(this.x, lakeBottom);
+
+                // Stop swaying if frozen
+                const sway = isFrozen ? 0 : Math.sin(Date.now() / 1000 + this.x) * 10;
+
+                lCtx.quadraticCurveTo(this.x + sway, lakeBottom - this.h / 2, this.x + sway / 2, lakeBottom - this.h);
+                lCtx.stroke();
+                lCtx.restore();
+            }
+        }
+
+        class SinkingIce {
+            constructor(surfaceY) {
+                this.x = Math.random() * lWidth; this.y = surfaceY + Math.random() * 5;
+                this.size = 6 + Math.random() * 8; this.vy = 1.2 + Math.random() * 1.5;
+                this.rot = Math.random() * Math.PI; this.vRot = (Math.random() - 0.5) * 0.1;
+                this.active = true;
+            }
+            update(targetY) {
+                this.y += this.vy; this.rot += this.vRot;
+                if (this.y >= targetY) { this.active = false; accumulatedBottomIce += 1.2; }
+            }
+            draw() {
+                lCtx.save(); lCtx.translate(this.x, this.y); lCtx.rotate(this.rot);
+                lCtx.fillStyle = 'rgba(255, 255, 255, 0.85)';
+                lCtx.fillRect(-this.size / 2, -this.size / 2, this.size, this.size);
+                lCtx.restore();
+            }
+        }
+
+        // --- Functions ---
+        function getPos(e) {
+            const rect = (e.target).getBoundingClientRect();
+            const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+            const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+            return { x: clientX - rect.left, y: clientY - rect.top };
+        }
+
+        function updateMacroUI() {
+            const m = Math.round(block.mass);
+            const v = Math.round(block.volume);
+            const d = block.density.toFixed(2);
+            displays.m.innerText = m + ' g';
+            displays.v.innerText = v + ' cm³';
+            displays.d.innerText = d + ' g/cm³';
+            displays.fM.innerText = m; displays.fV.innerText = v; displays.fD.innerText = d;
+
+            if (block.density < 1.0) {
+                displays.status.innerText = "Floating"; displays.status.className = "text-lg font-bold text-green-600";
+            } else if (block.density > 1.0) {
+                displays.status.innerText = "Sinking"; displays.status.className = "text-lg font-bold text-red-600";
+            } else {
+                displays.status.innerText = "Neutrally Buoyant"; displays.status.className = "text-lg font-bold text-blue-600";
+            }
+        }
+
+        function updateBlockSize() { block.size = 15 * Math.pow(block.volume, 1 / 3); }
+
+        function drawArrow(ctx, fromX, fromY, length, direction, color, label) {
+            if (length < 5) return;
+            const headLen = 12;
+            const angle = direction === 'down' ? Math.PI / 2 : -Math.PI / 2;
+            const toX = fromX + Math.cos(angle) * length;
+            const toY = fromY + Math.sin(angle) * length;
+            ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY);
+            ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.stroke();
+            ctx.beginPath();
+            ctx.moveTo(toX, toY);
+            ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
+            ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
+            ctx.lineTo(toX, toY); ctx.fillStyle = color; ctx.fill();
+            if (label) {
+                ctx.fillStyle = color; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
+                if (direction === 'down') ctx.fillText(label, toX, toY + 20);
+                else ctx.fillText(label, toX, toY - 10);
+            }
+        }
+
+        function updateLakeText() {
+            if (isRealWorld) {
+                lakeTitle.innerText = "Winter in the Lake (Real World)";
+                lakeDesc.innerText = "Ice floats on top. This layer insulates the liquid water below, allowing aquatic life to survive the winter.";
+            } else {
+                lakeTitle.innerText = "Winter in the Lake (Hypothetical)";
+                lakeDesc.innerText = "If ice were denser than water, it would sink! It would fall to the bottom, filling the lake upward and freezing all aquatic life.";
+            }
+        }
+
+        function resizeMacro() {
+            const container = canvas.parentElement;
+            width = canvas.width = container.clientWidth;
+            height = canvas.height = container.clientHeight;
+            waterLevel = height * MACRO_CONFIG.WATER_LEVEL_RATIO;
+            if (block.x === 0 && block.y === 0) { block.x = width / 2 - block.size / 2; block.y = height * 0.2; }
+        }
+
+        function resizeMicro() {
+            const container = microCanvas.parentElement;
+            mWidth = microCanvas.width = container.clientWidth;
+            mHeight = microCanvas.height = container.clientHeight;
+            if (molecules.length > 0) {
+                let minX = 10000, maxX = -10000, minY = 10000, maxY = -10000;
+                molecules.forEach(m => {
+                    if (m.targetX < minX) minX = m.targetX; if (m.targetX > maxX) maxX = m.targetX;
+                    if (m.targetY < minY) minY = m.targetY; if (m.targetY > maxY) maxY = m.targetY;
+                });
+                const w = maxX - minX; const h = maxY - minY;
+                const offsetX = (mWidth - w) / 2 - minX; const offsetY = (mHeight - h) / 2 - minY;
+                latticeBox = { x: (mWidth - w) / 2 - 40, y: (mHeight - h) / 2 - 40, w: w + 80, h: h + 80 };
+                molecules.forEach(m => {
+                    m.targetX += offsetX; m.targetY += offsetY;
+                    if (m.x < 0) m.x = mWidth / 2; if (m.y < 0) m.y = mHeight / 2;
+                });
+            }
+        }
+
+        function resizeLake() {
+            const container = lakeCanvas.parentElement;
+            lWidth = lakeCanvas.width = container.clientWidth;
+            lHeight = lakeCanvas.height = container.clientHeight;
+            if (fishArray.length === 0) initLake();
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.getElementById('macroControls').classList.add('hidden');
+            document.getElementById('macroControls').classList.remove('flex');
+            document.getElementById('microControls').classList.add('hidden');
+            document.getElementById('microControls').classList.remove('flex');
+            document.getElementById('lakeControls').classList.add('hidden');
+            document.getElementById('lakeControls').classList.remove('flex');
+
+            if (tab === 'macro') {
+                document.querySelector('button[onclick="switchTab(\'macro\')"]').classList.add('active');
+                document.getElementById('tab-macro').classList.add('active');
+                document.getElementById('macroControls').classList.remove('hidden');
+                document.getElementById('macroControls').classList.add('flex');
+                resizeMacro();
+            } else if (tab === 'micro') {
+                document.querySelector('button[onclick="switchTab(\'micro\')"]').classList.add('active');
+                document.getElementById('tab-micro').classList.add('active');
+                document.getElementById('microControls').classList.remove('hidden');
+                document.getElementById('microControls').classList.add('flex');
+                resizeMicro();
+            } else {
+                document.querySelector('button[onclick="switchTab(\'lake\')"]').classList.add('active');
+                document.getElementById('tab-lake').classList.add('active');
+                document.getElementById('lakeControls').classList.remove('hidden');
+                document.getElementById('lakeControls').classList.add('flex');
+                resizeLake();
+            }
+        }
+
+        function updateLakeScenario(val) {
+            isRealWorld = (val === 'real');
+            lakeTemp = 20;
+            lakeTempSlider.value = 20;
+            document.getElementById('lakeTempVal').innerText = "20°C";
+            document.getElementById('lakeTempVal').className = "font-bold text-emerald-600 text-sm";
+            initLake();
+            updateLakeText();
+        }
+
+        function initMicro() {
+            molecules = [];
+            const bondLen = 50; const wStep = bondLen * Math.sqrt(3);
+            const cols = 9; const rows = 8;
+            let count = 0;
+            for (let r = 0; r < rows; r++) {
+                let y = 0; const cycles = Math.floor(r / 2);
+                y += cycles * (bondLen * 1.5); if (r % 2 === 1) y += bondLen * 0.5;
+                for (let c = 0; c < cols; c++) {
+                    const m = new Molecule(count++);
+                    let x = c * wStep;
+                    const rowMod = r % 4; if (rowMod === 1 || rowMod === 2) x += wStep / 2;
+                    m.targetX = x; m.targetY = y; m.gridR = r; m.gridC = c;
+                    m.x = x + (Math.random() - 0.5) * 100; m.y = y + (Math.random() - 0.5) * 100;
+                    m.vx = (Math.random() - 0.5) * 1; m.vy = (Math.random() - 0.5) * 1;
+                    molecules.push(m);
+                }
+            }
+            molecules.sort((a, b) => (a.targetY - b.targetY) || (a.targetX - b.targetX));
+            molecules.forEach(m => {
+                let neighbors = molecules.filter(other => {
+                    if (other === m) return false;
+                    const d = Math.sqrt((m.targetX - other.targetX) ** 2 + (m.targetY - other.targetY) ** 2);
+                    return d < bondLen * 1.5;
+                });
+                let incoming = neighbors.filter(n => n.donatesTo && n.donatesTo.includes(m));
+                let candidates = neighbors.filter(n => !incoming.includes(n));
+                candidates.sort((a, b) => b.targetY - a.targetY);
+                m.donatesTo = candidates.slice(0, 2);
+                if (m.donatesTo.length === 2) {
+                    const t1 = m.donatesTo[0]; const t2 = m.donatesTo[1];
+                    const a1 = Math.atan2(t1.targetY - m.targetY, t1.targetX - m.targetX);
+                    const a2 = Math.atan2(t2.targetY - m.targetY, t2.targetX - m.targetX);
+                    let bisect = (a1 + a2) / 2; if (Math.abs(a1 - a2) > Math.PI) bisect += Math.PI;
+                    m.targetAngle = bisect;
+                } else if (m.donatesTo.length === 1) {
+                    const t1 = m.donatesTo[0];
+                    const a1 = Math.atan2(t1.targetY - m.targetY, t1.targetX - m.targetX);
+                    m.targetAngle = a1 + (60 * Math.PI / 180);
+                } else { m.targetAngle = Math.PI / 2; }
+            });
+        }
+
+        function initLake() {
+            fishArray = []; plantArray = []; iceParticles = []; accumulatedBottomIce = 0;
+            for (let i = 0; i < 8; i++) fishArray.push(new Fish());
+            for (let i = 0; i < 10; i++) plantArray.push(new Plant(i * 100 + 50));
+        }
+
+        function onDown(e) {
+            if (currentTab !== 'macro') return;
+            if (e.type === 'touchstart') e.preventDefault();
+            const p = getPos(e); mouse.x = p.x; mouse.y = p.y; mouse.down = true;
+            if (p.x > block.x && p.x < block.x + block.size && p.y > block.y && p.y < block.y + block.size) block.isDragging = true;
+        }
+        function onMove(e) {
+            if (currentTab !== 'macro') return;
+            if (e.type === 'touchmove') e.preventDefault();
+            const p = getPos(e); mouse.px = mouse.x; mouse.py = mouse.y; mouse.x = p.x; mouse.y = p.y;
+        }
+        function onUp() {
+            mouse.down = false;
+            if (block.isDragging) {
+                block.vx = (mouse.x - mouse.px) * 0.5;
+                block.vy = (mouse.y - mouse.py) * 0.5;
+            }
+            block.isDragging = false;
+        }
+
+        function updateMacroPhysics() {
+            if (block.isDragging) {
+                const targetX = mouse.x - block.size / 2;
+                const targetY = mouse.y - block.size / 2;
+                block.vx = (targetX - block.x) * 0.3;
+                block.vy = (targetY - block.y) * 0.3;
+                block.x += block.vx; block.y += block.vy;
+                let submergedHeight = Math.max(0, Math.min(block.size, (block.y + block.size) - waterLevel));
+                block.submergedRatio = submergedHeight / block.size;
+            } else {
+                const forceGravity = block.density * MACRO_CONFIG.GRAVITY;
+                let submergedHeight = Math.max(0, Math.min(block.size, (block.y + block.size) - waterLevel));
+                block.submergedRatio = submergedHeight / block.size;
+                const forceBuoyancy = - (block.submergedRatio * MACRO_CONFIG.WATER_DENSITY * MACRO_CONFIG.GRAVITY);
+                if (Math.abs(block.density - 1.0) < 0.02 && block.submergedRatio > 0.9) {
+                    const waterMiddleY = waterLevel + (height - waterLevel) / 2;
+                    const blockCenterY = block.y + block.size / 2;
+                    block.vy += (waterMiddleY - blockCenterY) * 0.005;
+                    block.vx *= 0.90; block.vy *= 0.90;
+                } else {
+                    block.vy += forceGravity + forceBuoyancy;
+                    let currentDamping = block.submergedRatio > 0 ? 0.92 : MACRO_CONFIG.DAMPING;
+                    block.vx *= currentDamping; block.vy *= currentDamping;
+                }
+                block.x += block.vx; block.y += block.vy;
+            }
+            if (block.y + block.size > height) { block.y = height - block.size; block.vy *= -0.3; }
+            if (block.x < 0) { block.x = 0; block.vx *= -0.5; }
+            if (block.x + block.size > width) { block.x = width - block.size; block.vx *= -0.5; }
+        }
+
+        function drawMacro() {
+            ctx.clearRect(0, 0, width, height);
+            const skyGradient = ctx.createLinearGradient(0, 0, 0, waterLevel);
+            skyGradient.addColorStop(0, '#f8fafc'); skyGradient.addColorStop(1, '#e2e8f0');
+            ctx.fillStyle = skyGradient; ctx.fillRect(0, 0, width, waterLevel);
+            const waterGradient = ctx.createLinearGradient(0, waterLevel, 0, height);
+            waterGradient.addColorStop(0, 'rgba(56, 189, 248, 0.8)');
+            waterGradient.addColorStop(1, 'rgba(3, 105, 161, 0.9)');
+            ctx.fillStyle = waterGradient; ctx.fillRect(0, waterLevel, width, height - waterLevel);
+            ctx.beginPath(); ctx.moveTo(0, waterLevel); ctx.lineTo(width, waterLevel);
+            ctx.strokeStyle = '#bae6fd'; ctx.lineWidth = 2; ctx.stroke();
+
+            ctx.save(); ctx.translate(block.x, block.y);
+            ctx.fillStyle = `rgba(255, 255, 255, 0.6)`; ctx.strokeStyle = '#475569'; ctx.lineWidth = 2;
+            ctx.beginPath(); ctx.roundRect(0, 0, block.size, block.size, 8); ctx.fill(); ctx.stroke();
+
+            let rawCount = Math.floor(block.mass / 15);
+            const cols = Math.ceil(Math.sqrt(rawCount));
+            const rows = Math.ceil(rawCount / cols);
+            const margin = 10;
+            const cellW = (block.size - margin * 2) / cols;
+            const cellH = (block.size - margin * 2) / rows;
+            ctx.fillStyle = '#0f172a';
+            for (let r = 0; r < rows; r++) {
+                for (let c = 0; c < cols; c++) {
+                    const jitter = 1.0;
+                    const vx = (Math.random() - 0.5) * jitter;
+                    const vy = (Math.random() - 0.5) * jitter;
+                    const px = margin + (c * cellW) + (cellW / 2) + vx;
+                    const py = margin + (r * cellH) + (cellH / 2) + vy;
+                    ctx.beginPath(); ctx.arc(px, py, 2.5, 0, Math.PI * 2); ctx.fill();
+                    if (forceToggle.checked) {
+                        ctx.save(); ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 2;
+                        ctx.beginPath(); ctx.moveTo(px, py); ctx.lineTo(px, py + 14);
+                        ctx.moveTo(px - 3, py + 10); ctx.lineTo(px, py + 14); ctx.lineTo(px + 3, py + 10);
+                        ctx.stroke(); ctx.restore();
+                    }
+                }
+            }
+            ctx.restore();
+
+            if (forceToggle.checked) {
+                const arrowScale = 0.08;
+                const gravityLen = block.mass * arrowScale;
+                drawArrow(ctx, block.x + block.size + 30, block.y + block.size / 2 - gravityLen / 2, gravityLen, 'down', '#dc2626', 'Weight');
+                const buoyancyLen = (block.volume * block.submergedRatio) * arrowScale;
+                if (buoyancyLen > 5) drawArrow(ctx, block.x - 30, block.y + block.size / 2 + buoyancyLen / 2, buoyancyLen, 'up', '#2563eb', 'Buoyancy');
+            }
+        }
+
+        function drawMicro() {
+            const grad = mCtx.createRadialGradient(mWidth / 2, mHeight / 2, 0, mWidth / 2, mHeight / 2, mWidth);
+            grad.addColorStop(0, '#1e293b'); grad.addColorStop(1, '#0f172a');
+            mCtx.fillStyle = grad; mCtx.fillRect(0, 0, mWidth, mHeight);
+
+            mCtx.save();
+            mCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; mCtx.lineWidth = 2; mCtx.setLineDash([6, 4]);
+            if (temperature > 0) {
+                const boxW = mWidth * 0.45; const boxH = mHeight * 0.45;
+                const startX = (mWidth - boxW) / 2; const startY = (mHeight - boxH) / 2;
+                mCtx.strokeRect(startX, startY, boxW, boxH);
+                mCtx.fillStyle = 'white'; mCtx.font = 'bold 14px sans-serif';
+                mCtx.fillText("Liquid Volume (Compact & Dense)", startX + 10, startY - 10);
+            } else {
+                mCtx.strokeStyle = 'rgba(100, 200, 255, 0.5)';
+                mCtx.strokeRect(latticeBox.x, latticeBox.y, latticeBox.w, latticeBox.h);
+                mCtx.fillStyle = '#bae6fd'; mCtx.font = 'bold 14px sans-serif';
+                mCtx.fillText("Solid Volume (Expanded)", latticeBox.x + 10, latticeBox.y - 10);
+            }
+            mCtx.restore();
+
+            mCtx.save();
+            mCtx.strokeStyle = temperature <= 0 ? 'rgba(250, 204, 21, 0.8)' : 'rgba(250, 204, 21, 0.3)';
+            mCtx.lineWidth = 2; mCtx.setLineDash([4, 4]);
+            const allAtoms = molecules.map(m => ({ m: m, ...m.getAtoms() }));
+            const threshold = 40 * 40;
+            for (let i = 0; i < allAtoms.length; i++) {
+                const molA = allAtoms[i];
+                for (let j = 0; j < allAtoms.length; j++) {
+                    if (i === j) continue;
+                    const molB = allAtoms[j];
+                    const d1 = (molA.h1.x - molB.o.x) ** 2 + (molA.h1.y - molB.o.y) ** 2;
+                    if (d1 < threshold) {
+                        mCtx.beginPath(); mCtx.moveTo(molA.h1.x, molA.h1.y); mCtx.lineTo(molB.o.x, molB.o.y); mCtx.stroke();
+                    }
+                    const d2 = (molA.h2.x - molB.o.x) ** 2 + (molA.h2.y - molB.o.y) ** 2;
+                    if (d2 < threshold) {
+                        mCtx.beginPath(); mCtx.moveTo(molA.h2.x, molA.h2.y); mCtx.lineTo(molB.o.x, molB.o.y); mCtx.stroke();
+                    }
+                }
+            }
+            mCtx.restore();
+            molecules.forEach(m => { m.update(mWidth, mHeight, temperature); m.draw(); });
+        }
+
+        function drawLake() {
+            lCtx.clearRect(0, 0, lWidth, lHeight);
+            const skyH = lHeight * 0.25;
+            const lakeB = lHeight - 40;
+            const waterS = skyH;
+            lCtx.fillStyle = '#bae6fd'; lCtx.fillRect(0, 0, lWidth, skyH);
+            lCtx.fillStyle = '#075985'; lCtx.fillRect(0, waterS, lWidth, lakeB - waterS);
+
+            let freezeIntensity = lakeTemp < 0 ? Math.abs(lakeTemp) / 20 : 0;
+
+            if (isRealWorld) {
+                const iceH = freezeIntensity * 80;
+                lCtx.fillStyle = 'white'; lCtx.fillRect(0, waterS, lWidth, iceH);
+                fishArray.forEach(f => { f.update(waterS + iceH, lakeB); f.draw(); });
+            } else {
+                const currentFloor = lakeB - Math.min(lakeB - waterS, accumulatedBottomIce);
+                if (lakeTemp < 0 && Math.random() < freezeIntensity * 0.5) iceParticles.push(new SinkingIce(waterS));
+                iceParticles.forEach(p => p.update(currentFloor));
+                iceParticles = iceParticles.filter(p => p.active);
+                iceParticles.forEach(p => p.draw());
+                lCtx.fillStyle = 'white'; lCtx.fillRect(0, currentFloor, lWidth, lakeB - currentFloor);
+                fishArray.forEach(f => { f.update(waterS, currentFloor); f.draw(); });
+            }
+            const iceTopVal = isRealWorld ? 9999 : (lakeB - accumulatedBottomIce);
+            plantArray.forEach(p => p.draw(lakeB, iceTopVal));
+            lCtx.fillStyle = '#44403c'; lCtx.fillRect(0, lakeB, lWidth, 40);
+        }
+
+        // --- Event Listeners ---
+        massSlider.addEventListener('input', (e) => {
+            block.mass = parseFloat(e.target.value);
+            block.density = block.mass / block.volume;
+            densitySlider.value = block.density.toFixed(2);
+            updateMacroUI();
+        });
+        volSlider.addEventListener('input', (e) => {
+            block.volume = parseFloat(e.target.value);
+            block.density = block.mass / block.volume;
+            densitySlider.value = block.density.toFixed(2);
+            updateBlockSize();
+            updateMacroUI();
+        });
+        densitySlider.addEventListener('input', (e) => {
+            block.density = parseFloat(e.target.value);
+            block.mass = block.density * block.volume;
+            if (block.mass > 3000) block.mass = 3000;
+            if (block.mass < 100) block.mass = 100;
+            block.density = block.mass / block.volume;
+            massSlider.value = block.mass;
+            updateMacroUI();
+        });
+
+        tempSlider.addEventListener('input', (e) => {
+            temperature = parseInt(e.target.value);
+            tempDisplay.innerText = temperature + "°C";
+            if (temperature <= 0) {
+                tempDisplay.className = "font-bold text-cyan-500 text-sm";
+                phaseTitle.innerText = "Solid Ice:";
+                phaseTitle.className = "text-cyan-600 font-bold";
+                phaseDesc.innerText = "Stable Hydrogen bonds lock molecules into an OPEN hexagonal lattice. High volume, low density.";
+            } else {
+                tempDisplay.className = "font-bold text-blue-600 text-sm";
+                phaseTitle.innerText = "Liquid Water:";
+                phaseTitle.className = "text-blue-700 font-bold";
+                phaseDesc.innerText = "Heat energy breaks bonds. Molecules slide closer together. Lower volume, higher density.";
+            }
+        });
+
+        lakeTempSlider.addEventListener('input', (e) => {
+            lakeTemp = parseInt(e.target.value);
+            lakeTempDisplay.innerText = lakeTemp + "°C";
+            if (lakeTemp <= 0) lakeTempDisplay.className = "font-bold text-cyan-600 text-sm";
+            else lakeTempDisplay.className = "font-bold text-emerald-600 text-sm";
+            if (lakeTemp > 0) fishArray.forEach(f => f.alive = true);
+        });
+
+        canvas.addEventListener('mousedown', onDown);
+        canvas.addEventListener('mousemove', onMove);
+        window.addEventListener('mouseup', onUp);
+        canvas.addEventListener('touchstart', onDown, { passive: false });
+        canvas.addEventListener('touchmove', onMove, { passive: false });
+        window.addEventListener('touchend', onUp);
+        window.addEventListener('resize', () => {
+            resizeMacro();
+            resizeMicro();
+            resizeLake();
+        });
+
+        function loop() {
+            if (currentTab === 'macro') {
+                updateMacroPhysics();
+                drawMacro();
+            } else if (currentTab === 'micro') {
+                drawMicro();
+            } else if (currentTab === 'lake') {
+                drawLake();
+            }
+            requestAnimationFrame(loop);
+        }
+
+        // Init
+        resizeMacro();
+        initMicro();
+        resizeMicro();
+        updateBlockSize();
+        updateMacroUI();
+        initLake();
+        loop();
+
+    </script>
+</body>
+
+</html>
