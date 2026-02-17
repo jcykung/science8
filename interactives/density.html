@@ -2,7 +2,6 @@
 <html lang="en">
 
 <head>
-    <!--JON was here-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Density Lab</title>
@@ -423,7 +422,9 @@
 
         class Fish {
             constructor() {
-                this.x = Math.random() * 800; this.y = 300 + Math.random() * 200;
+                const w = (typeof lWidth !== 'undefined' && lWidth > 0) ? lWidth : 800;
+                this.x = Math.random() * w;
+                this.y = 300 + Math.random() * 200;
                 this.vx = (Math.random() - 0.5) * 2; this.vy = (Math.random() - 0.5) * 0.5;
                 this.size = 20 + Math.random() * 10; this.alive = true;
                 this.color = `hsl(${Math.random() * 40 + 10}, 80%, 50%)`;
@@ -448,25 +449,21 @@
         }
 
         class Plant {
-            constructor(x) { this.x = x; this.h = 60 + Math.random() * 80; }
+            constructor(xPct) {
+                this.xPct = xPct;
+                this.h = 60 + Math.random() * 80;
+            }
             draw(lakeBottom, iceTop) {
-                // If iceTop (Y coord) is less than plant top (Y coord), the ice is above the plant
+                const x = this.xPct * lWidth;
+                // Only freeze if ice pile covers plant
                 const plantTop = lakeBottom - this.h;
                 const isFrozen = iceTop < plantTop;
-
                 lCtx.save();
-                lCtx.strokeStyle = isFrozen ? '#94a3b8' : '#15803d';
-                lCtx.lineWidth = 4;
-                lCtx.lineCap = 'round';
-                lCtx.beginPath();
-                lCtx.moveTo(this.x, lakeBottom);
-
-                // Stop swaying if frozen
-                const sway = isFrozen ? 0 : Math.sin(Date.now() / 1000 + this.x) * 10;
-
-                lCtx.quadraticCurveTo(this.x + sway, lakeBottom - this.h / 2, this.x + sway / 2, lakeBottom - this.h);
-                lCtx.stroke();
-                lCtx.restore();
+                lCtx.strokeStyle = isFrozen ? '#94a3b8' : '#15803d'; lCtx.lineWidth = 4; lCtx.lineCap = 'round';
+                lCtx.beginPath(); lCtx.moveTo(x, lakeBottom);
+                const sway = isFrozen ? 0 : Math.sin(Date.now() / 1000 + x) * 10;
+                lCtx.quadraticCurveTo(x + sway, lakeBottom - this.h / 2, x + sway / 2, lakeBottom - this.h);
+                lCtx.stroke(); lCtx.restore();
             }
         }
 
@@ -669,8 +666,14 @@
 
         function initLake() {
             fishArray = []; plantArray = []; iceParticles = []; accumulatedBottomIce = 0;
-            for (let i = 0; i < 8; i++) fishArray.push(new Fish());
-            for (let i = 0; i < 10; i++) plantArray.push(new Plant(i * 100 + 50));
+            const width = (typeof lWidth !== 'undefined' && lWidth > 0) ? lWidth : 800;
+            const fishCount = Math.max(8, Math.floor(width / 100));
+            for (let i = 0; i < fishCount; i++) fishArray.push(new Fish());
+            const plantCount = Math.max(10, Math.floor(width / 80));
+            for (let i = 0; i < plantCount; i++) {
+                const pct = 0.05 + (i / (plantCount - 1)) * 0.9;
+                plantArray.push(new Plant(pct));
+            }
         }
 
         function onDown(e) {
@@ -824,27 +827,96 @@
             const skyH = lHeight * 0.25;
             const lakeB = lHeight - 40;
             const waterS = skyH;
-            lCtx.fillStyle = '#bae6fd'; lCtx.fillRect(0, 0, lWidth, skyH);
-            lCtx.fillStyle = '#075985'; lCtx.fillRect(0, waterS, lWidth, lakeB - waterS);
 
-            let freezeIntensity = lakeTemp < 0 ? Math.abs(lakeTemp) / 20 : 0;
+            // SKY & ATMOSPHERE
+            const skyGrad = lCtx.createLinearGradient(0, 0, 0, skyH);
+            skyGrad.addColorStop(0, '#0ea5e9');
+            skyGrad.addColorStop(1, '#bae6fd');
+            lCtx.fillStyle = skyGrad;
+            lCtx.fillRect(0, 0, lWidth, skyH);
+
+            // Sun
+            lCtx.fillStyle = '#fcd34d';
+            lCtx.shadowColor = 'rgba(252, 211, 77, 0.5)';
+            lCtx.shadowBlur = 20;
+            lCtx.beginPath(); lCtx.arc(lWidth - 80, 50, 30, 0, Math.PI * 2); lCtx.fill();
+            lCtx.shadowBlur = 0;
+
+            // Clouds
+            lCtx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            lCtx.beginPath();
+            lCtx.arc(100, 60, 20, 0, Math.PI * 2);
+            lCtx.arc(130, 60, 25, 0, Math.PI * 2);
+            lCtx.arc(160, 60, 20, 0, Math.PI * 2);
+            lCtx.fill();
+
+            lCtx.beginPath();
+            lCtx.arc(lWidth / 2, 40, 25, 0, Math.PI * 2);
+            lCtx.arc(lWidth / 2 + 30, 30, 30, 0, Math.PI * 2);
+            lCtx.arc(lWidth / 2 + 60, 40, 20, 0, Math.PI * 2);
+            lCtx.fill();
+
+            // Label
+            lCtx.fillStyle = '#1e3a8a';
+            lCtx.font = 'bold 14px sans-serif';
+            lCtx.fillText("SKY (Air)", 20, 30);
+
+            // Water
+            lCtx.fillStyle = '#0284c7';
+            lCtx.fillRect(0, waterS, lWidth, lakeB - waterS);
+
+            let freezeIntensity = 0;
+            if (lakeTemp < 0) {
+                freezeIntensity = Math.min(1, Math.abs(lakeTemp) / 20);
+            }
+
+            const totalWaterHeight = lakeB - waterS;
+            let iceTopVal, iceBottomVal;
 
             if (isRealWorld) {
-                const iceH = freezeIntensity * 80;
-                lCtx.fillStyle = 'white'; lCtx.fillRect(0, waterS, lWidth, iceH);
-                fishArray.forEach(f => { f.update(waterS + iceH, lakeB); f.draw(); });
+                const iceThickness = freezeIntensity * (totalWaterHeight * 0.3);
+                iceBottomVal = waterS + iceThickness;
             } else {
-                const currentFloor = lakeB - Math.min(lakeB - waterS, accumulatedBottomIce);
-                if (lakeTemp < 0 && Math.random() < freezeIntensity * 0.5) iceParticles.push(new SinkingIce(waterS));
-                iceParticles.forEach(p => p.update(currentFloor));
-                iceParticles = iceParticles.filter(p => p.active);
-                iceParticles.forEach(p => p.draw());
-                lCtx.fillStyle = 'white'; lCtx.fillRect(0, currentFloor, lWidth, lakeB - currentFloor);
-                fishArray.forEach(f => { f.update(waterS, currentFloor); f.draw(); });
+                const iceHeight = Math.min(totalWaterHeight, accumulatedBottomIce);
+                iceTopVal = lakeB - iceHeight;
             }
-            const iceTopVal = isRealWorld ? 9999 : (lakeB - accumulatedBottomIce);
-            plantArray.forEach(p => p.draw(lakeB, iceTopVal));
-            lCtx.fillStyle = '#44403c'; lCtx.fillRect(0, lakeB, lWidth, 40);
+
+            if (!isRealWorld && lakeTemp < 0) {
+                if (Math.random() < 0.2) iceParticles.push(new SinkingIce(waterS));
+            }
+
+            lCtx.fillStyle = '#ffffff';
+            if (isRealWorld && freezeIntensity > 0) {
+                lCtx.fillRect(0, waterS, lWidth, (iceBottomVal - waterS));
+                lCtx.strokeStyle = '#cbd5e1';
+                lCtx.beginPath(); lCtx.moveTo(0, iceBottomVal); lCtx.lineTo(lWidth, iceBottomVal); lCtx.stroke();
+            } else if (!isRealWorld) {
+                if (accumulatedBottomIce > 0) {
+                    lCtx.fillRect(0, iceTopVal, lWidth, lakeB - iceTopVal);
+                    lCtx.save();
+                    lCtx.strokeStyle = '#e2e8f0';
+                    lCtx.beginPath(); lCtx.moveTo(0, iceTopVal);
+                    for (let i = 0; i < lWidth; i += 20) lCtx.lineTo(i, iceTopVal + (Math.random() - 0.5) * 10);
+                    lCtx.lineTo(lWidth, iceTopVal); lCtx.stroke();
+                    lCtx.restore();
+                }
+                const currentFloor = lakeB - accumulatedBottomIce;
+                iceParticles.forEach(p => { p.update(currentFloor); if (p.active) p.draw(); });
+                iceParticles = iceParticles.filter(p => p.active);
+            }
+
+            // Draw Plants with freezing logic
+            const currentIceTop = isRealWorld ? 9999 : (lakeB - accumulatedBottomIce);
+            plantArray.forEach(p => p.draw(lakeB, currentIceTop));
+
+            let fishTop = waterS; let fishBottom = lakeB;
+            if (isRealWorld) fishTop = iceBottomVal || waterS;
+            else fishBottom = iceTopVal || lakeB;
+
+            fishArray.forEach(f => { f.update(fishTop, fishBottom); f.draw(); });
+
+            lCtx.fillStyle = '#44403c';
+            lCtx.fillRect(0, lakeB, lWidth, 40);
         }
 
         // --- Event Listeners ---
@@ -927,6 +999,7 @@
         updateMacroUI();
         initLake();
         loop();
+
     </script>
 </body>
 
