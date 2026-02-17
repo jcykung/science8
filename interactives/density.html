@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+    <!--JON was here-->
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Interactive Density Lab</title>
@@ -394,7 +395,7 @@
                     this.angle += this.vAngle * (1 + temp * 0.05);
                     this.x += this.vx; this.y += this.vy;
                     currentBondAngle = 105 * (Math.PI / 180);
-                    const boxW = w * 0.45, boxH = h * 0.45, startX = (w - boxW) / 2, startY = (h - boxH) / 2, radius = 15;
+                    const boxW = w * 0.35, boxH = h * 0.35, startX = (w - boxW) / 2, startY = (h - boxH) / 2, radius = 15;
                     molecules.forEach(other => {
                         if (other === this) return;
                         const dx = other.x - this.x, dy = other.y - this.y, dist = Math.sqrt(dx * dx + dy * dy);
@@ -781,7 +782,7 @@
             mCtx.save();
             mCtx.strokeStyle = 'rgba(255, 255, 255, 0.4)'; mCtx.lineWidth = 2; mCtx.setLineDash([6, 4]);
             if (temperature > 0) {
-                const boxW = mWidth * 0.45; const boxH = mHeight * 0.45;
+                const boxW = mWidth * 0.35; const boxH = mHeight * 0.35;
                 const startX = (mWidth - boxW) / 2; const startY = (mHeight - boxH) / 2;
                 mCtx.strokeRect(startX, startY, boxW, boxH);
                 mCtx.fillStyle = 'white'; mCtx.font = 'bold 14px sans-serif';
@@ -926,7 +927,6 @@
         updateMacroUI();
         initLake();
         loop();
-
     </script>
 </body>
 
