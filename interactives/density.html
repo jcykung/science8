@@ -340,16 +340,19 @@
                     <span>Water</span>
                 </div>
             </div>
-            <div class="text-xs md:text-sm text-slate-600 w-full md:max-w-md bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
-                <strong id="phaseTitle" class="text-blue-700 block mb-1">Liquid Water:</strong>
-                <span id="phaseDesc">Heat energy breaks bonds. Molecules slide closer together into a tighter volume.</span>
+            <div class="text-xs md:text-sm text-slate-600 w-full md:max-w-md bg-white p-3 rounded-lg border border-blue-100 shadow-sm min-h-[70px] flex flex-col justify-center">
+                <strong id="phaseTitle" class="text-blue-700 font-bold block mb-1">Liquid Water:</strong>
+                <span id="phaseDesc" class="block">Heat energy breaks bonds. Molecules slide closer together into a tighter volume.</span>
             </div>
         </div>
 
         <!-- 4. Lake Controls -->
         <div id="lakeControls" class="p-3 md:p-4 hidden flex-col md:flex-row items-center justify-between gap-4 bg-emerald-50/50 w-full h-auto">
             
+            <!-- Controls Container (Left) -->
             <div class="flex flex-col md:flex-row gap-4 items-center flex-1 w-full">
+                
+                <!-- Mode Toggle -->
                 <div class="bg-white p-2 rounded-xl border border-emerald-100 shadow-sm shrink-0 flex items-center justify-center md:justify-start gap-4 px-4 w-full md:w-auto">
                      <span class="text-xs font-bold text-slate-500 uppercase self-center hidden md:block">Mode:</span>
                      <div class="radio-group flex flex-row gap-4">
@@ -364,6 +367,7 @@
                      </div>
                 </div>
 
+                <!-- Long Slider -->
                 <div class="flex flex-col w-full md:max-w-2xl bg-white/60 p-3 rounded-xl border border-emerald-100/50">
                     <div class="flex justify-between items-end mb-2">
                         <label class="text-xs font-bold text-slate-700">Water Temperature</label>
@@ -376,8 +380,10 @@
                         <span>20°C</span>
                     </div>
                 </div>
+
             </div>
 
+            <!-- Explanation Box (Right, Max 1/3) -->
             <div class="bg-white p-3 rounded-xl border border-emerald-200 shadow-sm w-full md:w-1/3 md:max-w-sm shrink-0 text-left self-stretch flex flex-col justify-center">
                 <h3 id="lakeTitle" class="font-bold text-emerald-800 text-xs mb-1">Winter in the Lake</h3>
                 <p id="lakeDesc" class="text-xs text-slate-600 leading-snug">
@@ -1378,12 +1384,12 @@
             if (temperature <= 0) {
                 tempDisplay.className = "font-bold text-cyan-500 text-sm";
                 phaseTitle.innerText = "Solid Ice:";
-                phaseTitle.className = "text-cyan-600 font-bold";
+                phaseTitle.className = "text-cyan-600 font-bold block mb-1";
                 phaseDesc.innerText = "Stable Hydrogen bonds lock molecules into an OPEN hexagonal lattice. High volume, low density.";
             } else {
                 tempDisplay.className = "font-bold text-blue-600 text-sm";
                 phaseTitle.innerText = "Liquid Water:";
-                phaseTitle.className = "text-blue-700 font-bold";
+                phaseTitle.className = "text-blue-700 font-bold block mb-1";
                 phaseDesc.innerText = "Heat energy breaks bonds. Molecules slide closer together. Lower volume, higher density.";
             }
         });
