@@ -21,6 +21,15 @@
             touch-action: none;
         }
 
+        /* Hide Scrollbar for cleaner UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
         input[type=range] {
             -webkit-appearance: none;
             background: transparent;
@@ -28,12 +37,12 @@
 
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 20px; /* Larger touch target */
-            width: 20px;
+            height: 24px; /* Larger touch target for mobile */
+            width: 24px;
             border-radius: 50%;
             background: #3b82f6;
             cursor: pointer;
-            margin-top: -8px;
+            margin-top: -10px;
             box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
             border: 2px solid white;
         }
@@ -46,6 +55,11 @@
             border-radius: 2px;
         }
 
+        /* Specific slider styles for lake temp to distinguish it */
+        #lakeTempSlider::-webkit-slider-thumb {
+            background: #10b981; /* Emerald-500 */
+        }
+
         .glass-panel {
             background: rgba(255, 255, 255, 0.95);
             backdrop-filter: blur(10px);
@@ -56,7 +70,7 @@
         .control-group {
             display: flex;
             flex-direction: column;
-            min-width: 110px;
+            min-width: 100px;
             flex: 1;
         }
 
@@ -65,9 +79,9 @@
             align-items: center;
             background: #f8fafc;
             border: 1px solid #cbd5e1;
-            padding: 8px 12px;
+            padding: 6px 10px;
             border-radius: 12px;
-            gap: 8px;
+            gap: 6px;
             box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.05);
             flex-wrap: wrap;
             justify-content: center;
@@ -95,7 +109,7 @@
         }
 
         .var-label {
-            font-size: 0.7rem;
+            font-size: 0.65rem;
             letter-spacing: 0.02em;
             color: #64748b;
             font-weight: 600;
@@ -106,17 +120,18 @@
             font-family: 'Courier New', monospace;
             font-weight: bold;
             color: #0f172a;
+            font-size: 1rem;
         }
 
         .equals {
-            font-size: 1.2rem;
+            font-size: 1rem;
             color: #94a3b8;
             font-weight: 300;
         }
 
         .tab-btn {
-            padding: 10px 16px;
-            font-size: 0.9rem;
+            padding: 12px 16px; /* Larger tap area */
+            font-size: 0.85rem;
             font-weight: 600;
             color: #64748b;
             border-bottom: 3px solid transparent;
@@ -158,17 +173,47 @@
 
         .radio-label input {
             margin-right: 12px;
-            width: 18px;
-            height: 18px;
+            width: 20px;
+            height: 20px;
             accent-color: #2563eb;
+        }
+        
+        .tower-btn {
+            background: white;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 8px 12px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: #475569;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            white-space: nowrap;
+        }
+        .tower-btn:hover:not(:disabled) { background: #f1f5f9; border-color: #94a3b8; }
+        .tower-btn:active:not(:disabled) { transform: scale(0.98); }
+        .tower-btn:disabled { opacity: 0.5; cursor: not-allowed; border-style: dashed; }
+        
+        .dot-indicator { width: 8px; height: 8px; border-radius: 50%; }
+
+        /* Mobile Optimizations */
+        @media (max-width: 640px) {
+            .glass-panel h1 { font-size: 1.1rem; }
+            .control-group label { font-size: 0.7rem; }
+            .control-group span { font-size: 0.7rem; }
+            .formula-container { transform: scale(0.9); transform-origin: left center; }
         }
     </style>
 </head>
 
 <body class="bg-slate-100 h-screen flex flex-col relative overflow-hidden">
 
+    <!-- Header Section -->
     <div class="glass-panel w-full z-20 flex flex-col shrink-0">
-        <div class="bg-slate-50 border-b border-slate-200 px-4 py-3 md:px-6">
+        <div class="bg-slate-50 border-b border-slate-200 px-3 py-2 md:px-6 md:py-3">
             <h1 class="text-lg md:text-xl font-bold text-slate-800">Density Interactive</h1>
             <p class="text-xs md:text-sm text-slate-600 mt-1 max-w-3xl leading-relaxed hidden sm:block">
                 <strong>Density (D)</strong> is a measure of how much matter (m) is packed into a specific space (V).
@@ -176,19 +221,20 @@
             </p>
         </div>
 
-        <div class="flex px-2 md:px-6 border-b border-slate-200 bg-white overflow-x-auto no-scrollbar">
+        <div class="flex px-0 md:px-6 border-b border-slate-200 bg-white overflow-x-auto no-scrollbar">
             <button class="tab-btn active" onclick="switchTab('macro')">1. What is density?</button>
-            <button class="tab-btn" onclick="switchTab('micro')">2. Why is ice less dense?</button>
-            <button class="tab-btn" onclick="switchTab('lake')">3. Why is the density of ice important?</button>
+            <button class="tab-btn" onclick="switchTab('tower')">2. Density Tower</button>
+            <button class="tab-btn" onclick="switchTab('micro')">3. Why is ice less dense?</button>
+            <button class="tab-btn" onclick="switchTab('lake')">4. Why is density important?</button>
         </div>
 
         <!-- 1. Macro Controls -->
-        <div id="macroControls" class="p-3 md:p-4 flex flex-col md:flex-row flex-wrap items-center justify-between gap-4 max-h-[40vh] overflow-y-auto">
-            <div class="formula-container w-full md:w-auto">
+        <div id="macroControls" class="p-2 md:p-4 flex flex-col md:flex-row flex-wrap items-center justify-between gap-3 md:gap-4 max-h-[35vh] overflow-y-auto overscroll-contain">
+            <div class="formula-container w-full md:w-auto justify-between md:justify-center bg-blue-50/50 md:bg-slate-50">
                 <div class="variable-group">
                     <span class="var-label text-blue-600">Density</span>
-                    <span id="formulaD" class="var-value text-lg md:text-xl text-blue-600">0.80</span>
-                    <span class="text-[10px] text-slate-400">g/cm³</span>
+                    <span id="formulaD" class="var-value text-blue-600">0.80</span>
+                    <span class="text-[9px] text-slate-400">g/cm³</span>
                 </div>
                 <div class="equals">=</div>
                 <div class="fraction">
@@ -203,42 +249,77 @@
                         <span class="var-label">Volume (cm³)</span>
                     </div>
                 </div>
+                
+                <div class="flex md:hidden items-center gap-2 ml-2 border-l pl-2 border-slate-300">
+                    <label class="text-[10px] font-semibold text-slate-600">Gravity</label>
+                    <input type="checkbox" id="forceToggleMobile" class="accent-blue-600 w-5 h-5" checked onchange="syncGravity(this.checked)">
+                </div>
             </div>
 
-            <div class="grid grid-cols-2 md:flex md:flex-1 w-full gap-4 md:gap-6 items-end justify-end">
+            <div class="grid grid-cols-2 md:flex md:flex-1 w-full gap-3 md:gap-6 items-end justify-end">
                 <div class="control-group">
-                    <div class="flex justify-between text-xs mb-2">
+                    <div class="flex justify-between text-xs mb-1">
                         <label class="font-bold text-slate-700">Mass</label>
-                        <span id="massVal" class="font-mono text-slate-600 bg-slate-100 px-2 rounded">800 g</span>
+                        <span id="massVal" class="font-mono text-slate-600 bg-slate-100 px-1 rounded text-[10px]">800 g</span>
                     </div>
                     <input type="range" id="massSlider" min="100" max="3000" step="50" value="800" class="w-full">
                 </div>
                 <div class="control-group">
-                    <div class="flex justify-between text-xs mb-2">
+                    <div class="flex justify-between text-xs mb-1">
                         <label class="font-bold text-slate-700">Volume</label>
-                        <span id="volVal" class="font-mono text-slate-600 bg-slate-100 px-2 rounded">1000 cm³</span>
+                        <span id="volVal" class="font-mono text-slate-600 bg-slate-100 px-1 rounded text-[10px]">1000 cm³</span>
                     </div>
                     <input type="range" id="volSlider" min="200" max="5000" step="50" value="1000" class="w-full">
                 </div>
                 <div class="control-group col-span-2 md:col-span-1 md:border-l md:pl-6 border-slate-200">
-                    <div class="flex justify-between text-xs mb-2">
+                    <div class="flex justify-between text-xs mb-1">
                         <label class="font-bold text-slate-700">Density</label>
-                        <span id="densityVal" class="font-bold text-blue-600 bg-blue-50 px-2 rounded">0.80 g/cm³</span>
+                        <span id="densityVal" class="font-bold text-blue-600 bg-blue-50 px-2 rounded text-[10px]">0.80 g/cm³</span>
                     </div>
                     <input type="range" id="densitySlider" min="0.1" max="3.0" step="0.1" value="0.8" class="w-full">
                 </div>
             </div>
 
-            <div class="flex items-center gap-2 md:border-l pl-0 md:pl-4 w-full md:w-auto justify-end">
+            <div class="hidden md:flex items-center gap-2 border-l pl-4 w-auto justify-end">
                 <label class="text-xs font-semibold text-slate-600">Gravity</label>
-                <input type="checkbox" id="forceToggle" class="accent-blue-600 w-5 h-5" checked>
+                <input type="checkbox" id="forceToggle" class="accent-blue-600 w-5 h-5" checked onchange="syncGravity(this.checked)">
             </div>
         </div>
 
-        <!-- 2. Micro Controls -->
-        <div id="microControls" class="p-4 hidden flex-col md:flex-row items-center justify-center gap-4 md:gap-8 bg-blue-50/50 max-h-[30vh] overflow-y-auto">
+        <!-- 2. Tower Controls - Redesigned Horizontal Layout -->
+        <div id="towerControls" class="p-3 md:p-4 hidden flex-row flex-wrap items-start gap-6 bg-slate-50 overflow-y-auto max-h-[35vh]">
+            
+            <div class="flex flex-col gap-2 shrink-0">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">1. Add Liquids First</span>
+                <div class="flex flex-wrap gap-2">
+                    <button class="tower-btn" onclick="addTowerLiquid('oil')"><div class="dot-indicator bg-yellow-400"></div>Oil (0.9)</button>
+                    <button class="tower-btn" onclick="addTowerLiquid('water')"><div class="dot-indicator bg-blue-500"></div>Water (1.0)</button>
+                    <button class="tower-btn" onclick="addTowerLiquid('honey')"><div class="dot-indicator bg-amber-700"></div>Honey (1.4)</button>
+                </div>
+            </div>
+
+            <div class="flex flex-col gap-2 shrink-0">
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">2. Add Solids</span>
+                <div class="flex flex-wrap gap-2" id="solidButtonsContainer">
+                    <button class="tower-btn solid-btn" disabled onclick="addTowerSolid('sponge')"><div class="dot-indicator bg-pink-300"></div>Sponge (0.1)</button>
+                    <button class="tower-btn solid-btn" disabled onclick="addTowerSolid('wax')"><div class="dot-indicator bg-yellow-100 border border-slate-300"></div>Beeswax (0.95)</button>
+                    <button class="tower-btn solid-btn" disabled onclick="addTowerSolid('plastic')"><div class="dot-indicator bg-sky-300"></div>Plastic (1.0)</button>
+                    <button class="tower-btn solid-btn" disabled onclick="addTowerSolid('rubber')"><div class="dot-indicator bg-slate-400"></div>Rubber (1.2)</button>
+                    <button class="tower-btn solid-btn" disabled onclick="addTowerSolid('brick')"><div class="dot-indicator bg-[#800000]"></div>Brick (1.9)</button>
+                </div>
+            </div>
+
+            <div class="flex items-end flex-1 justify-end h-full">
+                 <button class="px-4 py-2 bg-white hover:bg-red-50 text-red-500 font-bold border border-red-200 rounded-lg transition-colors text-sm" onclick="resetTower()">
+                    Reset Tower
+                 </button>
+            </div>
+        </div>
+
+        <!-- 3. Micro Controls -->
+        <div id="microControls" class="p-3 md:p-4 hidden flex-col md:flex-row items-center justify-center gap-4 md:gap-8 bg-blue-50/50 max-h-[35vh] overflow-y-auto">
             <div class="flex flex-col items-center w-full md:w-64">
-                <label class="text-sm font-bold text-slate-700 mb-1">Temperature</label>
+                <label class="text-xs md:text-sm font-bold text-slate-700 mb-1">Temperature</label>
                 <input type="range" id="tempSlider" min="-20" max="20" step="1" value="20" class="w-full">
                 <div class="flex justify-between w-full text-xs text-slate-500 mt-1 font-mono">
                     <span>Ice</span>
@@ -248,71 +329,82 @@
             </div>
             <div class="text-xs md:text-sm text-slate-600 w-full md:max-w-md bg-white p-3 rounded-lg border border-blue-100 shadow-sm">
                 <strong id="phaseTitle" class="text-blue-700 block mb-1">Liquid Water:</strong>
-                <span id="phaseDesc">Heat energy breaks bonds. Molecules slide closer together into a tighter
-                    volume.</span>
+                <span id="phaseDesc">Heat energy breaks bonds. Molecules slide closer together into a tighter volume.</span>
             </div>
         </div>
 
-        <!-- 3. Lake Controls -->
-        <div id="lakeControls" class="p-3 md:p-4 hidden flex-col md:flex-row items-start justify-start gap-4 md:gap-6 bg-emerald-50/50 max-h-[35vh] overflow-y-auto">
-            <!-- Scenario Selection -->
-            <div class="flex flex-row md:flex-col gap-4 md:gap-0 bg-white p-3 rounded-lg border border-emerald-100 shadow-sm w-full md:w-48 shrink-0">
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider mb-0 md:mb-2 hidden md:block">Mode</span>
-                <div class="radio-group flex-row md:flex-col w-full justify-around md:justify-start">
-                    <label class="radio-label">
-                        <input type="radio" name="lakeScenario" value="real" checked
-                            onchange="updateLakeScenario(this.value)">
-                        <div>
-                            <span class="block font-bold text-slate-700 text-sm">Real World</span>
-                            <span class="text-[10px] text-slate-500 hidden md:block">Ice Floats</span>
-                        </div>
-                    </label>
-                    <label class="radio-label mt-0 md:mt-1">
-                        <input type="radio" name="lakeScenario" value="hypothetical"
-                            onchange="updateLakeScenario(this.value)">
-                        <div>
-                            <span class="block font-bold text-slate-700 text-sm">Hypothetical</span>
-                            <span class="text-[10px] text-slate-500 hidden md:block">Ice Sinks</span>
-                        </div>
-                    </label>
+        <!-- 4. Lake Controls -->
+        <div id="lakeControls" class="p-3 md:p-4 hidden flex-col md:flex-row items-center justify-between gap-4 bg-emerald-50/50 w-full h-auto">
+            
+            <!-- Controls Container (Left) -->
+            <div class="flex flex-col md:flex-row gap-4 items-center flex-1 w-full">
+                
+                <!-- Mode Toggle -->
+                <div class="bg-white p-2 rounded-xl border border-emerald-100 shadow-sm shrink-0 flex items-center justify-center md:justify-start gap-4 px-4 w-full md:w-auto">
+                     <span class="text-xs font-bold text-slate-500 uppercase self-center hidden md:block">Mode:</span>
+                     <div class="radio-group flex flex-row gap-4">
+                        <label class="radio-label p-0">
+                            <input type="radio" name="lakeScenario" value="real" checked onchange="updateLakeScenario(this.value)">
+                            <span class="font-bold text-slate-700 text-xs md:text-sm">Real World</span>
+                        </label>
+                        <label class="radio-label p-0">
+                            <input type="radio" name="lakeScenario" value="hypothetical" onchange="updateLakeScenario(this.value)">
+                            <span class="font-bold text-slate-700 text-xs md:text-sm">Hypothetical</span>
+                        </label>
+                     </div>
                 </div>
+
+                <!-- Long Slider -->
+                <div class="flex flex-col w-full md:max-w-2xl bg-white/60 p-3 rounded-xl border border-emerald-100/50">
+                    <div class="flex justify-between items-end mb-2">
+                        <label class="text-xs font-bold text-slate-700">Water Temperature</label>
+                        <span id="lakeTempVal" class="font-mono font-bold text-emerald-600 text-sm">20°C</span>
+                    </div>
+                    <input type="range" id="lakeTempSlider" min="-20" max="20" step="1" value="20" class="w-full accent-emerald-500 h-2 bg-slate-200 rounded-lg appearance-none cursor-pointer">
+                    <div class="flex justify-between w-full text-[10px] text-slate-400 mt-1 font-mono">
+                        <span>-20°C</span>
+                        <span>0°C</span>
+                        <span>20°C</span>
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Temperature Slider -->
-            <div class="flex flex-col items-center w-full md:w-48 shrink-0">
-                <label class="text-xs font-bold text-slate-700 mb-2">Lake Temperature</label>
-                <input type="range" id="lakeTempSlider" min="-20" max="20" step="1" value="20" class="w-full">
-                <div class="flex justify-between w-full text-[10px] text-slate-500 mt-1 font-mono">
-                    <span>-20°C</span>
-                    <span id="lakeTempVal" class="font-bold text-emerald-600 text-xs">20°C</span>
-                    <span>20°C</span>
-                </div>
-            </div>
-
-            <!-- Description Box -->
-            <div class="flex-1 bg-white p-3 px-4 rounded-lg border border-emerald-200 shadow-sm w-full md:min-w-0">
-                <h3 id="lakeTitle" class="font-bold text-emerald-800 text-xs mb-1">Winter in the Lake (Real World)</h3>
-                <p id="lakeDesc" class="text-xs text-slate-600 leading-tight">
-                    Ice floats on top because it is less dense than liquid water. This layer insulates the lake,
-                    allowing aquatic life to survive the winter.
+            <!-- Explanation Box (Right, Max 1/3) -->
+            <div class="bg-white p-3 rounded-xl border border-emerald-200 shadow-sm w-full md:w-1/3 md:max-w-sm shrink-0 text-left self-stretch flex flex-col justify-center">
+                <h3 id="lakeTitle" class="font-bold text-emerald-800 text-xs mb-1">Winter in the Lake</h3>
+                <p id="lakeDesc" class="text-xs text-slate-600 leading-snug">
+                    Ice floats on top because it is less dense than liquid water. This layer insulates the lake, allowing aquatic life to survive the winter.
                 </p>
             </div>
+
         </div>
     </div>
 
+    <!-- Main Canvas Area -->
     <div class="relative flex-1 w-full bg-slate-200 overflow-hidden touch-none">
         <div id="tab-macro" class="tab-content active"><canvas id="simCanvas" class="w-full h-full"></canvas>
-            <div class="absolute bottom-6 left-6 pointer-events-none">
-                <div class="bg-white/80 backdrop-blur px-4 py-2 rounded-lg shadow-lg border border-white/50">
-                    <span class="text-xs text-slate-500 uppercase tracking-wide">Status</span>
-                    <div id="statusVal" class="text-lg font-bold text-green-600">Floating</div>
+            <div class="absolute bottom-4 left-4 md:bottom-6 md:left-6 pointer-events-none">
+                <div class="bg-white/80 backdrop-blur px-3 py-1.5 md:px-4 md:py-2 rounded-lg shadow-lg border border-white/50">
+                    <span class="text-[10px] md:text-xs text-slate-500 uppercase tracking-wide">Status</span>
+                    <div id="statusVal" class="text-base md:text-lg font-bold text-green-600">Floating</div>
                 </div>
             </div>
         </div>
+        
+        <div id="tab-tower" class="tab-content bg-slate-100">
+            <canvas id="towerCanvas" class="w-full h-full"></canvas>
+             <div class="absolute bottom-4 right-4 pointer-events-none text-right">
+                <div class="bg-white/90 backdrop-blur px-3 py-2 rounded-lg shadow-sm border border-slate-200 inline-block text-xs text-slate-500">
+                   <p>Particles show density.</p>
+                   <p>Closer = Denser</p>
+                </div>
+            </div>
+        </div>
+
         <div id="tab-micro" class="tab-content bg-slate-800"><canvas id="microCanvas" class="w-full h-full"></canvas>
-            <div class="absolute bottom-6 right-6 pointer-events-none">
-                <div
-                    class="bg-slate-900/80 text-white backdrop-blur px-4 py-3 rounded-lg shadow-lg border border-slate-700 max-w-[200px] md:max-w-none">
+            <div class="absolute bottom-4 right-4 md:bottom-6 md:right-6 pointer-events-none">
+                <div class="bg-slate-900/80 text-white backdrop-blur px-3 py-2 md:px-4 md:py-3 rounded-lg shadow-lg border border-slate-700 max-w-[150px] md:max-w-none">
                     <div class="flex items-center gap-2 mb-2">
                         <div class="w-3 h-3 rounded-full bg-red-500 shrink-0"></div> <span class="text-xs">Oxygen</span>
                     </div>
@@ -320,8 +412,7 @@
                         <div class="w-2 h-2 rounded-full bg-slate-300 shrink-0"></div> <span class="text-xs">Hydrogen</span>
                     </div>
                     <div class="flex items-center gap-2">
-                        <div class="w-4 h-0 border-t-2 border-dashed border-yellow-400/50 shrink-0"></div> <span
-                            class="text-xs">H-Bond</span>
+                        <div class="w-4 h-0 border-t-2 border-dashed border-yellow-400/50 shrink-0"></div> <span class="text-xs">H-Bond</span>
                     </div>
                 </div>
             </div>
@@ -335,6 +426,8 @@
         // --- Globals ---
         const canvas = document.getElementById('simCanvas');
         const ctx = canvas.getContext('2d');
+        const towerCanvas = document.getElementById('towerCanvas');
+        const tCtx = towerCanvas.getContext('2d');
         const microCanvas = document.getElementById('microCanvas');
         const mCtx = microCanvas.getContext('2d');
         const lakeCanvas = document.getElementById('lakeCanvas');
@@ -345,6 +438,8 @@
         const volSlider = document.getElementById('volSlider');
         const densitySlider = document.getElementById('densitySlider');
         const forceToggle = document.getElementById('forceToggle');
+        const forceToggleMobile = document.getElementById('forceToggleMobile');
+        
         const displays = {
             m: document.getElementById('massVal'), v: document.getElementById('volVal'), d: document.getElementById('densityVal'),
             status: document.getElementById('statusVal'), fM: document.getElementById('formulaM'), fV: document.getElementById('formulaV'), fD: document.getElementById('formulaD')
@@ -353,6 +448,13 @@
         let width, height, waterLevel;
         const block = { x: 0, y: 0, size: 150, vx: 0, vy: 0, density: 0.8, mass: 800, volume: 1000, isDragging: false, submergedRatio: 0 };
         const mouse = { x: 0, y: 0, px: 0, py: 0, down: false };
+
+        // Tower UI Globals
+        let tWidth, tHeight;
+        let towerLiquids = [];
+        let towerSolids = [];
+        let liquidsAdded = false;
+        const TOWER_GRAVITY = 0.5;
 
         // Micro UI
         const tempSlider = document.getElementById('tempSlider');
@@ -430,6 +532,159 @@
             }
         }
 
+        // --- Tower Classes ---
+        class TowerLiquid {
+            constructor(id, name, density, color) {
+                this.id = id; this.name = name; this.density = density; this.color = color;
+                this.height = 0; this.targetY = 0; this.currentY = 0; 
+                this.currentH = 0; // Animate height
+                // Particles
+                this.particles = [];
+                // Density determines particle count. More dense = More particles
+                const count = Math.floor(density * 80);
+                for(let i=0; i<count; i++) {
+                    this.particles.push({
+                        x: Math.random(), 
+                        y: Math.random(), 
+                        vx: (Math.random()-0.5)*0.002, 
+                        vy: (Math.random()-0.5)*0.002
+                    });
+                }
+            }
+            update(y, h, width) {
+                this.targetY = y;
+                // Smoothly animate height and Y position
+                this.currentH += (h - this.currentH) * 0.1;
+                this.currentY += (this.targetY - this.currentY) * 0.1;
+                
+                // Update particles
+                this.particles.forEach(p => {
+                    p.x += p.vx; p.y += p.vy;
+                    if(p.x < 0) p.x+=1; if(p.x>1) p.x-=1;
+                    if(p.y < 0) p.y+=1; if(p.y>1) p.y-=1;
+                });
+            }
+            draw(ctx, width) {
+                ctx.fillStyle = this.color;
+                ctx.fillRect(0, this.currentY, width, this.currentH);
+                // Draw name - Increased padding to 60 to prevent cutoff
+                ctx.fillStyle = 'rgba(0,0,0,0.6)';
+                ctx.font = 'bold 12px sans-serif';
+                ctx.fillText(`${this.name} (${this.density})`, 60, this.currentY + 20);
+                // Draw particles
+                ctx.fillStyle = 'rgba(255,255,255,0.4)';
+                this.particles.forEach(p => {
+                    const px = p.x * width;
+                    const py = this.currentY + (p.y * this.currentH);
+                    ctx.beginPath(); ctx.arc(px, py, 2, 0, Math.PI*2); ctx.fill();
+                });
+            }
+        }
+
+        class TowerSolid {
+            constructor(name, density, color) {
+                this.name = name; this.density = density; this.color = color;
+                this.size = 60;
+                this.x = tWidth/2 - this.size/2;
+                this.y = 20; // Spawn at top
+                this.vx = 0; this.vy = 0;
+                this.isDragging = false;
+                // Grid particles
+                this.particles = [];
+                const densityFactor = Math.sqrt(density); 
+                const rows = Math.min(10, Math.max(2, Math.floor(densityFactor * 4)));
+                const step = this.size / rows;
+                const offset = step/2;
+                for(let r=0; r<rows; r++) {
+                    for(let c=0; c<rows; c++) {
+                        this.particles.push({x: c*step + offset, y: r*step + offset});
+                    }
+                }
+            }
+            update(liquids, width, height) {
+                if(this.isDragging) return;
+
+                // Find current medium density
+                let fluidDensity = 0; // Air
+                let inFluid = false;
+                
+                // ROBUST COLLISION: Use grid logic instead of hitbox logic
+                // This prevents solids from falling through if liquids haven't animated yet
+                if (liquids.length > 0) {
+                    const cy = this.y + this.size/2;
+                    const layerHeight = height / liquids.length;
+                    
+                    // Liquids are sorted by density (descending), so bottom is 0 in sorted array?
+                    // No, updateTowerLogic loops: index 0 (Highest Density) -> targetY = Bottom
+                    // So Index 0 is at bottom (high Y). Index Last is at top (low Y).
+                    
+                    // Map Y to stack index. 
+                    // Y=0 -> Index Last (Oil)
+                    // Y=Height -> Index 0 (Honey)
+                    
+                    // Flip Y to measure from bottom
+                    const yFromBottom = height - cy;
+                    // Prevent negative or out of bounds
+                    if (yFromBottom > 0) {
+                        const stackIndex = Math.floor(yFromBottom / layerHeight);
+                        if (stackIndex >= 0 && stackIndex < liquids.length) {
+                            fluidDensity = liquids[stackIndex].density;
+                            inFluid = true;
+                        }
+                    }
+                }
+
+                // Physics
+                const forceG = this.density * TOWER_GRAVITY;
+                let forceB = 0;
+                
+                // Simplified Buoyancy
+                const drag = inFluid ? 0.85 : 0.98; // Faster movement
+                
+                // Determine direction
+                // Accel factor - Increased for snappy response
+                const accel = (this.density - fluidDensity) * 0.3; 
+                
+                this.vy += accel;
+                this.vy *= drag;
+                this.y += this.vy;
+                this.x += this.vx; this.vx *= drag;
+
+                // Bounds
+                if(this.y > height - this.size) {
+                     this.y = height - this.size; 
+                     this.vy = 0;
+                }
+                if(this.y < 0) { this.y = 0; this.vy = 0; } // Ceiling
+                if(this.x < 0) { this.x = 0; this.vx *= -0.5; }
+                if(this.x > width - this.size) { this.x = width - this.size; this.vx *= -0.5; }
+            }
+            draw(ctx) {
+                ctx.save();
+                ctx.translate(this.x, this.y);
+                ctx.fillStyle = this.color;
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.fillRect(0,0,this.size, this.size);
+                ctx.strokeRect(0,0,this.size, this.size);
+                
+                // Label
+                ctx.fillStyle = 'rgba(255,255,255,0.9)';
+                ctx.font = 'bold 10px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(this.name, this.size/2, -5);
+                ctx.fillText(this.density, this.size/2, this.size + 12);
+
+                // Particles
+                ctx.fillStyle = 'rgba(0,0,0,0.4)';
+                this.particles.forEach(p => {
+                    ctx.beginPath(); ctx.arc(p.x, p.y, 1.5, 0, Math.PI*2); ctx.fill();
+                });
+
+                ctx.restore();
+            }
+        }
+
         class Fish {
             constructor() {
                 const w = (typeof lWidth !== 'undefined' && lWidth > 0) ? lWidth : 800;
@@ -503,6 +758,11 @@
             const clientY = e.touches ? e.touches[0].clientY : e.clientY;
             return { x: clientX - rect.left, y: clientY - rect.top };
         }
+        
+        function syncGravity(val) {
+            forceToggle.checked = val;
+            forceToggleMobile.checked = val;
+        }
 
         function updateMacroUI() {
             const m = Math.round(block.mass);
@@ -522,25 +782,30 @@
             }
         }
 
-        function updateBlockSize() { block.size = 15 * Math.pow(block.volume, 1 / 3); }
+        function updateBlockSize() { 
+            const scaleFactor = width < 600 ? 10 : 15;
+            block.size = scaleFactor * Math.pow(block.volume, 1 / 3); 
+        }
 
         function drawArrow(ctx, fromX, fromY, length, direction, color, label) {
             if (length < 5) return;
-            const headLen = 12;
+            const headLen = width < 600 ? 8 : 12;
             const angle = direction === 'down' ? Math.PI / 2 : -Math.PI / 2;
             const toX = fromX + Math.cos(angle) * length;
             const toY = fromY + Math.sin(angle) * length;
             ctx.beginPath(); ctx.moveTo(fromX, fromY); ctx.lineTo(toX, toY);
-            ctx.strokeStyle = color; ctx.lineWidth = 4; ctx.lineCap = "round"; ctx.stroke();
+            ctx.strokeStyle = color; ctx.lineWidth = width < 600 ? 2 : 4; ctx.lineCap = "round"; ctx.stroke();
             ctx.beginPath();
             ctx.moveTo(toX, toY);
             ctx.lineTo(toX - headLen * Math.cos(angle - Math.PI / 6), toY - headLen * Math.sin(angle - Math.PI / 6));
             ctx.lineTo(toX - headLen * Math.cos(angle + Math.PI / 6), toY - headLen * Math.sin(angle + Math.PI / 6));
             ctx.lineTo(toX, toY); ctx.fillStyle = color; ctx.fill();
             if (label) {
-                ctx.fillStyle = color; ctx.font = 'bold 12px sans-serif'; ctx.textAlign = 'center';
-                if (direction === 'down') ctx.fillText(label, toX, toY + 20);
-                else ctx.fillText(label, toX, toY - 10);
+                ctx.fillStyle = color; 
+                ctx.font = width < 600 ? 'bold 10px sans-serif' : 'bold 12px sans-serif'; 
+                ctx.textAlign = 'center';
+                if (direction === 'down') ctx.fillText(label, toX, toY + (width < 600 ? 12 : 20));
+                else ctx.fillText(label, toX, toY - (width < 600 ? 6 : 10));
             }
         }
 
@@ -555,14 +820,18 @@
         }
 
         function resizeMacro() {
+            if (!canvas.parentElement) return;
             const container = canvas.parentElement;
             width = canvas.width = container.clientWidth;
             height = canvas.height = container.clientHeight;
             waterLevel = height * MACRO_CONFIG.WATER_LEVEL_RATIO;
-            if (block.x === 0 && block.y === 0) { block.x = width / 2 - block.size / 2; block.y = height * 0.2; }
+            if (block.x === 0 || block.x > width) block.x = width / 2 - block.size / 2;
+            if (block.y === 0) block.y = height * 0.2;
+            updateBlockSize();
         }
 
         function resizeMicro() {
+            if (!microCanvas.parentElement) return;
             const container = microCanvas.parentElement;
             mWidth = microCanvas.width = container.clientWidth;
             mHeight = microCanvas.height = container.clientHeight;
@@ -577,24 +846,36 @@
                 latticeBox = { x: (mWidth - w) / 2 - 40, y: (mHeight - h) / 2 - 40, w: w + 80, h: h + 80 };
                 molecules.forEach(m => {
                     m.targetX += offsetX; m.targetY += offsetY;
-                    if (m.x < 0) m.x = mWidth / 2; if (m.y < 0) m.y = mHeight / 2;
+                    if (m.x < 0 || m.x > mWidth) m.x = mWidth / 2;
+                    if (m.y < 0 || m.y > mHeight) m.y = mHeight / 2;
                 });
             }
         }
 
         function resizeLake() {
+            if (!lakeCanvas.parentElement) return;
             const container = lakeCanvas.parentElement;
             lWidth = lakeCanvas.width = container.clientWidth;
             lHeight = lakeCanvas.height = container.clientHeight;
             if (fishArray.length === 0) initLake();
         }
 
+        function resizeTower() {
+             if (!towerCanvas.parentElement) return;
+             const container = towerCanvas.parentElement;
+             tWidth = towerCanvas.width = container.clientWidth;
+             tHeight = towerCanvas.height = container.clientHeight;
+        }
+
         function switchTab(tab) {
             currentTab = tab;
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            // Hide all controls
             document.getElementById('macroControls').classList.add('hidden');
             document.getElementById('macroControls').classList.remove('flex');
+            document.getElementById('towerControls').classList.add('hidden');
+            document.getElementById('towerControls').classList.remove('flex');
             document.getElementById('microControls').classList.add('hidden');
             document.getElementById('microControls').classList.remove('flex');
             document.getElementById('lakeControls').classList.add('hidden');
@@ -606,6 +887,12 @@
                 document.getElementById('macroControls').classList.remove('hidden');
                 document.getElementById('macroControls').classList.add('flex');
                 resizeMacro();
+            } else if (tab === 'tower') {
+                 document.querySelector('button[onclick="switchTab(\'tower\')"]').classList.add('active');
+                document.getElementById('tab-tower').classList.add('active');
+                document.getElementById('towerControls').classList.remove('hidden');
+                document.getElementById('towerControls').classList.add('flex');
+                resizeTower();
             } else if (tab === 'micro') {
                 document.querySelector('button[onclick="switchTab(\'micro\')"]').classList.add('active');
                 document.getElementById('tab-micro').classList.add('active');
@@ -629,6 +916,33 @@
             document.getElementById('lakeTempVal').className = "font-bold text-emerald-600 text-sm";
             initLake();
             updateLakeText();
+        }
+
+        function addTowerLiquid(type) {
+            const id = Date.now();
+            liquidsAdded = true;
+            // Enable solid buttons
+            document.querySelectorAll('.solid-btn').forEach(btn => btn.disabled = false);
+            
+            if(type === 'water') towerLiquids.push(new TowerLiquid(id, "Water", 1.0, "rgba(59, 130, 246, 0.7)"));
+            if(type === 'oil') towerLiquids.push(new TowerLiquid(id, "Oil", 0.9, "rgba(251, 191, 36, 0.7)"));
+            if(type === 'honey') towerLiquids.push(new TowerLiquid(id, "Honey", 1.4, "rgba(180, 83, 9, 0.8)"));
+        }
+
+        function addTowerSolid(type) {
+            if (!liquidsAdded) return;
+            if(type === 'sponge') towerSolids.push(new TowerSolid("Sponge", 0.1, "#f9a8d4"));
+            if(type === 'wax') towerSolids.push(new TowerSolid("Beeswax", 0.95, "#fef3c7"));
+            if(type === 'plastic') towerSolids.push(new TowerSolid("Plastic", 1.0, "#38bdf8"));
+            if(type === 'rubber') towerSolids.push(new TowerSolid("Rubber", 1.2, "#94a3b8"));
+            if(type === 'brick') towerSolids.push(new TowerSolid("Brick", 1.9, "#991b1b"));
+        }
+
+        function resetTower() {
+            towerLiquids = [];
+            towerSolids = [];
+            liquidsAdded = false;
+            document.querySelectorAll('.solid-btn').forEach(btn => btn.disabled = true);
         }
 
         function initMicro() {
@@ -687,15 +1001,38 @@
         }
 
         function onDown(e) {
-            if (currentTab !== 'macro') return;
-            if (e.type === 'touchstart') e.preventDefault();
-            const p = getPos(e); mouse.x = p.x; mouse.y = p.y; mouse.down = true;
-            if (p.x > block.x && p.x < block.x + block.size && p.y > block.y && p.y < block.y + block.size) block.isDragging = true;
+            const p = getPos(e); 
+            mouse.x = p.x; mouse.y = p.y; mouse.down = true;
+
+            if (currentTab === 'macro') {
+                if (e.type === 'touchstart') e.preventDefault();
+                if (p.x > block.x && p.x < block.x + block.size && p.y > block.y && p.y < block.y + block.size) block.isDragging = true;
+            } else if (currentTab === 'tower') {
+                 for(let i=towerSolids.length-1; i>=0; i--) {
+                     const s = towerSolids[i];
+                     if(p.x > s.x && p.x < s.x + s.size && p.y > s.y && p.y < s.y + s.size) {
+                         s.isDragging = true;
+                         towerSolids.splice(i, 1);
+                         towerSolids.push(s);
+                         mouse.px = s.x; mouse.py = s.y; 
+                         break;
+                     }
+                 }
+            }
         }
         function onMove(e) {
-            if (currentTab !== 'macro') return;
-            if (e.type === 'touchmove') e.preventDefault();
+            if (e.type === 'touchmove' && (currentTab === 'macro' || currentTab === 'tower')) e.preventDefault();
             const p = getPos(e); mouse.px = mouse.x; mouse.py = mouse.y; mouse.x = p.x; mouse.y = p.y;
+            
+            if(currentTab === 'tower') {
+                 towerSolids.forEach(s => {
+                     if(s.isDragging) {
+                         s.x += mouse.x - mouse.px;
+                         s.y += mouse.y - mouse.py;
+                         s.vx = 0; s.vy = 0; 
+                     }
+                 });
+            }
         }
         function onUp() {
             mouse.down = false;
@@ -704,6 +1041,7 @@
                 block.vy = (mouse.y - mouse.py) * 0.5;
             }
             block.isDragging = false;
+            towerSolids.forEach(s => s.isDragging = false);
         }
 
         function updateMacroPhysics() {
@@ -754,10 +1092,26 @@
 
             // Clouds
             ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+            
+            // Cloud 1
             ctx.beginPath();
             ctx.arc(100, 70, 20, 0, Math.PI * 2);
             ctx.arc(130, 60, 25, 0, Math.PI * 2);
             ctx.arc(160, 70, 20, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Cloud 2 (More clouds added)
+            ctx.beginPath();
+            ctx.arc(300, 50, 22, 0, Math.PI * 2);
+            ctx.arc(335, 40, 28, 0, Math.PI * 2);
+            ctx.arc(370, 50, 22, 0, Math.PI * 2);
+            ctx.fill();
+
+            // Cloud 3
+            ctx.beginPath();
+            ctx.arc(width - 200, 80, 18, 0, Math.PI * 2);
+            ctx.arc(width - 170, 70, 24, 0, Math.PI * 2);
+            ctx.arc(width - 140, 80, 18, 0, Math.PI * 2);
             ctx.fill();
 
             // Water
@@ -798,12 +1152,46 @@
             ctx.restore();
 
             if (forceToggle.checked) {
-                const arrowScale = 0.08;
+                const arrowScale = width < 600 ? 0.05 : 0.08;
                 const gravityLen = block.mass * arrowScale;
-                drawArrow(ctx, block.x + block.size + 30, block.y + block.size / 2 - gravityLen / 2, gravityLen, 'down', '#dc2626', 'Weight');
+                drawArrow(ctx, block.x + block.size + (width < 600 ? 15 : 30), block.y + block.size / 2 - gravityLen / 2, gravityLen, 'down', '#dc2626', 'Weight');
                 const buoyancyLen = (block.volume * block.submergedRatio) * arrowScale;
-                if (buoyancyLen > 5) drawArrow(ctx, block.x - 30, block.y + block.size / 2 + buoyancyLen / 2, buoyancyLen, 'up', '#2563eb', 'Buoyancy');
+                if (buoyancyLen > 5) drawArrow(ctx, block.x - (width < 600 ? 15 : 30), block.y + block.size / 2 + buoyancyLen / 2, buoyancyLen, 'up', '#2563eb', 'Buoyancy');
             }
+        }
+
+        function updateTowerLogic() {
+            // Sort Liquids by Density
+            towerLiquids.sort((a,b) => b.density - a.density);
+            // Calculate stacks
+            if(towerLiquids.length > 0) {
+                const h = tHeight / towerLiquids.length;
+                towerLiquids.forEach((l, i) => {
+                    const targetY = tHeight - (i+1)*h;
+                    l.update(targetY, h, tWidth);
+                });
+            }
+            // Update Solids
+            towerSolids.forEach(s => s.update(towerLiquids, tWidth, tHeight));
+        }
+
+        function drawTower() {
+            tCtx.clearRect(0, 0, tWidth, tHeight);
+            
+            // Draw Liquids
+            if(towerLiquids.length === 0) {
+                tCtx.fillStyle = '#f1f5f9';
+                tCtx.fillRect(0, 0, tWidth, tHeight);
+                tCtx.fillStyle = '#94a3b8';
+                tCtx.font = 'bold 20px sans-serif';
+                tCtx.textAlign = 'center';
+                tCtx.fillText("Add Liquids from the controls above!", tWidth/2, tHeight/2);
+            } else {
+                towerLiquids.forEach(l => l.draw(tCtx, tWidth));
+            }
+
+            // Draw Solids
+            towerSolids.forEach(s => s.draw(tCtx));
         }
 
         function drawMicro() {
@@ -997,16 +1385,35 @@
         canvas.addEventListener('touchstart', onDown, { passive: false });
         canvas.addEventListener('touchmove', onMove, { passive: false });
         window.addEventListener('touchend', onUp);
+        
+        towerCanvas.addEventListener('mousedown', onDown);
+        towerCanvas.addEventListener('mousemove', onMove);
+        towerCanvas.addEventListener('touchstart', onDown, { passive: false });
+        towerCanvas.addEventListener('touchmove', onMove, { passive: false });
+
         window.addEventListener('resize', () => {
             resizeMacro();
             resizeMicro();
             resizeLake();
+            resizeTower();
+        });
+        
+        window.addEventListener('orientationchange', () => {
+             setTimeout(() => {
+                resizeMacro();
+                resizeMicro();
+                resizeLake();
+                resizeTower();
+             }, 100);
         });
 
         function loop() {
             if (currentTab === 'macro') {
                 updateMacroPhysics();
                 drawMacro();
+            } else if (currentTab === 'tower') {
+                updateTowerLogic();
+                drawTower();
             } else if (currentTab === 'micro') {
                 drawMicro();
             } else if (currentTab === 'lake') {
@@ -1017,6 +1424,7 @@
 
         // Init
         resizeMacro();
+        resizeTower();
         initMicro();
         resizeMicro();
         updateBlockSize();
