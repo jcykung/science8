@@ -1,0 +1,303 @@
+<!doctype html>
+<html lang="en-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Refraction Explained - Printable Handout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .info-section {
+        border: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+      }
+      /* Print-specific styles */
+      @media print {
+        body {
+          font-family: "Times New Roman", serif;
+          background-color: #ffffff;
+          color: #000000;
+        }
+        .info-section {
+          border: 1px solid #cccccc;
+          padding: 1rem;
+          margin-bottom: 1rem;
+          border-radius: 0;
+          page-break-inside: avoid;
+        }
+        h1,
+        h2,
+        h3,
+        p,
+        li,
+        strong,
+        text {
+          color: #000000 !important;
+        }
+        .info-section,
+        .bg-white,
+        .bg-yellow-100,
+        .bg-blue-100,
+        .bg-emerald-100,
+        .bg-slate-100 {
+          background-color: #ffffff !important;
+        }
+        svg {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-800">
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl">
+      <!-- Header Section -->
+      <header class="text-center mb-6 p-4 info-section bg-white">
+        <h1 class="text-4xl font-bold text-slate-900">Refraction</h1>
+      </header>
+
+      <!-- Word Breakdown Section -->
+      <div class="info-section bg-yellow-100 border-yellow-200">
+        <h2 class="text-2xl font-bold text-yellow-900 mb-4">
+          Breaking Down the Word
+        </h2>
+        <div
+          class="flex items-center justify-center text-2xl font-semibold mb-4 bg-yellow-50 p-3 rounded-lg"
+        >
+          <span class="text-amber-700">Re-</span
+          ><span class="text-slate-500 mx-2">+</span
+          ><span class="text-amber-700">Frangere</span>
+        </div>
+        <div class="space-y-3 text-yellow-800">
+          <p>
+            <strong class="font-semibold text-yellow-900">Re-:</strong> A Latin
+            prefix meaning
+            <strong class="font-semibold">"back" or "again."</strong>
+          </p>
+          <p>
+            <strong class="font-semibold text-yellow-900">Frangere:</strong> A
+            Latin word meaning
+            <strong class="font-semibold">"to break."</strong> (Related to words
+            like <em>fracture</em> and <em>fragment</em>)
+          </p>
+        </div>
+        <hr class="my-4 border-yellow-300" />
+        <p class="text-center font-semibold text-yellow-900">
+          So, "refraction" literally means "to break back" or bend. The light
+          ray looks "broken" as it enters a new material!
+        </p>
+      </div>
+
+      <!-- The Core Idea -->
+      <div class="info-section bg-blue-100 border-blue-200">
+        <h2 class="text-2xl font-bold text-blue-900 mb-3">
+          The Core Idea: Speed & Direction
+        </h2>
+        <p class="text-blue-800 mb-4">
+          <strong class="font-semibold">Refraction</strong> is the bending of
+          light as it passes from one transparent substance into another. This
+          happens because light travels at different
+          <strong class="font-semibold">speeds</strong> in different materials
+          (like air vs. water).
+        </p>
+        <div
+          class="w-full bg-white p-4 rounded-lg shadow-sm border border-blue-100"
+        >
+          <svg
+            viewBox="0 0 200 120"
+            class="w-full"
+            aria-labelledby="refraction-title"
+          >
+            <title id="refraction-title">
+              A diagram showing a light ray bending as it moves from air to
+              water.
+            </title>
+
+            <defs>
+              <!-- Small, elegant arrowhead -->
+              <marker
+                id="arrowhead"
+                markerWidth="6"
+                markerHeight="4"
+                refX="3"
+                refY="2"
+                orient="auto"
+              >
+                <polygon points="0 0, 6 2, 0 4" fill="#ef4444" />
+              </marker>
+            </defs>
+
+            <!-- Boundary and Water -->
+            <rect x="0" y="60" width="200" height="60" fill="#eff6ff" />
+            <line
+              x1="0"
+              y1="60"
+              x2="200"
+              y2="60"
+              stroke="#3b82f6"
+              stroke-width="1.5"
+            />
+
+            <!-- Normal Line -->
+            <line
+              x1="100"
+              y1="10"
+              x2="100"
+              y2="110"
+              stroke="#94a3b8"
+              stroke-width="1"
+              stroke-dasharray="4"
+            />
+            <text x="105" y="20" font-size="5" fill="#64748b" class="italic">
+              Normal Line (90°)
+            </text>
+
+            <!-- Incident Ray -->
+            <line
+              x1="30"
+              y1="10"
+              x2="100"
+              y2="60"
+              stroke="#ef4444"
+              stroke-width="2"
+            />
+            <!-- Small indicator arrow halfway along ray -->
+            <path
+              d="M 61 32.1 L 65 35"
+              fill="none"
+              stroke="#ef4444"
+              stroke-width="2"
+              marker-end="url(#arrowhead)"
+            />
+            <text x="25" y="25" font-size="7" font-weight="bold" fill="#b91c1c">
+              Air (Faster)
+            </text>
+
+            <!-- Refracted Ray -->
+            <line
+              x1="100"
+              y1="60"
+              x2="140"
+              y2="110"
+              stroke="#ef4444"
+              stroke-width="2"
+            />
+            <!-- Small indicator arrow halfway along ray -->
+            <path
+              d="M 116 80 L 120 85"
+              fill="none"
+              stroke="#ef4444"
+              stroke-width="2"
+              marker-end="url(#arrowhead)"
+            />
+            <text
+              x="145"
+              y="100"
+              font-size="7"
+              font-weight="bold"
+              fill="#1e3a8a"
+            >
+              Water (Slower)
+            </text>
+
+            <!-- Labels -->
+            <text x="35" y="75" font-size="6" fill="#1e40af" font-weight="600">
+              Light bends TOWARD the normal
+            </text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Key Concepts -->
+      <div class="info-section bg-emerald-100 border-emerald-200">
+        <h2 class="text-2xl font-bold text-emerald-900 mb-3">
+          The "Rules" of Bending
+        </h2>
+        <p class="text-emerald-800 mb-4">
+          How much light bends depends on how much the material slows down the
+          light waves.
+        </p>
+        <div class="space-y-4">
+          <div class="bg-emerald-50 p-4 rounded-lg">
+            <h3 class="font-bold text-emerald-900 text-lg">
+              Fast to Slow (Air to Glass)
+            </h3>
+            <p class="text-emerald-800 mt-1">
+              When light hits a denser material, it slows down and bends
+              <strong class="font-semibold text-emerald-900">TOWARD</strong> the
+              normal line.
+            </p>
+          </div>
+          <div class="bg-emerald-50 p-4 rounded-lg">
+            <h3 class="font-bold text-emerald-900 text-lg">
+              Slow to Fast (Water to Air)
+            </h3>
+            <p class="text-emerald-800 mt-1">
+              When light enters a less dense material, it speeds up and bends
+              <strong class="font-semibold text-emerald-900">AWAY</strong> from
+              the normal line.
+            </p>
+          </div>
+          <div class="bg-emerald-50 p-4 rounded-lg">
+            <h3 class="font-bold text-emerald-900 text-lg">Density Matters</h3>
+            <p class="text-emerald-800 mt-1">
+              More dense materials (like glass or diamond) resist the passage of
+              light more than less dense materials (like air or water). This
+              resistance is what causes the change in speed.
+            </p>
+          </div>
+        </div>
+        <div class="bg-emerald-50 p-4 rounded-lg mt-6">
+          <p class="text-emerald-800 text-center">
+            <strong class="font-semibold">The Sidewalk Analogy:</strong> Imagine
+            a shopping cart rolling from a sidewalk (fast) into grass (slow) at
+            an angle. The first wheel that hits the grass slows down first,
+            causing the whole cart to pivot and turn. That's exactly how light
+            bends!
+          </p>
+        </div>
+      </div>
+
+      <!-- Reading in Context -->
+      <div class="info-section bg-slate-100 border-slate-200">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">
+          Reading in Context: The Broken Straw
+        </h2>
+        <div class="space-y-4 text-slate-700">
+          <p>
+            Have you ever noticed how a straw looks disconnected or "broken"
+            when you put it in a glass of water? This is a classic example of
+            <strong class="font-semibold text-slate-900">refraction</strong> in
+            action.
+          </p>
+          <p>
+            Your eyes see objects because light reflects off them and travels to
+            your pupils. When the straw is in water, the light reflecting off
+            the bottom of the straw must pass through the water, then the glass,
+            and finally the air to reach your eyes. Because the light
+            <strong class="font-semibold text-slate-900">refracts</strong>
+            (bends) at the boundary between the water and the air, your brain is
+            tricked.
+          </p>
+          <p>
+            Your brain assumes light always travels in a perfectly straight
+            line. It traces the bent light rays back to where it
+            <em>thinks</em> they came from, creating an "image" of the straw
+            that is slightly shifted from its actual position. This shift makes
+            the straw look bent, even though it is perfectly straight!
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

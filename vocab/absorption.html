@@ -1,0 +1,256 @@
+<!doctype html>
+<html lang="en-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Absorption Explained - Printable Handout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .info-section {
+        border: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+      }
+      @media print {
+        body {
+          font-family: "Times New Roman", serif;
+          background-color: #ffffff;
+          color: #000000;
+        }
+        .info-section {
+          border: 1px solid #cccccc;
+          padding: 1rem;
+          margin-bottom: 1rem;
+          border-radius: 0;
+          page-break-inside: avoid;
+        }
+        h1,
+        h2,
+        h3,
+        p,
+        li,
+        strong,
+        text {
+          color: #000000 !important;
+        }
+        .info-section,
+        .bg-white,
+        .bg-blue-100,
+        .bg-emerald-100,
+        .bg-slate-100 {
+          background-color: #ffffff !important;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-800">
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-3xl">
+      <!-- Header Section -->
+      <header class="text-center mb-6 p-4 info-section bg-white">
+        <h1 class="text-4xl font-bold text-slate-900 text-center mb-2">
+          Absorption
+        </h1>
+      </header>
+
+      <!-- Word Breakdown Section -->
+      <div class="info-section bg-blue-100 border-blue-200">
+        <h2 class="text-2xl font-bold text-blue-900 mb-4">
+          Breaking Down the Word
+        </h2>
+        <div
+          class="flex items-center justify-center text-2xl font-semibold mb-4 bg-blue-50 p-3 rounded-lg border border-blue-200"
+        >
+          <span class="text-blue-700">Ab-</span
+          ><span class="text-slate-400 mx-1">+</span
+          ><span class="text-blue-700">Sorbere</span
+          ><span class="text-slate-500 mx-2">→</span
+          ><span class="text-blue-700">Absorb</span>
+        </div>
+        <div class="space-y-3 text-blue-800">
+          <p>
+            <strong class="font-semibold text-blue-900">Origin:</strong> From
+            Latin <em>ab-</em> (away) and <em>sorbere</em> (to suck in/swallow).
+          </p>
+          <p>
+            <strong class="font-semibold text-blue-900">Modern Meaning:</strong>
+            When one thing takes in another thing and
+            <strong class="font-semibold">keeps it inside</strong>.
+          </p>
+        </div>
+        <hr class="my-4 border-blue-300" />
+        <p class="text-center font-semibold text-blue-900 italic">
+          In science, absorption is like a sponge for energy! Instead of
+          bouncing off, the energy stays in the object.
+        </p>
+      </div>
+
+      <!-- The Science Section -->
+      <div class="info-section bg-white border-slate-200">
+        <h2 class="text-2xl font-bold text-slate-900 mb-3">
+          How Does Light Absorb?
+        </h2>
+        <p class="text-slate-700 mb-4">
+          When light hits an object, the atoms inside the object start to
+          vibrate. If the frequency of the light matches the "natural" vibration
+          of the atoms, the atoms
+          <strong class="font-semibold">soak up</strong> the energy. This energy
+          usually turns into
+          <strong class="text-red-600 font-bold uppercase">heat</strong>.
+        </p>
+
+        <!-- Absorption Visual -->
+        <div class="w-full bg-slate-50 p-4 rounded-lg border border-slate-200">
+          <svg viewBox="0 0 200 100" class="w-full">
+            <!-- Surface -->
+            <rect x="120" y="10" width="60" height="80" rx="4" fill="#1e293b" />
+            <text
+              x="150"
+              y="95"
+              font-size="7"
+              fill="#1e293b"
+              text-anchor="middle"
+              font-weight="bold"
+            >
+              Dark Object
+            </text>
+
+            <!-- Incoming Light -->
+            <line
+              x1="10"
+              y1="50"
+              x2="110"
+              y2="50"
+              stroke="#f59e0b"
+              stroke-width="3"
+            />
+            <polygon points="110,47 118,50 110,53" fill="#f59e0b" />
+            <text x="10" y="45" font-size="7" font-weight="bold" fill="#b45309">
+              Light Energy
+            </text>
+
+            <!-- Inside the object (Heat) -->
+            <path
+              d="M 130 40 Q 135 30 140 40 T 150 40"
+              fill="none"
+              stroke="#ef4444"
+              stroke-width="1.5"
+            />
+            <path
+              d="M 130 60 Q 135 50 140 60 T 150 60"
+              fill="none"
+              stroke="#ef4444"
+              stroke-width="1.5"
+            />
+            <text x="140" y="52" font-size="6" fill="white" font-weight="bold">
+              Molecular
+            </text>
+            <text x="141" y="58" font-size="6" fill="white" font-weight="bold">
+              Vibration
+            </text>
+
+            <text
+              x="170"
+              y="52"
+              font-size="8"
+              fill="#ef4444"
+              font-weight="black"
+            >
+              HEAT
+            </text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Color Context -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+        <div
+          class="p-4 bg-slate-800 border border-slate-900 rounded-xl text-white"
+        >
+          <h3 class="font-bold text-slate-100 text-lg mb-1">Black Objects</h3>
+          <p class="text-slate-300 text-sm">
+            Black surfaces <strong class="text-white">absorb</strong> almost all
+            the light that hits them. Since no light reflects back to your eyes,
+            it looks dark and feels hot.
+          </p>
+        </div>
+        <div class="p-4 bg-white border border-slate-200 rounded-xl">
+          <h3 class="font-bold text-slate-900 text-lg mb-1">White Objects</h3>
+          <p class="text-slate-700 text-sm">
+            White surfaces
+            <strong class="text-slate-900 font-bold">reflect</strong> most light
+            and <strong class="text-slate-900 font-bold">absorb</strong> very
+            little. This is why white clothes keep you cool in the sun!
+          </p>
+        </div>
+      </div>
+
+      <!-- Mind-Blowing Fact -->
+      <div class="info-section bg-emerald-100 border-emerald-200">
+        <div class="flex items-start gap-4">
+          <div class="bg-emerald-500 text-white rounded-full p-2 mt-1">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              class="h-5 w-5"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+            >
+              <path
+                fill-rule="evenodd"
+                d="M11.3 1.046A1 1 0 0112 2v5h4a1 1 0 01.82 1.573l-7 10A1 1 0 018 18v-5H4a1 1 0 01-.82-1.573l7-10a1 1 0 011.12-.38z"
+                clip-rule="evenodd"
+              />
+            </svg>
+          </div>
+          <p class="text-emerald-800">
+            <strong class="font-semibold">Mind-Blowing Fact:</strong> Scientists
+            have created a material called
+            <strong class="font-semibold">Vantablack</strong> that is so good at
+            <strong class="font-semibold">absorption</strong> that it "swallows"
+            99.96% of light. Looking at it is like looking into a bottomless
+            hole!
+          </p>
+        </div>
+      </div>
+
+      <!-- Reading in Context -->
+      <div class="info-section bg-slate-100 border-slate-200">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">
+          Reading in Context: Photosynthesis
+        </h2>
+        <div class="space-y-4 text-slate-700">
+          <p>
+            Life on Earth depends on
+            <strong class="font-semibold text-slate-900">absorption</strong>!
+            Inside every green leaf, there is a pigment called chlorophyll.
+          </p>
+          <p>
+            Chlorophyll's main job is to
+            <strong class="font-semibold text-slate-900">absorb</strong> the
+            energy from sunlight. It specifically likes to
+            <strong class="font-semibold text-slate-900">absorb</strong> red and
+            blue light. The green light isn't absorbed as well, so it bounces
+            off—which is why plants look green to us!
+          </p>
+          <p>
+            The plant then uses that
+            <strong class="font-semibold text-slate-900">absorbed</strong>
+            energy to turn water and carbon dioxide into food (sugar). Without
+            the ability to
+            <strong class="font-semibold text-slate-900">absorb</strong> light,
+            plants couldn't grow, and we would have no food to eat.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>

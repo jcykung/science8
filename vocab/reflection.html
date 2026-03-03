@@ -1,0 +1,398 @@
+<!doctype html>
+<html lang="en-CA">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Reflection of Light - Printable Handout</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      body {
+        font-family: "Inter", sans-serif;
+      }
+      .info-section {
+        border: 1px solid #e2e8f0;
+        margin-bottom: 1.5rem;
+        padding: 1.5rem;
+        border-radius: 0.75rem;
+      }
+      /* Print-specific styles */
+      @media print {
+        body {
+          font-family: "Times New Roman", serif;
+          background-color: #ffffff;
+          color: #000000;
+        }
+        .info-section {
+          border: 1px solid #cccccc;
+          padding: 1rem;
+          margin-bottom: 1rem;
+          border-radius: 0;
+          page-break-inside: avoid;
+        }
+        h1,
+        h2,
+        h3,
+        p,
+        li,
+        strong,
+        text {
+          color: #000000 !important;
+        }
+        .info-section,
+        .bg-white {
+          background-color: #ffffff !important;
+        }
+        svg {
+          -webkit-print-color-adjust: exact;
+          print-color-adjust: exact;
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-slate-50 text-slate-800">
+    <div class="container mx-auto p-4 sm:p-6 md:p-8 max-w-4xl">
+      <!-- Header Section -->
+      <header class="text-center mb-6 p-4 info-section bg-white">
+        <h1 class="text-3xl sm:text-4xl font-bold text-slate-900">
+          Reflection
+        </h1>
+      </header>
+
+      <!-- Word Breakdown Section -->
+      <div class="info-section bg-purple-100">
+        <h2 class="text-2xl font-bold text-purple-900 mb-4">
+          Breaking Down the Word
+        </h2>
+        <div class="flex flex-col md:flex-row gap-4 mb-4">
+          <div
+            class="flex-1 bg-purple-50 p-3 rounded-lg border border-purple-200 shadow-sm"
+          >
+            <strong
+              class="text-purple-700 text-sm uppercase tracking-wider block mb-1"
+              >Prefix</strong
+            >
+            <strong class="text-purple-900 text-xl block mb-1">Re-</strong>
+            <span class="text-purple-800 text-sm"
+              >From Latin, meaning <em>back</em> or <em>again</em>.</span
+            >
+          </div>
+          <div
+            class="flex-1 bg-purple-50 p-3 rounded-lg border border-purple-200 shadow-sm"
+          >
+            <strong
+              class="text-purple-700 text-sm uppercase tracking-wider block mb-1"
+              >Root</strong
+            >
+            <strong class="text-purple-900 text-xl block mb-1">-flect-</strong>
+            <span class="text-purple-800 text-sm"
+              >From the Latin verb <em>flectere</em>, meaning
+              <em>to bend</em> or <em>to curve</em>.</span
+            >
+          </div>
+          <div
+            class="flex-1 bg-purple-50 p-3 rounded-lg border border-purple-200 shadow-sm"
+          >
+            <strong
+              class="text-purple-700 text-sm uppercase tracking-wider block mb-1"
+              >Suffix</strong
+            >
+            <strong class="text-purple-900 text-xl block mb-1">-ion</strong>
+            <span class="text-purple-800 text-sm"
+              >A Latin suffix that turns a verb into a noun. It means
+              <em>the act, process, or state of</em>.</span
+            >
+          </div>
+        </div>
+        <div
+          class="text-purple-900 mt-4 text-center bg-purple-200/50 p-3 rounded-lg border border-purple-300"
+        >
+          <p>
+            Put together, <strong>Reflection</strong> literally translates to
+            <strong>"the act of bending back."</strong> In physics, it is the
+            process where a wave (like light) hits a surface and bounces back
+            into the medium it came from.
+          </p>
+        </div>
+      </div>
+
+      <!-- The Core Idea & Diagram -->
+      <div class="info-section bg-amber-50">
+        <h2 class="text-2xl font-bold text-amber-900 mb-3">
+          The Core Idea: The Law of Reflection
+        </h2>
+        <p class="text-amber-800 mb-4">
+          When light travels and hits a smooth surface like a mirror, it doesn't
+          stop. It "bends back." The rule it follows when bouncing is perfectly
+          predictable.
+        </p>
+        <div class="w-full bg-white p-4 rounded-xl border border-amber-200">
+          <svg
+            viewBox="0 0 120 70"
+            class="w-full h-auto"
+            aria-labelledby="reflection-title"
+          >
+            <title id="reflection-title">
+              Diagram showing the Law of Reflection
+            </title>
+
+            <!-- Mirror Surface -->
+            <line
+              x1="10"
+              y1="50"
+              x2="110"
+              y2="50"
+              stroke="#475569"
+              stroke-width="2"
+            />
+            <!-- Mirror Hash Marks (indicating back of mirror) -->
+            <g stroke="#94a3b8" stroke-width="1">
+              <line x1="15" y1="50" x2="10" y2="55" />
+              <line x1="25" y1="50" x2="20" y2="55" />
+              <line x1="35" y1="50" x2="30" y2="55" />
+              <line x1="45" y1="50" x2="40" y2="55" />
+              <line x1="55" y1="50" x2="50" y2="55" />
+              <line x1="65" y1="50" x2="60" y2="55" />
+              <line x1="75" y1="50" x2="70" y2="55" />
+              <line x1="85" y1="50" x2="80" y2="55" />
+              <line x1="95" y1="50" x2="90" y2="55" />
+              <line x1="105" y1="50" x2="100" y2="55" />
+            </g>
+            <text x="110" y="62" font-size="4" fill="#475569" text-anchor="end">
+              Smooth Surface (Mirror)
+            </text>
+
+            <!-- Normal Line -->
+            <line
+              x1="60"
+              y1="10"
+              x2="60"
+              y2="50"
+              stroke="#94a3b8"
+              stroke-dasharray="2,2"
+              stroke-width="1"
+            />
+            <text
+              x="60"
+              y="8"
+              font-size="4"
+              font-weight="bold"
+              fill="#64748b"
+              text-anchor="middle"
+            >
+              Normal Line (90°)
+            </text>
+
+            <!-- Incident Ray -->
+            <!-- Arrow head marker definition -->
+            <defs>
+              <marker
+                id="arrowhead-in"
+                markerWidth="6"
+                markerHeight="6"
+                refX="3"
+                refY="3"
+                orient="auto"
+              >
+                <polygon points="0 0, 6 3, 0 6" fill="#f59e0b" />
+              </marker>
+              <marker
+                id="arrowhead-out"
+                markerWidth="6"
+                markerHeight="6"
+                refX="3"
+                refY="3"
+                orient="auto"
+              >
+                <polygon points="0 0, 6 3, 0 6" fill="#d97706" />
+              </marker>
+            </defs>
+
+            <line
+              x1="20"
+              y1="15"
+              x2="60"
+              y2="50"
+              stroke="#f59e0b"
+              stroke-width="1.5"
+              marker-end="url(#arrowhead-in)"
+            />
+            <text
+              x="32"
+              y="28"
+              font-size="4"
+              font-weight="bold"
+              fill="#b45309"
+              transform="rotate(40, 32, 28)"
+            >
+              Incident Ray
+            </text>
+
+            <!-- Reflected Ray -->
+            <line
+              x1="60"
+              y1="50"
+              x2="100"
+              y2="15"
+              stroke="#d97706"
+              stroke-width="1.5"
+              marker-end="url(#arrowhead-out)"
+            />
+            <text
+              x="88"
+              y="28"
+              font-size="4"
+              font-weight="bold"
+              fill="#b45309"
+              transform="rotate(-40, 88, 28)"
+            >
+              Reflected Ray
+            </text>
+
+            <!-- Angles -->
+            <path
+              d="M 50 41 A 14 14 0 0 1 60 36"
+              fill="none"
+              stroke="#64748b"
+              stroke-width="0.8"
+            />
+            <text
+              x="54"
+              y="34"
+              font-size="4.5"
+              font-style="italic"
+              fill="#334155"
+            >
+              i
+            </text>
+
+            <path
+              d="M 60 36 A 14 14 0 0 1 70 41"
+              fill="none"
+              stroke="#64748b"
+              stroke-width="0.8"
+            />
+            <text
+              x="64"
+              y="34"
+              font-size="4.5"
+              font-style="italic"
+              fill="#334155"
+            >
+              r
+            </text>
+          </svg>
+        </div>
+        <p
+          class="text-amber-900 mt-4 text-center font-medium bg-amber-100/50 p-2 rounded"
+        >
+          The Angle of Incidence (<span class="italic">i</span>) ALWAYS equals
+          the Angle of Reflection (<span class="italic">r</span>).
+        </p>
+      </div>
+
+      <!-- Key Terms -->
+      <div class="info-section bg-indigo-50">
+        <h2 class="text-2xl font-bold text-indigo-900 mb-4">The Key Players</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div
+            class="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm"
+          >
+            <h3
+              class="font-bold text-indigo-800 text-lg border-b border-indigo-100 pb-2 mb-2"
+            >
+              Incident Ray
+            </h3>
+            <p class="text-indigo-900 text-sm">
+              The incoming beam of light that is travelling <em>toward</em> the
+              surface. ("Incidence" comes from a Latin word meaning "to fall
+              upon").
+            </p>
+          </div>
+          <div
+            class="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm"
+          >
+            <h3
+              class="font-bold text-indigo-800 text-lg border-b border-indigo-100 pb-2 mb-2"
+            >
+              Reflected Ray
+            </h3>
+            <p class="text-indigo-900 text-sm">
+              The beam of light that has bounced off the surface and is
+              travelling <em>away</em> from it.
+            </p>
+          </div>
+          <div
+            class="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm"
+          >
+            <h3
+              class="font-bold text-indigo-800 text-lg border-b border-indigo-100 pb-2 mb-2"
+            >
+              The Normal
+            </h3>
+            <p class="text-indigo-900 text-sm">
+              An imaginary dashed line drawn exactly perpendicular (at a
+              90-degree angle) to the surface where the light hits. We measure
+              our angles from this line!
+            </p>
+          </div>
+          <div
+            class="bg-white p-4 rounded-lg border border-indigo-100 shadow-sm"
+          >
+            <h3
+              class="font-bold text-indigo-800 text-lg border-b border-indigo-100 pb-2 mb-2"
+            >
+              Angles (i & r)
+            </h3>
+            <p class="text-indigo-900 text-sm">
+              We measure the angle between the rays and the
+              <strong>Normal</strong> line. No matter how you tilt a mirror,
+              angle <em>i</em> and angle <em>r</em> will be identical.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Reading in Context -->
+      <div class="info-section bg-slate-100">
+        <h2 class="text-2xl font-bold text-slate-900 mb-4">
+          Reading in Context: Mirrors vs. Walls
+        </h2>
+        <div class="space-y-4 text-slate-700">
+          <p>
+            If light bounces off almost everything we see,
+            <strong
+              >why can you see your face in a mirror, but not in a painted
+              wall?</strong
+            >
+          </p>
+          <p>
+            The answer lies in how the light "bends back." A mirror is
+            incredibly smooth at a microscopic level. When perfectly parallel
+            rays of light from your face hit the mirror, they all hit at the
+            exact same angle. Because of the Law of Reflection, they all bounce
+            back totally parallel to one another. This organized bouncing is
+            called <strong>Specular Reflection</strong>, and it creates a clear
+            image.
+          </p>
+          <p>
+            A painted wall, on the other hand, is microscopically bumpy and
+            rough. When parallel rays of light hit those tiny bumps, each
+            individual ray hits a slightly different angle. They all still
+            follow the Law of Reflection, but because the "surface" is angled
+            differently at every microscopic point, the light rays scatter in
+            thousands of different directions! This scattered bouncing is called
+            <strong>Diffuse Reflection</strong>. The light reaches your eyes,
+            allowing you to see the wall, but the organized image of your face
+            is completely scrambled.
+          </p>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
