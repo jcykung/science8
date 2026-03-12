@@ -1,0 +1,1100 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Law of Reflection - Science 8 Review</title>
+    <style>
+        /* Monokai Pro Color Palette */
+        :root {
+            --bg-color: #2D2A2E;
+            --panel-bg: #403E41;
+            --text-main: #FCFCFA;
+            --accent-yellow: #FFD866;
+            --accent-orange: #FC9867;
+            --accent-red: #FF6188;
+            --accent-green: #A9DC76;
+            --accent-cyan: #78DCE8;
+            --accent-purple: #AB9DF2;
+        }
+
+        body {
+            margin: 0;
+            padding: 20px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+
+        h1 {
+            margin-top: 0;
+            margin-bottom: 5px;
+            color: var(--accent-cyan);
+            text-align: center;
+        }
+
+        p.subtitle {
+            margin-top: 0;
+            color: var(--accent-purple);
+            font-size: 1em;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .tab-btn {
+            background-color: var(--panel-bg);
+            color: var(--text-main);
+            border: 2px solid transparent;
+            padding: 10px 15px;
+            cursor: pointer;
+            border-radius: 8px;
+            font-size: 1em;
+            font-weight: bold;
+            transition: 0.2s;
+            flex: 1;
+            min-width: 140px;
+            text-align: center;
+        }
+
+        .tab-btn:hover {
+            background-color: #555;
+        }
+
+        .tab-btn.active {
+            border-color: var(--accent-orange);
+            background-color: #1E1D1F;
+            color: var(--accent-orange);
+        }
+
+        .tab-content {
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            width: 100%;
+            max-width: 800px;
+        }
+
+        .tab-content.active {
+            display: flex;
+        }
+
+        .instructions {
+            background-color: var(--panel-bg);
+            padding: 15px;
+            border-radius: 8px;
+            width: 100%;
+            box-sizing: border-box;
+            margin-bottom: 15px;
+            border-left: 5px solid var(--accent-yellow);
+            line-height: 1.5;
+        }
+
+        .canvas-container {
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            background-color: #1E1D1F;
+            border: 2px solid var(--panel-bg);
+            position: relative;
+            /* Added for absolute positioning of child buttons */
+        }
+
+        .reset-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--panel-bg);
+            color: var(--text-main);
+            border: 2px solid var(--accent-cyan);
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 6px 12px;
+            font-weight: bold;
+            z-index: 10;
+            display: none;
+            transition: 0.2s;
+        }
+
+        .reset-btn:hover {
+            background-color: var(--accent-cyan);
+            color: var(--bg-color);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            cursor: grab;
+            touch-action: none;
+            /* Prevent scrolling while dragging */
+        }
+
+        canvas:active {
+            cursor: grabbing;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+            flex-wrap: wrap;
+            justify-content: center;
+            width: 100%;
+        }
+
+        button.action-btn {
+            background-color: var(--accent-green);
+            color: #1E1D1F;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.1s, filter 0.2s;
+        }
+
+        button.action-btn:hover {
+            filter: brightness(1.1);
+            transform: translateY(-2px);
+        }
+
+        button.action-btn:active {
+            transform: translateY(0);
+        }
+
+        .feedback {
+            font-size: 1.2em;
+            font-weight: bold;
+            min-width: 200px;
+            text-align: center;
+            padding: 10px;
+            border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .score-display {
+            color: var(--accent-yellow);
+            font-weight: bold;
+            margin-top: 10px;
+            font-size: 1.2em;
+        }
+    </style>
+</head>
+
+<body>
+
+    <h1>Law of Reflection Review</h1>
+    <p class="subtitle">Science 8 Interactive Sandbox & Quiz</p>
+
+    <div class="tabs">
+        <button class="tab-btn active" onclick="switchTab('review')">1. Explore & Review</button>
+        <button class="tab-btn" onclick="switchTab('flat')">2. Flat Mirrors</button>
+        <button class="tab-btn" onclick="switchTab('curved')">3. Curved Surfaces</button>
+        <button class="tab-btn" onclick="switchTab('random')">4. Random Shapes</button>
+    </div>
+
+    <!-- TAB 1: REVIEW -->
+    <div id="review" class="tab-content active">
+        <div class="instructions">
+            <strong>The Law of Reflection:</strong> The angle of incidence (<em>i</em>) equals the angle of reflection
+            (<em>r</em>). Both angles are measured from the <strong>Normal Line</strong> (a line exactly 90° to the
+            surface).
+            <br><span style="color:var(--accent-cyan); font-weight: bold;">Interact: Drag the yellow laser emitter. Drag
+                the protractor and snap it to the mirror! Use the <strong style="color:var(--accent-green);">green
+                    handle</strong> to rotate it. <strong style="color:var(--accent-purple);">Draw a box in empty space
+                    to zoom, then drag to pan!</strong></span>
+        </div>
+        <div class="canvas-container">
+            <button id="resetViewBtn" class="reset-btn" onclick="resetView()">Reset View</button>
+            <canvas id="reviewCanvas" width="800" height="400"></canvas>
+        </div>
+    </div>
+
+    <!-- TABS 2, 3, 4: QUIZZES -->
+    <div id="quizContainer" class="tab-content">
+        <div class="instructions" id="quizInstructions">
+            <strong>Challenge:</strong> Drag the orange node to set the reflected ray. Match the incident angle (i) from
+            the normal line!
+            <br>
+            <label
+                style="cursor: pointer; display: inline-flex; align-items: center; gap: 8px; margin-top: 10px; font-weight: bold; color: var(--accent-yellow);">
+                <input type="checkbox" id="showTangentBtn" onchange="drawQuiz()">
+                Show Flat Surface (Tangent Line)
+            </label>
+        </div>
+        <div class="canvas-container">
+            <canvas id="quizCanvas" width="800" height="400"></canvas>
+        </div>
+        <div class="controls">
+            <button id="quizActionBtn" class="action-btn" onclick="handleQuizAction()">Check Answer</button>
+            <div id="feedbackText" class="feedback">Question 1 / 5</div>
+        </div>
+        <div id="scoreDisplay" class="score-display"></div>
+    </div>
+
+    <script>
+        // --- UTILS & MATH ---
+        const radToDeg = rad => rad * (180 / Math.PI);
+        const degToRad = deg => deg * (Math.PI / 180);
+        const distance = (x1, y1, x2, y2) => Math.hypot(x2 - x1, y2 - y1);
+
+        // Normalize angle to be between 0 and 2PI
+        function normalizeAngle(angle) {
+            let a = angle % (2 * Math.PI);
+            if (a < 0) a += (2 * Math.PI);
+            return a;
+        }
+
+        function shuffleArray(array) {
+            let curId = array.length;
+            while (0 !== curId) {
+                let randId = Math.floor(Math.random() * curId);
+                curId -= 1;
+                let tmp = array[curId];
+                array[curId] = array[randId];
+                array[randId] = tmp;
+            }
+            return array;
+        }
+
+        // Helper to get touch or mouse position relative to canvas internal resolution
+        function getEventPos(e, canvas) {
+            const rect = canvas.getBoundingClientRect();
+            let clientX = e.clientX;
+            let clientY = e.clientY;
+
+            if (e.touches && e.touches.length > 0) {
+                clientX = e.touches[0].clientX;
+                clientY = e.touches[0].clientY;
+                e.preventDefault(); // Prevent scrolling
+            }
+
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+
+            return { x: (clientX - rect.left) * scaleX, y: (clientY - rect.top) * scaleY };
+        }
+
+        // --- QUESTION BANKS (30 per category) ---
+        const QUESTION_BANKS = { flat: [], curved: [], random: [] };
+        function initBanks() {
+            for (let i = 0; i < 30; i++) {
+                QUESTION_BANKS.flat.push({
+                    surfaceAngle: degToRad((Math.random() * 60) - 30),
+                    incidentOffset: degToRad((Math.random() * 60) + 15) * (Math.random() > 0.5 ? 1 : -1)
+                });
+                QUESTION_BANKS.curved.push({
+                    surfaceAngle: degToRad((Math.random() * 80) - 40),
+                    incidentOffset: degToRad((Math.random() * 60) + 15) * (Math.random() > 0.5 ? 1 : -1),
+                    isConcave: Math.random() > 0.5
+                });
+                QUESTION_BANKS.random.push({
+                    surfaceAngle: degToRad((Math.random() * 120) - 60),
+                    incidentOffset: degToRad((Math.random() * 60) + 15) * (Math.random() > 0.5 ? 1 : -1)
+                });
+            }
+        }
+        initBanks();
+
+        // --- DRAWING UTILS ---
+        function drawArrow(ctx, fromX, fromY, toX, toY, color) {
+            let angle = Math.atan2(toY - fromY, toX - fromX);
+            let midX = (fromX + toX) / 2;
+            let midY = (fromY + toY) / 2;
+
+            ctx.save();
+            ctx.translate(midX, midY);
+            ctx.rotate(angle);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-15, -8);
+            ctx.lineTo(-15, 8);
+            ctx.fillStyle = color;
+            ctx.fill();
+            ctx.restore();
+        }
+
+        // Draws a shaded wedge between two angles (like standard triangle angle notation)
+        function drawAngleWedge(ctx, x, y, angleA, angleB, radius, strokeColor, fillColor, label, valueDeg) {
+            let a = normalizeAngle(angleA);
+            let b = normalizeAngle(angleB);
+            let diff = b - a;
+
+            if (diff > Math.PI) diff -= 2 * Math.PI;
+            if (diff < -Math.PI) diff += 2 * Math.PI;
+
+            // Fill wedge
+            ctx.beginPath();
+            ctx.moveTo(x, y);
+            ctx.arc(x, y, radius, a, a + diff, diff < 0);
+            ctx.closePath();
+            ctx.fillStyle = fillColor;
+            ctx.fill();
+
+            // Stroke arc
+            ctx.beginPath();
+            ctx.arc(x, y, radius, a, a + diff, diff < 0);
+            ctx.strokeStyle = strokeColor;
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Label
+            let mid = a + diff / 2;
+            let labelX = x + Math.cos(mid) * (radius + 22);
+            let labelY = y + Math.sin(mid) * (radius + 22);
+
+            ctx.fillStyle = strokeColor;
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            let text = valueDeg !== undefined ? `${label} = ${valueDeg}°` : label;
+            ctx.fillText(text, labelX, labelY);
+        }
+
+
+        // --- TAB SWITCHING ---
+        let currentQuizMode = 'flat';
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+
+            event.target.classList.add('active');
+
+            if (tabId === 'review') {
+                document.getElementById('review').classList.add('active');
+                drawReview();
+            } else {
+                document.getElementById('quizContainer').classList.add('active');
+                currentQuizMode = tabId;
+                startQuiz();
+            }
+        }
+
+        // --- TAB 1: REVIEW CANVAS LOGIC ---
+        const rCanvas = document.getElementById('reviewCanvas');
+        const rCtx = rCanvas.getContext('2d');
+
+        let laser = { x: 200, y: 150, radius: 18, isDragging: false };
+        const mirrorCenter = { x: 400, y: 330 };
+        let protractor = { x: 120, y: 100, rotation: 0, isDragging: false, isRotating: false, snapped: false };
+
+        // Zoom State Variables
+        let view = { panX: 0, panY: 0, scale: 1, isPanning: false, startX: 0, startY: 0, initialPanX: 0, initialPanY: 0 };
+        let selectionBox = { active: false, startX: 0, startY: 0, currentX: 0, currentY: 0 };
+
+        // Transforms screen coordinates to virtual zoomed coordinates
+        function getVirtualPos(e, canvas) {
+            let pos = getEventPos(e, canvas);
+            if (canvas === rCanvas) {
+                return {
+                    x: (pos.x - view.panX) / view.scale,
+                    y: (pos.y - view.panY) / view.scale
+                };
+            }
+            return pos;
+        }
+
+        function handleReviewStart(e) {
+            const vPos = getVirtualPos(e, rCanvas);
+
+            // Calculate position of the rotation handle (200px above the center, relative to rotation)
+            let handleX = protractor.x + Math.cos(protractor.rotation - Math.PI / 2) * 200;
+            let handleY = protractor.y + Math.sin(protractor.rotation - Math.PI / 2) * 200;
+
+            // Calculate if click is inside the actual semi-circle area of the protractor
+            let dx = vPos.x - protractor.x;
+            let dy = vPos.y - protractor.y;
+            let distToPro = Math.hypot(dx, dy);
+            // Reverse-rotate the click coordinate to standard space to check top vs bottom half
+            let localY = dx * Math.sin(-protractor.rotation) + dy * Math.cos(-protractor.rotation);
+
+            if (distance(vPos.x, vPos.y, handleX, handleY) < 30) {
+                protractor.isRotating = true;
+            } else if (distance(vPos.x, vPos.y, laser.x, laser.y) < 40) {
+                // Prioritize grabbing the tiny laser over the large protractor if they overlap
+                laser.isDragging = true;
+            } else if (distToPro <= 180 && (localY <= 0 || distToPro <= 25)) {
+                // Only drag if inside the 180px radius AND on the top half (or grabbing the center point)
+                protractor.isDragging = true;
+            } else {
+                if (view.scale > 1) {
+                    // Start panning
+                    let screenPos = getEventPos(e, rCanvas);
+                    view.isPanning = true;
+                    view.startX = screenPos.x;
+                    view.startY = screenPos.y;
+                    view.initialPanX = view.panX;
+                    view.initialPanY = view.panY;
+                } else {
+                    // Start drawing zoom selection box
+                    selectionBox.active = true;
+                    selectionBox.startX = vPos.x;
+                    selectionBox.startY = vPos.y;
+                    selectionBox.currentX = vPos.x;
+                    selectionBox.currentY = vPos.y;
+                }
+            }
+        }
+
+        function handleReviewMove(e) {
+            if (view.isPanning) {
+                let screenPos = getEventPos(e, rCanvas);
+                view.panX = view.initialPanX + (screenPos.x - view.startX);
+                view.panY = view.initialPanY + (screenPos.y - view.startY);
+                drawReview();
+                return;
+            }
+
+            const vPos = getVirtualPos(e, rCanvas);
+
+            if (selectionBox.active) {
+                selectionBox.currentX = vPos.x;
+                selectionBox.currentY = vPos.y;
+                drawReview();
+                return;
+            }
+
+            if (!laser.isDragging && !protractor.isDragging && !protractor.isRotating) return;
+
+            if (protractor.isRotating) {
+                let angle = Math.atan2(vPos.y - protractor.y, vPos.x - protractor.x);
+                let rot = angle + Math.PI / 2;
+
+                // Soft snap to 0, 90, 180, 270 degrees
+                let snapAngles = [0, Math.PI / 2, Math.PI, 3 * Math.PI / 2, 2 * Math.PI, -Math.PI / 2, -Math.PI, -3 * Math.PI / 2, -2 * Math.PI];
+                for (let sa of snapAngles) {
+                    if (Math.abs(rot - sa) < 0.08) { // ~4.5 degrees snap radius
+                        rot = sa;
+                        break;
+                    }
+                }
+                protractor.rotation = rot;
+                drawReview();
+                return;
+            }
+
+            if (laser.isDragging) {
+                laser.x = vPos.x;
+                laser.y = Math.min(Math.max(vPos.y, 20), mirrorCenter.y - 20);
+                drawReview();
+            }
+            if (protractor.isDragging) {
+                protractor.x = vPos.x;
+                protractor.y = vPos.y;
+                if (distance(vPos.x, vPos.y, mirrorCenter.x, mirrorCenter.y) < 50) {
+                    protractor.x = mirrorCenter.x;
+                    protractor.y = mirrorCenter.y;
+                    protractor.snapped = true;
+                } else {
+                    protractor.snapped = false;
+                }
+                drawReview();
+            }
+        }
+
+        function handleReviewEnd() {
+            if (view.isPanning) {
+                view.isPanning = false;
+            }
+
+            if (selectionBox.active) {
+                let width = Math.abs(selectionBox.currentX - selectionBox.startX);
+                let height = Math.abs(selectionBox.currentY - selectionBox.startY);
+
+                // Only zoom if the user actually dragged a decent sized box (ignores accidental clicks)
+                if (width > 20 && height > 20) {
+                    let minX = Math.min(selectionBox.startX, selectionBox.currentX);
+                    let minY = Math.min(selectionBox.startY, selectionBox.currentY);
+
+                    let scaleX = rCanvas.width / width;
+                    let scaleY = rCanvas.height / height;
+
+                    // Cap scale to prevent insane zooming (max 12x zoom)
+                    let newScale = Math.min(scaleX, scaleY);
+                    view.scale = Math.min(newScale, 12);
+
+                    // Center the selection
+                    let cX = minX + width / 2;
+                    let cY = minY + height / 2;
+                    view.panX = (rCanvas.width / 2) - (cX * view.scale);
+                    view.panY = (rCanvas.height / 2) - (cY * view.scale);
+
+                    document.getElementById('resetViewBtn').style.display = 'block';
+                }
+                selectionBox.active = false;
+                drawReview();
+            }
+
+            laser.isDragging = false;
+            protractor.isDragging = false;
+            protractor.isRotating = false;
+        }
+
+        function resetView() {
+            view.panX = 0;
+            view.panY = 0;
+            view.scale = 1;
+            document.getElementById('resetViewBtn').style.display = 'none';
+            drawReview();
+        }
+
+        rCanvas.addEventListener('mousedown', handleReviewStart);
+        rCanvas.addEventListener('mousemove', handleReviewMove);
+        rCanvas.addEventListener('mouseup', handleReviewEnd);
+        rCanvas.addEventListener('mouseleave', handleReviewEnd);
+        rCanvas.addEventListener('touchstart', handleReviewStart, { passive: false });
+        rCanvas.addEventListener('touchmove', handleReviewMove, { passive: false });
+        rCanvas.addEventListener('touchend', handleReviewEnd);
+
+        function drawProtractor(ctx, x, y, rot = 0) {
+            ctx.save();
+            ctx.translate(x, y);
+            ctx.rotate(rot);
+
+            // Main semi-circle background and fully closed border
+            ctx.beginPath();
+            ctx.arc(0, 0, 180, Math.PI, 0);
+            ctx.closePath(); // Closes the bottom perfectly
+            ctx.fillStyle = 'rgba(120, 220, 232, 0.15)';
+            ctx.fill();
+            ctx.strokeStyle = '#78DCE8';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Crosshair Center mark
+            ctx.beginPath();
+            ctx.moveTo(-15, 0); ctx.lineTo(15, 0);
+            ctx.moveTo(0, -15); ctx.lineTo(0, 15);
+            ctx.strokeStyle = '#FC9867';
+            ctx.lineWidth = 1;
+            ctx.stroke();
+
+            // Inner decorative boundary line for numbers
+            ctx.beginPath();
+            ctx.arc(0, 0, 100, Math.PI, 0);
+            ctx.strokeStyle = 'rgba(120, 220, 232, 0.4)';
+            ctx.stroke();
+
+            // Ticks and Dual-Scale Numbers
+            for (let i = 0; i <= 180; i++) {
+                ctx.save();
+                ctx.rotate(degToRad(-i)); // Rotate to right side edge
+
+                let is10 = i % 10 === 0;
+                let is5 = i % 5 === 0;
+
+                // Draw Tick Marks
+                ctx.beginPath();
+                if (is10) {
+                    ctx.moveTo(150, 0);
+                } else if (is5) {
+                    ctx.moveTo(165, 0);
+                } else {
+                    ctx.moveTo(172, 0);
+                }
+                ctx.lineTo(180, 0);
+                ctx.strokeStyle = '#78DCE8';
+                ctx.lineWidth = is10 ? 2 : 1;
+                ctx.stroke();
+
+                // Draw Numbers (only on 10s)
+                if (is10) {
+                    ctx.fillStyle = '#FCFCFA';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+
+                    // Outer Scale (0 on left, 180 on right)
+                    let outerNum = 180 - i;
+                    ctx.save();
+                    ctx.translate(138, 0); // Position outer ring
+                    ctx.rotate(degToRad(i)); // Counter-rotate to keep text completely upright
+                    ctx.font = '11px Arial';
+                    ctx.fillText(outerNum.toString(), 0, 0);
+                    ctx.restore();
+
+                    // Inner Scale (180 on left, 0 on right)
+                    let innerNum = i;
+                    ctx.save();
+                    ctx.translate(115, 0); // Position inner ring
+                    ctx.rotate(degToRad(i)); // Counter-rotate
+                    ctx.font = '11px Arial';
+                    ctx.fillStyle = 'rgba(252, 252, 250, 0.7)'; // Slightly dimmer for contrast
+                    ctx.fillText(innerNum.toString(), 0, 0);
+                    ctx.restore();
+                }
+                ctx.restore();
+            }
+
+            // Center Snapping Handle (Orange)
+            ctx.beginPath();
+            ctx.arc(0, 0, 12, 0, Math.PI * 2);
+            ctx.fillStyle = 'rgba(252, 152, 103, 0.5)';
+            ctx.fill();
+            ctx.strokeStyle = '#FC9867';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            // Rotation Handle (Green, at the top)
+            ctx.beginPath();
+            ctx.arc(0, -200, 14, 0, Math.PI * 2);
+            ctx.fillStyle = '#A9DC76';
+            ctx.fill();
+            ctx.strokeStyle = '#FCFCFA';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+
+            ctx.fillStyle = '#2D2A2E';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText("↻", 0, -200);
+
+            ctx.restore();
+        }
+
+        function drawReview() {
+            // Clear physical canvas safely regardless of zoom scale
+            rCtx.save();
+            rCtx.setTransform(1, 0, 0, 1, 0, 0);
+            rCtx.clearRect(0, 0, rCanvas.width, rCanvas.height);
+            rCtx.restore();
+
+            // Apply Camera View Transform
+            rCtx.save();
+            rCtx.translate(view.panX, view.panY);
+            rCtx.scale(view.scale, view.scale);
+
+            // Draw Mirror Line
+            rCtx.beginPath();
+            rCtx.moveTo(50, mirrorCenter.y);
+            rCtx.lineTo(750, mirrorCenter.y);
+            rCtx.strokeStyle = '#78DCE8';
+            rCtx.lineWidth = 6;
+            rCtx.stroke();
+
+            for (let i = 60; i < 750; i += 25) {
+                rCtx.beginPath();
+                rCtx.moveTo(i, mirrorCenter.y + 3);
+                rCtx.lineTo(i - 15, mirrorCenter.y + 18);
+                rCtx.strokeStyle = '#78DCE8';
+                rCtx.lineWidth = 2;
+                rCtx.stroke();
+            }
+
+            let dx = mirrorCenter.x - laser.x;
+            let dy = mirrorCenter.y - laser.y;
+            let angleIn = Math.atan2(dy, dx);
+
+            let normalAngle = -Math.PI / 2;
+            let rayFromMirrorAngle = angleIn + Math.PI;
+
+            let incidenceAngle = Math.abs(normalizeAngle(rayFromMirrorAngle) - normalizeAngle(normalAngle));
+            if (incidenceAngle > Math.PI) incidenceAngle = 2 * Math.PI - incidenceAngle;
+            let reflectionAngle = normalAngle - (rayFromMirrorAngle - normalAngle);
+
+            let refDx = Math.cos(reflectionAngle) * 800;
+            let refDy = Math.sin(reflectionAngle) * 800;
+
+            // Draw Normal
+            rCtx.beginPath();
+            rCtx.moveTo(mirrorCenter.x, mirrorCenter.y);
+            rCtx.lineTo(mirrorCenter.x, 30);
+            rCtx.setLineDash([10, 10]);
+            rCtx.strokeStyle = '#AB9DF2';
+            rCtx.lineWidth = 2;
+            rCtx.stroke();
+            rCtx.setLineDash([]);
+
+            rCtx.fillStyle = '#AB9DF2';
+            rCtx.font = '16px Arial';
+            rCtx.textAlign = 'center';
+            rCtx.fillText("Normal (90°)", mirrorCenter.x, 20);
+
+            // Draw Incident Ray
+            rCtx.beginPath();
+            rCtx.moveTo(laser.x, laser.y);
+            rCtx.lineTo(mirrorCenter.x, mirrorCenter.y);
+            rCtx.strokeStyle = '#FFD866';
+            rCtx.lineWidth = 4;
+            rCtx.stroke();
+            drawArrow(rCtx, laser.x, laser.y, mirrorCenter.x, mirrorCenter.y, '#FFD866');
+
+            // Draw Reflected Ray
+            rCtx.beginPath();
+            rCtx.moveTo(mirrorCenter.x, mirrorCenter.y);
+            rCtx.lineTo(mirrorCenter.x + refDx, mirrorCenter.y + refDy);
+            rCtx.strokeStyle = '#FF6188';
+            rCtx.lineWidth = 4;
+            rCtx.stroke();
+            drawArrow(rCtx, mirrorCenter.x, mirrorCenter.y, mirrorCenter.x + refDx, mirrorCenter.y + refDy, '#FF6188');
+
+            // Draw Laser Source
+            rCtx.beginPath();
+            rCtx.arc(laser.x, laser.y, laser.radius, 0, Math.PI * 2);
+            rCtx.fillStyle = '#FFD866';
+            rCtx.fill();
+            rCtx.strokeStyle = '#FCFCFA';
+            rCtx.lineWidth = 2;
+            rCtx.stroke();
+
+            rCtx.beginPath();
+            rCtx.arc(laser.x, laser.y, laser.radius + 5, 0, Math.PI * 2);
+            rCtx.fillStyle = 'rgba(255, 216, 102, 0.3)';
+            rCtx.fill();
+
+            // Draw dynamic angle wedges
+            let degIn = radToDeg(incidenceAngle).toFixed(1);
+            drawAngleWedge(rCtx, mirrorCenter.x, mirrorCenter.y, normalAngle, rayFromMirrorAngle, 60, '#FFD866', 'rgba(255, 216, 102, 0.2)', 'i', degIn);
+            drawAngleWedge(rCtx, mirrorCenter.x, mirrorCenter.y, normalAngle, reflectionAngle, 60, '#FF6188', 'rgba(255, 97, 136, 0.2)', 'r', degIn);
+
+            // Draw Protractor with rotation state
+            drawProtractor(rCtx, protractor.x, protractor.y, protractor.rotation);
+
+            // Draw Selection Box Overlay if active
+            if (selectionBox.active) {
+                rCtx.beginPath();
+                rCtx.rect(selectionBox.startX, selectionBox.startY, selectionBox.currentX - selectionBox.startX, selectionBox.currentY - selectionBox.startY);
+                rCtx.fillStyle = 'rgba(120, 220, 232, 0.15)';
+                rCtx.fill();
+                rCtx.strokeStyle = '#78DCE8';
+                rCtx.lineWidth = 2 / view.scale; // Maintain visual line width regardless of zoom
+                rCtx.setLineDash([6 / view.scale, 4 / view.scale]);
+                rCtx.stroke();
+                rCtx.setLineDash([]);
+            }
+
+            rCtx.restore(); // Restore view transform
+        }
+
+
+        // --- QUIZ ENGINE (TABS 2, 3, 4) ---
+        const qCanvas = document.getElementById('quizCanvas');
+        const qCtx = qCanvas.getContext('2d');
+
+        let quizState = {
+            questionNum: 1,
+            maxQuestions: 5,
+            score: 0,
+            surfaceAngle: 0,
+            normalAngle: 0,
+            incidentAngle: 0,
+            userAngle: 0,
+            isConcave: false,
+            isDragging: false,
+            stage: 'answering',
+            sessionQuestions: [] // The 5 questions pulled for the current session
+        };
+
+        const qCenter = { x: 400, y: 250 };
+
+        function generateQuestion() {
+            quizState.stage = 'answering';
+            document.getElementById('feedbackText').innerText = `Question ${quizState.questionNum} / ${quizState.maxQuestions}`;
+            document.getElementById('feedbackText').style.backgroundColor = 'rgba(0,0,0,0.2)';
+            document.getElementById('feedbackText').style.color = 'var(--text-main)';
+            document.getElementById('quizActionBtn').innerText = "Check Answer";
+            document.getElementById('quizActionBtn').style.display = "block";
+            if (quizState.questionNum === 1) document.getElementById('scoreDisplay').innerText = "";
+
+            // Pull configuration from the randomized session bank
+            let qConfig = quizState.sessionQuestions[quizState.questionNum - 1];
+
+            quizState.surfaceAngle = qConfig.surfaceAngle;
+            quizState.normalAngle = quizState.surfaceAngle - Math.PI / 2;
+            quizState.incidentAngle = quizState.normalAngle + qConfig.incidentOffset;
+            if (qConfig.isConcave !== undefined) quizState.isConcave = qConfig.isConcave;
+
+            // Start user handle off somewhat randomly
+            let wrongOffset = qConfig.incidentOffset + degToRad((Math.random() * 60) + 20);
+            if (Math.random() > 0.5) wrongOffset *= -1;
+            quizState.userAngle = quizState.normalAngle + wrongOffset;
+
+            drawQuiz();
+        }
+
+        function handleQuizStart(e) {
+            if (quizState.stage !== 'answering') return;
+            const pos = getEventPos(e, qCanvas);
+
+            let handleX = qCenter.x + Math.cos(quizState.userAngle) * 200;
+            let handleY = qCenter.y + Math.sin(quizState.userAngle) * 200;
+
+            // 1. Check if clicking directly on the handle
+            if (distance(pos.x, pos.y, handleX, handleY) < 50) {
+                quizState.isDragging = true;
+                return;
+            }
+
+            // 2. Check if clicking anywhere along the reflected ray itself
+            let rayDx = handleX - qCenter.x;
+            let rayDy = handleY - qCenter.y;
+
+            // Calculate projection of click position onto the ray segment
+            let t = ((pos.x - qCenter.x) * rayDx + (pos.y - qCenter.y) * rayDy) / (200 * 200);
+
+            // t > 0.1 prevents grabbing when clicking the exact pivot center
+            // t < 3.0 allows grabbing anywhere along the ray even if it points off-canvas
+            if (t > 0.1 && t < 3.0) {
+                let projX = qCenter.x + t * rayDx;
+                let projY = qCenter.y + t * rayDy;
+
+                // If the perpendicular distance from the click to the ray line is less than 30px
+                if (distance(pos.x, pos.y, projX, projY) < 30) {
+                    quizState.isDragging = true;
+                }
+            }
+        }
+
+        function handleQuizMove(e) {
+            if (quizState.isDragging && quizState.stage === 'answering') {
+                const pos = getEventPos(e, qCanvas);
+                quizState.userAngle = Math.atan2(pos.y - qCenter.y, pos.x - qCenter.x);
+                drawQuiz();
+            }
+        }
+
+        function handleQuizEnd() { quizState.isDragging = false; }
+
+        qCanvas.addEventListener('mousedown', handleQuizStart);
+        qCanvas.addEventListener('mousemove', handleQuizMove);
+        qCanvas.addEventListener('mouseup', handleQuizEnd);
+        qCanvas.addEventListener('mouseleave', handleQuizEnd);
+        qCanvas.addEventListener('touchstart', handleQuizStart, { passive: false });
+        qCanvas.addEventListener('touchmove', handleQuizMove, { passive: false });
+        qCanvas.addEventListener('touchend', handleQuizEnd);
+
+        function drawQuiz() {
+            qCtx.clearRect(0, 0, qCanvas.width, qCanvas.height);
+
+            // Draw Surface based on mode
+            qCtx.save();
+            qCtx.translate(qCenter.x, qCenter.y);
+            qCtx.rotate(quizState.surfaceAngle);
+            qCtx.strokeStyle = '#78DCE8';
+            qCtx.lineWidth = 6;
+            qCtx.lineCap = 'round';
+
+            if (currentQuizMode === 'flat') {
+                qCtx.beginPath();
+                qCtx.moveTo(-250, 0);
+                qCtx.lineTo(250, 0);
+                qCtx.stroke();
+                for (let i = -240; i < 250; i += 20) {
+                    qCtx.beginPath();
+                    qCtx.moveTo(i, 3);
+                    qCtx.lineTo(i - 10, 15);
+                    qCtx.lineWidth = 2;
+                    qCtx.stroke();
+                }
+            } else if (currentQuizMode === 'curved') {
+                qCtx.beginPath();
+                let radius = 250;
+                if (quizState.isConcave) {
+                    qCtx.arc(0, -radius, radius, Math.PI / 2 - 0.6, Math.PI / 2 + 0.6);
+                } else {
+                    qCtx.arc(0, radius, radius, -Math.PI / 2 - 0.6, -Math.PI / 2 + 0.6);
+                }
+                qCtx.stroke();
+            } else if (currentQuizMode === 'random') {
+                qCtx.beginPath();
+                qCtx.moveTo(-250, 30);
+                qCtx.bezierCurveTo(-150, -50, -100, 0, 0, 0);
+                qCtx.bezierCurveTo(100, 0, 150, 60, 250, -20);
+                qCtx.stroke();
+            }
+            qCtx.restore();
+
+            // Draw Tangent Line
+            let tangentBtn = document.getElementById('showTangentBtn');
+            if (tangentBtn && tangentBtn.checked) {
+                qCtx.save();
+                qCtx.translate(qCenter.x, qCenter.y);
+                qCtx.rotate(quizState.surfaceAngle);
+
+                qCtx.beginPath();
+                qCtx.moveTo(-150, 0);
+                qCtx.lineTo(150, 0);
+                qCtx.strokeStyle = 'rgba(255, 255, 255, 0.7)';
+                qCtx.lineWidth = 3;
+                qCtx.setLineDash([8, 4]);
+                qCtx.stroke();
+
+                qCtx.setLineDash([]);
+                for (let i = -140; i < 150; i += 20) {
+                    qCtx.beginPath();
+                    qCtx.moveTo(i, 2);
+                    qCtx.lineTo(i - 10, 12);
+                    qCtx.lineWidth = 1;
+                    qCtx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                    qCtx.stroke();
+                }
+                qCtx.restore();
+            }
+
+            // Draw Normal Line
+            qCtx.beginPath();
+            qCtx.moveTo(qCenter.x, qCenter.y);
+            qCtx.lineTo(qCenter.x + Math.cos(quizState.normalAngle) * 250, qCenter.y + Math.sin(quizState.normalAngle) * 250);
+            qCtx.setLineDash([8, 8]);
+            qCtx.strokeStyle = '#AB9DF2';
+            qCtx.lineWidth = 2;
+            qCtx.stroke();
+            qCtx.setLineDash([]);
+
+            qCtx.fillStyle = '#AB9DF2';
+            qCtx.font = '14px Arial';
+            qCtx.textAlign = 'center';
+            qCtx.fillText("Normal", qCenter.x + Math.cos(quizState.normalAngle) * 270, qCenter.y + Math.sin(quizState.normalAngle) * 270);
+
+            // Draw Incident Ray
+            let incStartX = qCenter.x + Math.cos(quizState.incidentAngle) * 300;
+            let incStartY = qCenter.y + Math.sin(quizState.incidentAngle) * 300;
+
+            qCtx.beginPath();
+            qCtx.moveTo(incStartX, incStartY);
+            qCtx.lineTo(qCenter.x, qCenter.y);
+            qCtx.strokeStyle = '#FFD866';
+            qCtx.lineWidth = 4;
+            qCtx.stroke();
+            drawArrow(qCtx, incStartX, incStartY, qCenter.x, qCenter.y, '#FFD866');
+
+            // Draw Angle 'i' Wedge dynamically
+            let offsetIn = Math.abs(normalizeAngle(quizState.incidentAngle) - normalizeAngle(quizState.normalAngle));
+            if (offsetIn > Math.PI) offsetIn = 2 * Math.PI - offsetIn;
+            drawAngleWedge(qCtx, qCenter.x, qCenter.y, quizState.normalAngle, quizState.incidentAngle, 60, '#FFD866', 'rgba(255, 216, 102, 0.2)', 'i', radToDeg(offsetIn).toFixed(0));
+
+
+            let rayColor = '#FC9867';
+            let fillColor = 'rgba(252, 152, 103, 0.2)';
+            if (quizState.stage === 'reviewing' || quizState.stage === 'finished') {
+                rayColor = '#A9DC76';
+                fillColor = 'rgba(169, 220, 118, 0.2)';
+            }
+
+            // Draw User's Reflected Ray
+            qCtx.beginPath();
+            qCtx.moveTo(qCenter.x, qCenter.y);
+            let endX = qCenter.x + Math.cos(quizState.userAngle) * 200;
+            let endY = qCenter.y + Math.sin(quizState.userAngle) * 200;
+            qCtx.lineTo(endX, endY);
+            qCtx.strokeStyle = rayColor;
+            qCtx.lineWidth = 4;
+            qCtx.stroke();
+            drawArrow(qCtx, qCenter.x, qCenter.y, endX, endY, rayColor);
+
+            // Draw Angle 'r' Wedge dynamically
+            let offsetOut = Math.abs(normalizeAngle(quizState.userAngle) - normalizeAngle(quizState.normalAngle));
+            if (offsetOut > Math.PI) offsetOut = 2 * Math.PI - offsetOut;
+            drawAngleWedge(qCtx, qCenter.x, qCenter.y, quizState.normalAngle, quizState.userAngle, 60, rayColor, fillColor, 'r', radToDeg(offsetOut).toFixed(0));
+
+            // Interactive Handle
+            qCtx.beginPath();
+            qCtx.arc(endX, endY, 15, 0, Math.PI * 2);
+            qCtx.fillStyle = rayColor;
+            qCtx.fill();
+            qCtx.strokeStyle = '#FCFCFA';
+            qCtx.lineWidth = 2;
+            qCtx.stroke();
+
+            if (quizState.stage === 'answering') {
+                qCtx.beginPath();
+                qCtx.arc(endX, endY, 22, 0, Math.PI * 2);
+                qCtx.fillStyle = 'rgba(252, 152, 103, 0.3)';
+                qCtx.fill();
+            }
+        }
+
+        function handleQuizAction() {
+            let btn = document.getElementById('quizActionBtn');
+            let fb = document.getElementById('feedbackText');
+
+            if (quizState.stage === 'finished') {
+                startQuiz(); // Play again loop triggered!
+                return;
+            }
+
+            if (quizState.stage === 'answering') {
+                let expectedAngle = quizState.normalAngle - (quizState.incidentAngle - quizState.normalAngle);
+                let eNorm = normalizeAngle(expectedAngle);
+                let uNorm = normalizeAngle(quizState.userAngle);
+
+                let diff = Math.abs(eNorm - uNorm);
+                if (diff > Math.PI) diff = 2 * Math.PI - diff;
+
+                if (diff < degToRad(4)) {
+                    quizState.userAngle = expectedAngle;
+                    quizState.stage = 'reviewing';
+                    quizState.score++;
+
+                    fb.innerText = "Correct! Spot on.";
+                    fb.style.color = 'var(--accent-green)';
+                    fb.style.backgroundColor = 'rgba(169, 220, 118, 0.2)';
+
+                    if (quizState.questionNum >= quizState.maxQuestions) {
+                        btn.innerText = "See Final Score";
+                    } else {
+                        btn.innerText = "Next Question";
+                    }
+                } else {
+                    fb.innerText = "Not quite! Adjust angle 'r' to match angle 'i'.";
+                    fb.style.color = 'var(--accent-red)';
+                    fb.style.backgroundColor = 'rgba(255, 97, 136, 0.2)';
+                }
+                drawQuiz();
+
+            } else if (quizState.stage === 'reviewing') {
+                if (quizState.questionNum >= quizState.maxQuestions) {
+                    quizState.stage = 'finished';
+                    btn.innerText = "Play Again";
+                    fb.innerText = "Level Complete!";
+                    fb.style.color = 'var(--accent-yellow)';
+                    fb.style.backgroundColor = 'transparent';
+                    document.getElementById('scoreDisplay').innerText = `Final Score: ${quizState.score} / ${quizState.maxQuestions}`;
+                } else {
+                    quizState.questionNum++;
+                    generateQuestion();
+                }
+            }
+        }
+
+        function startQuiz() {
+            quizState.questionNum = 1;
+            quizState.score = 0;
+            quizState.stage = 'answering';
+            document.getElementById('scoreDisplay').innerText = "";
+
+            // Shuffle the 30 question bank and take top 5
+            let currentBank = [...QUESTION_BANKS[currentQuizMode]];
+            quizState.sessionQuestions = shuffleArray(currentBank).slice(0, 5);
+
+            generateQuestion();
+        }
+
+        window.onload = () => {
+            drawReview();
+        };
+
+    </script>
+</body>
+
+</html>
