@@ -108,13 +108,15 @@
         .canvas-container {
             width: 100%;
             max-width: 800px;
+            height: 70vh;
+            min-height: 400px;
+            max-height: 600px;
             overflow: hidden;
             border-radius: 8px;
             box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
             background-color: #1E1D1F;
             border: 2px solid var(--panel-bg);
             position: relative;
-            /* Added for absolute positioning of child buttons */
         }
 
         .reset-btn {
@@ -141,10 +143,9 @@
         canvas {
             display: block;
             width: 100%;
-            height: auto;
+            height: 100%;
             cursor: grab;
             touch-action: none;
-            /* Prevent scrolling while dragging */
         }
 
         canvas:active {
@@ -226,7 +227,7 @@
         </div>
         <div class="canvas-container">
             <button id="resetViewBtn" class="reset-btn" onclick="resetView()">Reset View</button>
-            <canvas id="reviewCanvas" width="800" height="400"></canvas>
+            <canvas id="reviewCanvas" width="800" height="600"></canvas>
         </div>
     </div>
 
@@ -243,7 +244,7 @@
             </label>
         </div>
         <div class="canvas-container">
-            <canvas id="quizCanvas" width="800" height="400"></canvas>
+            <canvas id="quizCanvas" width="800" height="600"></canvas>
         </div>
         <div class="controls">
             <button id="quizActionBtn" class="action-btn" onclick="handleQuizAction()">Check Answer</button>
@@ -395,7 +396,7 @@
         const rCtx = rCanvas.getContext('2d');
 
         let laser = { x: 200, y: 150, radius: 18, isDragging: false };
-        const mirrorCenter = { x: 400, y: 330 };
+        const mirrorCenter = { x: 400, y: 530 };
         let protractor = { x: 120, y: 100, rotation: 0, isDragging: false, isRotating: false, snapped: false };
 
         // Zoom State Variables
@@ -805,7 +806,7 @@
             sessionQuestions: [] // The 5 questions pulled for the current session
         };
 
-        const qCenter = { x: 400, y: 250 };
+        const qCenter = { x: 400, y: 350 };
 
         function generateQuestion() {
             quizState.stage = 'answering';
