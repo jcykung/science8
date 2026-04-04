@@ -1,0 +1,1749 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Refraction Simulation - Science 8 Review</title>
+    <style>
+      /* Monokai Pro Color Palette */
+      :root {
+        --bg-color: #2d2a2e;
+        --panel-bg: #403e41;
+        --text-main: #fcfcfa;
+        --accent-yellow: #ffd866;
+        --accent-orange: #fc9867;
+        --accent-red: #ff6188;
+        --accent-green: #a9dc76;
+        --accent-cyan: #78dce8;
+        --accent-purple: #ab9df2;
+      }
+
+      body {
+        margin: 0;
+        padding: 20px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        height: 100vh;
+        box-sizing: border-box;
+        overflow: hidden;
+      }
+
+      h1 {
+        margin-top: 0;
+        margin-bottom: 5px;
+        color: var(--accent-cyan);
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      p.subtitle {
+        margin-top: 0;
+        margin-bottom: 15px;
+        color: #b5b4b6;
+        font-size: 1.1em;
+        text-align: center;
+        flex-shrink: 0;
+      }
+
+      .tabs,
+      .quiz-tabs {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 15px;
+        flex-shrink: 0;
+        flex-wrap: wrap;
+        justify-content: center;
+      }
+
+      .tab-btn {
+        background-color: var(--panel-bg);
+        color: var(--text-main);
+        border: 2px solid transparent;
+        padding: 10px 20px;
+        font-size: 1.1em;
+        cursor: pointer;
+        border-radius: 8px;
+        transition: all 0.2s ease;
+        font-weight: bold;
+      }
+
+      .tab-btn:hover {
+        border-color: var(--accent-purple);
+      }
+      .tab-btn.active {
+        background-color: var(--accent-purple);
+        color: var(--bg-color);
+      }
+
+      .quiz-tab-btn {
+        background-color: #363437;
+        color: var(--text-main);
+        border: 1px solid var(--accent-cyan);
+        padding: 8px 15px;
+        font-size: 0.95em;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+      .quiz-tab-btn:hover {
+        background-color: rgba(120, 220, 232, 0.2);
+      }
+      .quiz-tab-btn.active {
+        background-color: var(--accent-cyan);
+        color: var(--bg-color);
+        font-weight: bold;
+      }
+
+      .container {
+        display: none;
+        width: 100%;
+        max-width: 1200px;
+        flex: 1;
+        min-height: 0;
+        background-color: var(--panel-bg);
+        border-radius: 12px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        padding: 20px;
+        box-sizing: border-box;
+        gap: 20px;
+      }
+
+      .container.active {
+        display: flex;
+      }
+
+      .canvas-section {
+        flex: 1;
+        position: relative;
+        min-height: 0;
+        border-radius: 8px;
+        background-color: #221f22;
+        box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.5);
+        overflow: hidden;
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        cursor: crosshair;
+        touch-action: none;
+      }
+
+      .controls-section {
+        width: 300px;
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+        overflow-y: auto;
+        padding-right: 5px;
+      }
+
+      .controls-section::-webkit-scrollbar {
+        width: 6px;
+      }
+      .controls-section::-webkit-scrollbar-track {
+        background: transparent;
+      }
+      .controls-section::-webkit-scrollbar-thumb {
+        background: #666;
+        border-radius: 3px;
+      }
+
+      .panel {
+        background-color: #363437;
+        padding: 15px;
+        border-radius: 8px;
+        border-left: 4px solid var(--accent-yellow);
+        flex-shrink: 0;
+      }
+
+      .panel h3 {
+        margin-top: 0;
+        color: var(--accent-yellow);
+        font-size: 1.1em;
+        margin-bottom: 10px;
+      }
+
+      .data-row {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+        font-size: 1em;
+      }
+
+      .data-row span:last-child {
+        font-family: monospace;
+        font-size: 1.1em;
+        color: var(--accent-cyan);
+      }
+
+      .lens-controls {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      .lens-btn {
+        background-color: var(--bg-color);
+        color: var(--text-main);
+        border: 1px solid var(--accent-cyan);
+        padding: 10px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.2s;
+      }
+      .lens-btn:hover {
+        background-color: rgba(120, 220, 232, 0.2);
+      }
+      .lens-btn.active {
+        background-color: var(--accent-cyan);
+        color: var(--bg-color);
+        font-weight: bold;
+      }
+
+      .slider-container {
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+      }
+
+      .slider-container label {
+        font-size: 0.9em;
+        color: #b5b4b6;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      input[type="range"] {
+        -webkit-appearance: none;
+        width: 100%;
+        background: transparent;
+      }
+
+      input[type="range"]::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        height: 18px;
+        width: 18px;
+        border-radius: 50%;
+        background: var(--accent-orange);
+        cursor: pointer;
+        margin-top: -7px;
+      }
+
+      input[type="range"]::-webkit-slider-runnable-track {
+        width: 100%;
+        height: 4px;
+        cursor: pointer;
+        background: #555;
+        border-radius: 2px;
+      }
+
+      button.action-btn {
+        background-color: var(--accent-green);
+        color: var(--bg-color);
+        border: none;
+        padding: 12px;
+        font-size: 1.1em;
+        font-weight: bold;
+        border-radius: 8px;
+        cursor: pointer;
+        margin-top: 5px;
+        transition: opacity 0.2s;
+        width: 100%;
+      }
+
+      button.action-btn:hover {
+        opacity: 0.8;
+      }
+      button.action-btn:disabled {
+        background-color: #555;
+        cursor: not-allowed;
+        color: #888;
+      }
+
+      .feedback {
+        padding: 10px;
+        border-radius: 6px;
+        text-align: center;
+        font-weight: bold;
+        min-height: 24px;
+        font-size: 0.95em;
+      }
+
+      .quiz-header {
+        text-align: center;
+        margin-bottom: 15px;
+      }
+
+      @media (max-width: 900px) {
+        body {
+          height: auto;
+          min-height: 100vh;
+          overflow: auto;
+        }
+        .container {
+          flex-direction: column;
+          height: 850px;
+        }
+        .controls-section {
+          width: 100%;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Refraction Simulation</h1>
+    <p class="subtitle">Bending Light Through Mediums (Density & Speed)</p>
+
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchMode('review')">
+        Interactive Lab
+      </button>
+      <button class="tab-btn" onclick="switchMode('quiz')">
+        Refraction Quiz
+      </button>
+    </div>
+
+    <!-- REVIEW MODE CONTAINER -->
+    <div id="reviewContainer" class="container active">
+      <div class="canvas-section" id="reviewCanvasWrapper">
+        <canvas id="reviewCanvas"></canvas>
+      </div>
+      <div class="controls-section">
+        <div class="panel" style="border-left-color: var(--accent-purple)">
+          <h3>Lens Shape</h3>
+          <div class="lens-controls">
+            <button
+              class="lens-btn active"
+              id="btn-rect"
+              onclick="setLens('rect')"
+            >
+              Rectangular Block
+            </button>
+            <button
+              class="lens-btn"
+              id="btn-convex"
+              onclick="setLens('convex')"
+            >
+              Biconvex Lens
+            </button>
+            <button
+              class="lens-btn"
+              id="btn-concave"
+              onclick="setLens('concave')"
+            >
+              Biconcave Lens
+            </button>
+          </div>
+        </div>
+
+        <div class="panel" style="border-left-color: var(--accent-orange)">
+          <h3>Laser Mode</h3>
+          <div class="lens-controls" style="flex-direction: row">
+            <button
+              class="lens-btn active"
+              id="btn-single-ray"
+              onclick="setRayMode('single')"
+              style="flex: 1"
+            >
+              Single Ray
+            </button>
+            <button
+              class="lens-btn"
+              id="btn-multi-ray"
+              onclick="setRayMode('multi')"
+              style="flex: 1"
+            >
+              Multiple Rays
+            </button>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h3>Medium Properties</h3>
+          <table
+            style="
+              width: 100%;
+              border-collapse: collapse;
+              margin-top: 5px;
+              font-size: 0.95em;
+            "
+          >
+            <thead>
+              <tr
+                style="border-bottom: 2px solid #555; color: var(--accent-cyan)"
+              >
+                <th style="text-align: left; padding: 4px 0">Medium</th>
+                <th style="text-align: left; padding: 4px 0">Density</th>
+                <th style="text-align: left; padding: 4px 0">Speed</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="border-bottom: 1px solid #444">
+                <td style="padding: 8px 0; font-weight: bold">Air</td>
+                <td style="padding: 8px 0">Less Dense</td>
+                <td style="padding: 8px 0; color: #fff; font-weight: bold">
+                  Fast
+                </td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; font-weight: bold">Lens</td>
+                <td style="padding: 8px 0">More Dense</td>
+                <td style="padding: 8px 0; color: #fff; font-weight: bold">
+                  Slow
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel" style="border-left-color: var(--accent-green)">
+          <h3>Observations</h3>
+          <p
+            id="observationText"
+            style="font-size: 0.9em; line-height: 1.4; margin: 0"
+          >
+            <strong>Rectangular Block:</strong> Light slows and bends towards
+            the normal entering the block, then speeds up and bends away exiting
+            the block.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <!-- QUIZ MODE CONTAINER -->
+    <div id="quizContainer" class="container">
+      <div class="canvas-section" id="quizCanvasWrapper">
+        <canvas id="quizCanvas"></canvas>
+      </div>
+      <div class="controls-section">
+        <div class="quiz-header">
+          <div class="quiz-tabs">
+            <button class="quiz-tab-btn active" onclick="setQuizMode('rect')">
+              Rectangular
+            </button>
+            <button class="quiz-tab-btn" onclick="setQuizMode('convex')">
+              Biconvex
+            </button>
+            <button class="quiz-tab-btn" onclick="setQuizMode('concave')">
+              Biconcave
+            </button>
+            <button class="quiz-tab-btn" onclick="setQuizMode('random')">
+              Random
+            </button>
+          </div>
+        </div>
+
+        <div
+          class="panel"
+          style="border-left-color: var(--accent-orange); padding-bottom: 5px"
+        >
+          <h3>Question <span id="qNumDisplay">1</span> / 5</h3>
+          <p
+            style="
+              margin-top: 0;
+              margin-bottom: 10px;
+              font-size: 0.9em;
+              color: var(--accent-yellow);
+            "
+          >
+            <strong>Note:</strong> The interior of the shape is MORE dense than
+            the outside air.
+          </p>
+        </div>
+
+        <div class="panel" style="padding-top: 10px">
+          <h3 style="margin-bottom: 5px">Estimate Refraction</h3>
+          <p style="font-size: 0.85em; color: #b5b4b6; margin-top: 0">
+            Drag sliders to bend the light. Remember rules for entering/exiting
+            denser mediums!
+          </p>
+
+          <div class="slider-container">
+            <label>Step 1: Inside Ray <span id="valInside">0°</span></label>
+            <input
+              type="range"
+              id="internalSlider"
+              min="-45"
+              max="45"
+              value="0"
+              step="1"
+            />
+          </div>
+
+          <div class="slider-container">
+            <label>Step 2: Exit Ray <span id="valExit">0°</span></label>
+            <input
+              type="range"
+              id="emergentSlider"
+              min="-45"
+              max="45"
+              value="0"
+              step="1"
+            />
+          </div>
+
+          <button id="quizBtn" class="action-btn" onclick="handleQuizAction()">
+            Check Answer
+          </button>
+          <div
+            id="quizFeedback"
+            class="feedback"
+            style="margin-top: 10px"
+          ></div>
+        </div>
+
+        <div
+          class="panel"
+          style="
+            border-left-color: transparent;
+            background: transparent;
+            text-align: center;
+            padding: 5px;
+          "
+        >
+          <h2
+            id="scoreDisplay"
+            style="color: var(--accent-purple); margin: 0"
+          ></h2>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      // --- GLOBAL STATE ---
+      let currentMode = "review";
+      let animationId;
+
+      // --- REVIEW LAB STATE ---
+      const reviewCanvas = document.getElementById("reviewCanvas");
+      const rCtx = reviewCanvas.getContext("2d");
+
+      let lensType = "rect";
+      let rayMode = "single";
+
+      let laserX = 400;
+      let laserY = 100; // Lowered from 60 to give room for the rotation knob
+      let laserAngle = Math.PI / 2;
+
+      let mouseX = 0;
+      let mouseY = 0;
+      let dragMode = null;
+
+      // --- QUIZ STATE ---
+      const quizCanvas = document.getElementById("quizCanvas");
+      const qCtx = quizCanvas.getContext("2d");
+
+      let currentQuizMode = "rect";
+      const QUESTION_BANKS = {
+        rect: [],
+        convex: [],
+        concave: [],
+        random: [],
+      };
+
+      let quizState = {
+        questionNum: 1,
+        maxQuestions: 5,
+        score: 0,
+        stage: "answering",
+        currentQ: null,
+        sessionQuestions: [],
+      };
+
+      // --- RESPONSIVE CANVAS ---
+      const resizeObserver = new ResizeObserver((entries) => {
+        for (let entry of entries) {
+          if (entry.target.id === "reviewCanvasWrapper") {
+            reviewCanvas.width = entry.contentRect.width;
+            reviewCanvas.height = entry.contentRect.height;
+            if (laserX === 400) laserX = reviewCanvas.width / 2;
+          }
+          if (entry.target.id === "quizCanvasWrapper") {
+            quizCanvas.width = entry.contentRect.width;
+            quizCanvas.height = entry.contentRect.height;
+            if (currentMode === "quiz") drawQuiz();
+          }
+        }
+      });
+
+      window.addEventListener("load", () => {
+        resizeObserver.observe(document.getElementById("reviewCanvasWrapper"));
+        resizeObserver.observe(document.getElementById("quizCanvasWrapper"));
+        generateBanks();
+
+        // Register quiz slider listeners globally to avoid stacking
+        const resetToAnswering = () => {
+          if (quizState.stage === "reviewing") {
+            quizState.stage = "answering";
+            document.getElementById("quizBtn").innerText = "Check Answer";
+            document.getElementById("quizFeedback").innerText = "";
+            document.getElementById("quizFeedback").style.backgroundColor =
+              "transparent";
+          }
+        };
+
+        document
+          .getElementById("internalSlider")
+          .addEventListener("input", (e) => {
+            document.getElementById("valInside").innerText =
+              e.target.value + "°";
+            resetToAnswering();
+            if (currentMode === "quiz") drawQuiz();
+          });
+        document
+          .getElementById("emergentSlider")
+          .addEventListener("input", (e) => {
+            document.getElementById("valExit").innerText = e.target.value + "°";
+            resetToAnswering();
+            if (currentMode === "quiz") drawQuiz();
+          });
+
+        requestAnimationFrame(drawReview);
+      });
+
+      // --- UTILITY FUNCTIONS ---
+      function switchMode(mode) {
+        currentMode = mode;
+        document
+          .querySelectorAll(".tab-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document
+          .querySelectorAll(".container")
+          .forEach((c) => c.classList.remove("active"));
+
+        if (mode === "review") {
+          document.querySelectorAll(".tab-btn")[0].classList.add("active");
+          document.getElementById("reviewContainer").classList.add("active");
+        } else {
+          document.querySelectorAll(".tab-btn")[1].classList.add("active");
+          document.getElementById("quizContainer").classList.add("active");
+          startQuiz();
+        }
+      }
+
+      function setLens(type) {
+        lensType = type;
+        document
+          .querySelectorAll(".lens-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        document.getElementById(`btn-${type}`).classList.add("active");
+
+        const obsText = document.getElementById("observationText");
+        if (type === "rect") {
+          obsText.innerHTML =
+            "<strong>Rectangular Block:</strong> Light slows and bends towards the normal entering the block, then speeds up and bends away exiting the block.";
+        } else if (type === "convex") {
+          obsText.innerHTML =
+            "<strong>Biconvex Lens:</strong> The thick, curved middle causes the exiting light rays to bend inwards (converge).";
+        } else if (type === "concave") {
+          obsText.innerHTML =
+            "<strong>Biconcave Lens:</strong> The thin middle and thick edges cause the exiting light rays to bend outwards (diverge).";
+        }
+      }
+
+      function setRayMode(mode) {
+        rayMode = mode;
+        document
+          .getElementById("btn-single-ray")
+          .classList.toggle("active", mode === "single");
+        document
+          .getElementById("btn-multi-ray")
+          .classList.toggle("active", mode === "multi");
+      }
+
+      function clamp(val, min, max) {
+        return Math.max(min, Math.min(max, val));
+      }
+
+      function shuffleArray(arr) {
+        for (let i = arr.length - 1; i > 0; i--) {
+          const j = Math.floor(Math.random() * (i + 1));
+          [arr[i], arr[j]] = [arr[j], arr[i]];
+        }
+        return arr;
+      }
+
+      function rotateVectorRad(v, rad) {
+        let cos = Math.cos(rad);
+        let sin = Math.sin(rad);
+        return { x: v.x * cos - v.y * sin, y: v.x * sin + v.y * cos };
+      }
+
+      // Returns degrees rotated
+      function rotateVector(v, degrees) {
+        return rotateVectorRad(v, (degrees * Math.PI) / 180);
+      }
+
+      function angleBetween(v1, v2) {
+        return (
+          (Math.acos(clamp(v1.x * v2.x + v1.y * v2.y, -1, 1)) * 180) / Math.PI
+        );
+      }
+
+      // --- MATH & PHYSICS ---
+      function refract(Ix, Iy, Nx, Ny, n1, n2) {
+        const eta = n1 / n2;
+        let cosI = -(Ix * Nx + Iy * Ny);
+        if (cosI < 0) {
+          cosI = -cosI;
+          Nx = -Nx;
+          Ny = -Ny;
+        }
+        const sinT2 = eta * eta * (1.0 - cosI * cosI);
+        if (sinT2 > 1.0)
+          return { x: Ix + 2 * cosI * Nx, y: Iy + 2 * cosI * Ny, tir: true };
+        const cosT = Math.sqrt(1.0 - sinT2);
+        return {
+          x: eta * Ix + (eta * cosI - cosT) * Nx,
+          y: eta * Iy + (eta * cosI - cosT) * Ny,
+          tir: false,
+        };
+      }
+
+      function intersectLine(ro, rd, p1, p2) {
+        let dx = p2.x - p1.x;
+        let dy = p2.y - p1.y;
+        let len = Math.hypot(dx, dy);
+        let nx = -dy / len,
+          ny = dx / len;
+        let denom = rd.x * nx + rd.y * ny;
+        if (Math.abs(denom) < 1e-6) return null;
+        let t = ((p1.x - ro.x) * nx + (p1.y - ro.y) * ny) / denom;
+        if (t < 1e-4) return null;
+        let hitX = ro.x + rd.x * t;
+        let hitY = ro.y + rd.y * t;
+        let dot1 = (hitX - p1.x) * dx + (hitY - p1.y) * dy;
+        let dot2 = (hitX - p2.x) * dx + (hitY - p2.y) * dy;
+        if (dot1 >= 0 && dot2 <= 0) {
+          if (denom > 0) {
+            nx = -nx;
+            ny = -ny;
+          }
+          return { t: t, pt: { x: hitX, y: hitY }, n: { x: nx, y: ny } };
+        }
+        return null;
+      }
+
+      function intersectPolygonHits(ro, rd, vertices) {
+        let hits = [];
+        for (let i = 0; i < vertices.length; i++) {
+          let p1 = vertices[i];
+          let p2 = vertices[(i + 1) % vertices.length];
+          let hit = intersectLine(ro, rd, p1, p2);
+          if (hit) hits.push(hit);
+        }
+        hits.sort((a, b) => a.t - b.t);
+        return hits.length > 0 ? hits[0] : null;
+      }
+
+      function intersectArc(
+        ro,
+        rd,
+        center,
+        radius,
+        isConcaveArc,
+        boundsValidFn,
+      ) {
+        let ox = ro.x - center.x;
+        let oy = ro.y - center.y;
+        let a = rd.x * rd.x + rd.y * rd.y;
+        let b = 2 * (ox * rd.x + oy * rd.y);
+        let c = ox * ox + oy * oy - radius * radius;
+        let disc = b * b - 4 * a * c;
+        if (disc < 0) return null;
+
+        let hits = [];
+        let t1 = (-b - Math.sqrt(disc)) / (2 * a);
+        let t2 = (-b + Math.sqrt(disc)) / (2 * a);
+        if (t1 > 1e-4) hits.push(t1);
+        if (t2 > 1e-4) hits.push(t2);
+
+        for (let t of hits) {
+          let hitX = ro.x + rd.x * t;
+          let hitY = ro.y + rd.y * t;
+          if (boundsValidFn(hitX, hitY)) {
+            let nx = (hitX - center.x) / radius;
+            let ny = (hitY - center.y) / radius;
+            if (isConcaveArc) {
+              nx = -nx;
+              ny = -ny;
+            }
+            if (rd.x * nx + rd.y * ny > 0) {
+              nx = -nx;
+              ny = -ny;
+            }
+            return { t: t, pt: { x: hitX, y: hitY }, n: { x: nx, y: ny } };
+          }
+        }
+        return null;
+      }
+
+      // Calculates hits around an arbitrary 0,0 center
+      function getLensIntersections(ro, rd, type) {
+        let hits = [];
+        const w = 300;
+        if (type === "rect") {
+          const h = 140;
+          hits.push(
+            intersectLine(
+              ro,
+              rd,
+              { x: -w / 2, y: -h / 2 },
+              { x: w / 2, y: -h / 2 },
+            ),
+          );
+          hits.push(
+            intersectLine(
+              ro,
+              rd,
+              { x: -w / 2, y: h / 2 },
+              { x: w / 2, y: h / 2 },
+            ),
+          );
+          hits.push(
+            intersectLine(
+              ro,
+              rd,
+              { x: -w / 2, y: -h / 2 },
+              { x: -w / 2, y: h / 2 },
+            ),
+          );
+          hits.push(
+            intersectLine(
+              ro,
+              rd,
+              { x: w / 2, y: -h / 2 },
+              { x: w / 2, y: h / 2 },
+            ),
+          );
+        } else if (type === "convex") {
+          hits.push(
+            intersectArc(
+              ro,
+              rd,
+              { x: 0, y: 200 },
+              250,
+              false,
+              (x, y) => y <= 0.1 && Math.abs(x) <= 150.1,
+            ),
+          );
+          hits.push(
+            intersectArc(
+              ro,
+              rd,
+              { x: 0, y: -200 },
+              250,
+              false,
+              (x, y) => y >= -0.1 && Math.abs(x) <= 150.1,
+            ),
+          );
+        } else if (type === "concave") {
+          hits.push(
+            intersectArc(
+              ro,
+              rd,
+              { x: 0, y: -270 },
+              250,
+              true,
+              (x, y) => y >= -70.1 && Math.abs(x) <= 150.1,
+            ),
+          );
+          hits.push(
+            intersectArc(
+              ro,
+              rd,
+              { x: 0, y: 270 },
+              250,
+              true,
+              (x, y) => y <= 70.1 && Math.abs(x) <= 150.1,
+            ),
+          );
+          hits.push(
+            intersectLine(ro, rd, { x: -150, y: -70 }, { x: -150, y: 70 }),
+          );
+          hits.push(
+            intersectLine(ro, rd, { x: 150, y: -70 }, { x: 150, y: 70 }),
+          );
+        }
+        hits = hits.filter((h) => h !== null);
+        hits.sort((a, b) => a.t - b.t);
+        return hits.length > 0 ? hits[0] : null;
+      }
+
+      // Translates coordinates, unwinds rotation, computes hit, rewinds rotation.
+      function intersectRotatedShape(
+        ro,
+        rd,
+        shape,
+        cx,
+        cy,
+        rotRad,
+        customVertices,
+      ) {
+        let ro_origin = { x: ro.x - cx, y: ro.y - cy };
+
+        let ro_unrot = rotateVectorRad(ro_origin, -rotRad);
+        let rd_unrot = rotateVectorRad(rd, -rotRad);
+
+        let hit = null;
+        if (shape === "randomPoly") {
+          hit = intersectPolygonHits(ro_unrot, rd_unrot, customVertices);
+        } else {
+          hit = getLensIntersections(ro_unrot, rd_unrot, shape);
+        }
+
+        if (!hit) return null;
+
+        let pt_rot = rotateVectorRad(hit.pt, rotRad);
+        let n_rot = rotateVectorRad(hit.n, rotRad);
+
+        return {
+          t: hit.t,
+          pt: { x: pt_rot.x + cx, y: pt_rot.y + cy },
+          n: n_rot,
+        };
+      }
+
+      function drawAngleArc(ctx, pt, n, rayIn, rayOut, inColor, outColor) {
+        // Draw Normal Line
+        ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+        ctx.setLineDash([5, 5]);
+        ctx.lineWidth = 1.5;
+        ctx.beginPath();
+        ctx.moveTo(pt.x - n.x * 60, pt.y - n.y * 60);
+        ctx.lineTo(pt.x + n.x * 60, pt.y + n.y * 60);
+        ctx.stroke();
+        ctx.setLineDash([]);
+
+        const drawArcSegment = (refNormal, vRay, color, radius) => {
+          let a1 = Math.atan2(refNormal.y, refNormal.x);
+          let a2 = Math.atan2(vRay.y, vRay.x);
+
+          let diff = a2 - a1;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          while (diff > Math.PI) diff -= Math.PI * 2;
+
+          ctx.strokeStyle = "rgba(255, 255, 255, 0.4)";
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          if (diff > 0) {
+            ctx.arc(pt.x, pt.y, radius, a1, a1 + diff);
+          } else {
+            ctx.arc(pt.x, pt.y, radius, a1 + diff, a1);
+          }
+          ctx.stroke();
+        };
+
+        drawArcSegment(n, { x: -rayIn.x, y: -rayIn.y }, inColor, 30);
+        drawArcSegment({ x: -n.x, y: -n.y }, rayOut, outColor, 35);
+      }
+
+      // --- BANK GENERATION ---
+      function generateBanks() {
+        const standardShapes = ["rect", "convex", "concave"];
+
+        standardShapes.forEach((shape) => {
+          QUESTION_BANKS[shape] = [];
+          let attempts = 0;
+          let cx = 400;
+          let cy = 300;
+
+          while (QUESTION_BANKS[shape].length < 30 && attempts < 2000) {
+            attempts++;
+            let ox = Math.random() * 160 - 80;
+            let ro = { x: cx + ox, y: cy - 220 };
+
+            let sign = ox > 0 ? 1 : -1;
+            let angleDeg = sign * (Math.random() * 30 + 15); // Much wider offset angle (15 to 45 deg)
+            let angleRad = Math.PI / 2 + (angleDeg * Math.PI) / 180;
+            let rd = { x: Math.cos(angleRad), y: Math.sin(angleRad) };
+
+            // Allows variety! Lens could be oriented vertically, horizontally, or diagonally.
+            let rotRad = Math.random() * 2 * Math.PI;
+
+            let hit1 = intersectRotatedShape(
+              ro,
+              rd,
+              shape,
+              cx,
+              cy,
+              rotRad,
+              null,
+            );
+            if (!hit1 || hit1.pt.y > cy + 150 || hit1.pt.y < cy - 150) continue;
+
+            let ref1 = refract(rd.x, rd.y, hit1.n.x, hit1.n.y, 1.0, 1.5);
+            if (ref1.tir) continue;
+            let ro2 = {
+              x: hit1.pt.x + ref1.x * 0.1,
+              y: hit1.pt.y + ref1.y * 0.1,
+            };
+            let hit2_true = intersectRotatedShape(
+              ro2,
+              ref1,
+              shape,
+              cx,
+              cy,
+              rotRad,
+              null,
+            );
+            if (
+              !hit2_true ||
+              hit2_true.pt.y < cy - 150 ||
+              hit2_true.pt.y > cy + 150
+            )
+              continue;
+
+            let ref2 = refract(
+              ref1.x,
+              ref1.y,
+              hit2_true.n.x,
+              hit2_true.n.y,
+              1.5,
+              1.0,
+            );
+            if (ref2.tir) continue;
+
+            QUESTION_BANKS[shape].push({
+              ox: ox,
+              angleRad: angleRad,
+              shape: shape,
+              rotRad: rotRad,
+              scored: false,
+            });
+          }
+
+          // Backup guarantee
+          if (QUESTION_BANKS[shape].length === 0) {
+            QUESTION_BANKS[shape].push({
+              ox: -50,
+              angleRad: Math.PI / 2 - (25 * Math.PI) / 180,
+              shape: shape,
+              rotRad: 0,
+              scored: false,
+            });
+          }
+        });
+
+        // True random procedural shapes
+        QUESTION_BANKS["random"] = [];
+        let attempts = 0;
+        let cx = 400;
+        let cy = 300;
+        while (QUESTION_BANKS["random"].length < 30 && attempts < 2000) {
+          attempts++;
+          let numSides = Math.floor(Math.random() * 5) + 4; // 4 to 8 sides (Procedurally random polygons)
+          let vertices = [];
+          for (let i = 0; i < numSides; i++) {
+            let a = (i / numSides) * 2 * Math.PI;
+            let angleVariance = (Math.random() - 0.5) * (Math.PI / numSides);
+            let r = Math.random() * 60 + 80; // Distance variance
+            vertices.push({
+              x: r * Math.cos(a + angleVariance),
+              y: r * Math.sin(a + angleVariance),
+            });
+          }
+
+          let ox = Math.random() * 160 - 80;
+          let ro = { x: cx + ox, y: cy - 220 };
+
+          let sign = ox > 0 ? 1 : -1;
+          let angleDeg = sign * (Math.random() * 30 + 15);
+          let angleRad = Math.PI / 2 + (angleDeg * Math.PI) / 180;
+          let rd = { x: Math.cos(angleRad), y: Math.sin(angleRad) };
+
+          let rotRad = Math.random() * 2 * Math.PI;
+
+          let hit1 = intersectRotatedShape(
+            ro,
+            rd,
+            "randomPoly",
+            cx,
+            cy,
+            rotRad,
+            vertices,
+          );
+          if (!hit1 || hit1.pt.y > cy + 150 || hit1.pt.y < cy - 150) continue;
+
+          let ref1 = refract(rd.x, rd.y, hit1.n.x, hit1.n.y, 1.0, 1.5);
+          if (ref1.tir) continue;
+          let ro2 = {
+            x: hit1.pt.x + ref1.x * 0.1,
+            y: hit1.pt.y + ref1.y * 0.1,
+          };
+          let hit2_true = intersectRotatedShape(
+            ro2,
+            ref1,
+            "randomPoly",
+            cx,
+            cy,
+            rotRad,
+            vertices,
+          );
+          if (
+            !hit2_true ||
+            hit2_true.pt.y < cy - 150 ||
+            hit2_true.pt.y > cy + 150
+          )
+            continue;
+
+          let ref2 = refract(
+            ref1.x,
+            ref1.y,
+            hit2_true.n.x,
+            hit2_true.n.y,
+            1.5,
+            1.0,
+          );
+          if (ref2.tir) continue;
+
+          QUESTION_BANKS["random"].push({
+            ox: ox,
+            angleRad: angleRad,
+            shape: "randomPoly",
+            rotRad: rotRad,
+            vertices: vertices,
+            scored: false,
+          });
+        }
+
+        if (QUESTION_BANKS["random"].length === 0) {
+          let pts = [
+            { x: 0, y: -100 },
+            { x: 100, y: 100 },
+            { x: -100, y: 100 },
+          ];
+          QUESTION_BANKS["random"].push({
+            ox: -50,
+            angleRad: Math.PI / 2 - (25 * Math.PI) / 180,
+            shape: "randomPoly",
+            rotRad: 0,
+            vertices: pts,
+            scored: false,
+          });
+        }
+      }
+
+      // --- DRAWING FUNCTIONS ---
+      function drawShape(ctx, shape, cx, cy, rotRad, vertices) {
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.rotate(rotRad);
+
+        ctx.fillStyle = "rgba(120, 220, 232, 0.15)";
+        ctx.strokeStyle = "rgba(120, 220, 232, 0.8)";
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+
+        if (shape === "rect") {
+          ctx.rect(-150, -70, 300, 140);
+        } else if (shape === "convex") {
+          ctx.arc(
+            0,
+            200,
+            250,
+            Math.atan2(-200, -150),
+            Math.atan2(-200, 150),
+            false,
+          );
+          ctx.arc(
+            0,
+            -200,
+            250,
+            Math.atan2(200, 150),
+            Math.atan2(200, -150),
+            false,
+          );
+        } else if (shape === "concave") {
+          ctx.moveTo(-150, -70);
+          ctx.arc(
+            0,
+            -270,
+            250,
+            Math.atan2(200, -150),
+            Math.atan2(200, 150),
+            true,
+          );
+          ctx.lineTo(150, 70);
+          ctx.arc(
+            0,
+            270,
+            250,
+            Math.atan2(-200, 150),
+            Math.atan2(-200, -150),
+            true,
+          );
+          ctx.lineTo(-150, -70);
+        } else if (shape === "randomPoly" && vertices) {
+          for (let i = 0; i < vertices.length; i++) {
+            if (i === 0) ctx.moveTo(vertices[i].x, vertices[i].y);
+            else ctx.lineTo(vertices[i].x, vertices[i].y);
+          }
+          ctx.closePath();
+        }
+
+        ctx.fill();
+        ctx.stroke();
+        ctx.restore();
+      }
+
+      function drawReview() {
+        if (currentMode === "review") {
+          const cw = reviewCanvas.width;
+          const ch = reviewCanvas.height;
+          const cx = cw / 2;
+          const cy = ch / 2 + 30;
+
+          rCtx.fillStyle = "#221F22";
+          rCtx.fillRect(0, 0, cw, ch);
+
+          drawShape(rCtx, lensType, cx, cy, 0, null); // Lab holds items flat at 0 rotation
+
+          let numRays = rayMode === "single" ? 1 : 5;
+          let spread = 20;
+          let perpAngle = laserAngle + Math.PI / 2;
+          let perpDir = { x: Math.cos(perpAngle), y: Math.sin(perpAngle) };
+
+          for (let i = 0; i < numRays; i++) {
+            let offsetMultiplier = rayMode === "single" ? 0 : i - 2; // -2, -1, 0, 1, 2
+            let ro = {
+              x: laserX + perpDir.x * (offsetMultiplier * spread),
+              y: laserY + perpDir.y * (offsetMultiplier * spread),
+            };
+            let rd = { x: Math.cos(laserAngle), y: Math.sin(laserAngle) };
+
+            let isCenterRay = rayMode === "single" || i === 2;
+
+            let hit1 = intersectRotatedShape(ro, rd, lensType, cx, cy, 0, null);
+
+            if (hit1) {
+              rCtx.shadowColor = "#FF0000";
+              rCtx.shadowBlur = 20;
+              rCtx.strokeStyle = "#FF3333";
+              rCtx.lineWidth = 4;
+              rCtx.beginPath();
+              rCtx.moveTo(ro.x, ro.y);
+              rCtx.lineTo(hit1.pt.x, hit1.pt.y);
+              rCtx.stroke();
+              rCtx.stroke();
+              rCtx.shadowBlur = 0;
+
+              let ref1 = refract(rd.x, rd.y, hit1.n.x, hit1.n.y, 1.0, 1.5);
+              let rd2 = { x: ref1.x, y: ref1.y };
+
+              if (isCenterRay) {
+                drawAngleArc(
+                  rCtx,
+                  hit1.pt,
+                  hit1.n,
+                  rd,
+                  rd2,
+                  "#FF3333",
+                  "#FF3333",
+                );
+              }
+
+              let ro2 = {
+                x: hit1.pt.x + rd2.x * 0.1,
+                y: hit1.pt.y + rd2.y * 0.1,
+              };
+              let hit2 = intersectRotatedShape(
+                ro2,
+                rd2,
+                lensType,
+                cx,
+                cy,
+                0,
+                null,
+              );
+
+              if (hit2) {
+                rCtx.shadowColor = "#FF0000";
+                rCtx.shadowBlur = 15;
+                rCtx.strokeStyle = "#FF3333";
+                rCtx.lineWidth = 3;
+                rCtx.beginPath();
+                rCtx.moveTo(hit1.pt.x, hit1.pt.y);
+                rCtx.lineTo(hit2.pt.x, hit2.pt.y);
+                rCtx.stroke();
+                rCtx.stroke();
+                rCtx.shadowBlur = 0;
+
+                let ref2 = refract(rd2.x, rd2.y, hit2.n.x, hit2.n.y, 1.5, 1.0);
+                let rd3 = { x: ref2.x, y: ref2.y };
+
+                rCtx.shadowColor = "#FF0000";
+                rCtx.shadowBlur = 20;
+                rCtx.strokeStyle = "#FF3333";
+                rCtx.lineWidth = 4;
+                rCtx.beginPath();
+                rCtx.moveTo(hit2.pt.x, hit2.pt.y);
+                rCtx.lineTo(hit2.pt.x + rd3.x * 1000, hit2.pt.y + rd3.y * 1000);
+                rCtx.stroke();
+                rCtx.stroke();
+                rCtx.shadowBlur = 0;
+
+                if (isCenterRay) {
+                  drawAngleArc(
+                    rCtx,
+                    hit2.pt,
+                    hit2.n,
+                    rd2,
+                    rd3,
+                    "#FF3333",
+                    "#FF3333",
+                  );
+                }
+              } else {
+                rCtx.shadowColor = "#FF0000";
+                rCtx.shadowBlur = 20;
+                rCtx.strokeStyle = "#FF3333";
+                rCtx.lineWidth = 4;
+                rCtx.beginPath();
+                rCtx.moveTo(hit1.pt.x, hit1.pt.y);
+                rCtx.lineTo(hit1.pt.x + rd2.x * 1000, hit1.pt.y + rd2.y * 1000);
+                rCtx.stroke();
+                rCtx.stroke();
+                rCtx.shadowBlur = 0;
+              }
+            } else {
+              rCtx.shadowColor = "#FF0000";
+              rCtx.shadowBlur = 20;
+              rCtx.strokeStyle = "#FF3333";
+              rCtx.lineWidth = 4;
+              rCtx.beginPath();
+              rCtx.moveTo(ro.x, ro.y);
+              rCtx.lineTo(ro.x + rd.x * 1500, ro.y + rd.y * 1500);
+              rCtx.stroke();
+              rCtx.stroke();
+              rCtx.shadowBlur = 0;
+            }
+          }
+
+          // Gun Body
+          rCtx.fillStyle = "#8B0000";
+          rCtx.save();
+          rCtx.translate(laserX, laserY);
+          rCtx.rotate(laserAngle);
+
+          rCtx.strokeStyle = "#555";
+          rCtx.lineWidth = 4;
+          rCtx.beginPath();
+          rCtx.moveTo(-30, 0);
+          rCtx.lineTo(-55, 0);
+          rCtx.stroke();
+          rCtx.fillStyle = "var(--accent-cyan)";
+          rCtx.beginPath();
+          rCtx.arc(-55, 0, 8, 0, Math.PI * 2);
+          rCtx.fill();
+
+          if (rayMode === "single") {
+            rCtx.fillStyle = "#8B0000";
+            rCtx.fillRect(-30, -15, 40, 30);
+            rCtx.shadowColor = "#FF0000";
+            rCtx.shadowBlur = 15;
+            rCtx.fillStyle = "#FF3333";
+            rCtx.fillRect(10, -8, 10, 16);
+          } else {
+            rCtx.fillStyle = "#8B0000";
+            rCtx.fillRect(-30, -55, 40, 110);
+            for (let i = 0; i < 5; i++) {
+              let offset = (i - 2) * 20;
+              rCtx.shadowColor = "#FF0000";
+              rCtx.shadowBlur = 15;
+              rCtx.fillStyle = "#FF3333";
+              rCtx.fillRect(10, offset - 8, 10, 16);
+            }
+          }
+          rCtx.restore();
+        }
+
+        animationId = requestAnimationFrame(drawReview);
+      }
+
+      // --- REVIEW EVENT LISTENERS ---
+      function getMousePos(e, canvas) {
+        const rect = canvas.getBoundingClientRect();
+        const scaleX = canvas.width / rect.width;
+        const scaleY = canvas.height / rect.height;
+        let clientX = e.clientX,
+          clientY = e.clientY;
+        if (e.touches && e.touches.length > 0) {
+          clientX = e.touches[0].clientX;
+          clientY = e.touches[0].clientY;
+        }
+        mouseX = (clientX - rect.left) * scaleX;
+        mouseY = (clientY - rect.top) * scaleY;
+      }
+
+      function handleInteractStart(e) {
+        if (currentMode !== "review") return;
+        getMousePos(e, reviewCanvas);
+
+        let hx = laserX - Math.cos(laserAngle) * 55;
+        let hy = laserY - Math.sin(laserAngle) * 55;
+
+        let distToHandle = Math.hypot(mouseX - hx, mouseY - hy);
+        let distToLaser = Math.hypot(mouseX - laserX, mouseY - laserY);
+
+        if (distToHandle < 25) {
+          dragMode = "angle";
+        } else if (distToLaser < 40) {
+          dragMode = "position";
+        }
+      }
+
+      function handleInteractMove(e) {
+        if (currentMode !== "review" || !dragMode) return;
+        getMousePos(e, reviewCanvas);
+
+        if (dragMode === "position") {
+          laserX = clamp(mouseX, 50, reviewCanvas.width - 50);
+        } else if (dragMode === "angle") {
+          laserAngle = Math.atan2(mouseY - laserY, mouseX - laserX) + Math.PI;
+        }
+      }
+
+      function handleInteractEnd() {
+        dragMode = null;
+      }
+
+      reviewCanvas.addEventListener("mousedown", handleInteractStart);
+      window.addEventListener("mouseup", handleInteractEnd);
+      reviewCanvas.addEventListener("mousemove", handleInteractMove);
+      reviewCanvas.addEventListener(
+        "touchstart",
+        (e) => {
+          e.preventDefault();
+          handleInteractStart(e);
+        },
+        { passive: false },
+      );
+      reviewCanvas.addEventListener(
+        "touchmove",
+        (e) => {
+          e.preventDefault();
+          handleInteractMove(e);
+        },
+        { passive: false },
+      );
+      reviewCanvas.addEventListener("touchend", handleInteractEnd);
+
+      // --- QUIZ LOGIC ---
+      function setQuizMode(mode) {
+        currentQuizMode = mode;
+        document
+          .querySelectorAll(".quiz-tab-btn")
+          .forEach((btn) => btn.classList.remove("active"));
+        event.target.classList.add("active");
+        startQuiz();
+      }
+
+      function startQuiz() {
+        quizState.questionNum = 1;
+        quizState.score = 0;
+        quizState.stage = "answering";
+        document.getElementById("scoreDisplay").innerText = "";
+
+        let currentBank = [...QUESTION_BANKS[currentQuizMode]];
+        quizState.sessionQuestions = shuffleArray(currentBank).slice(0, 5);
+
+        generateQuestion();
+      }
+
+      function generateQuestion() {
+        quizState.stage = "answering";
+        document.getElementById("quizBtn").innerText = "Check Answer";
+        const fb = document.getElementById("quizFeedback");
+        fb.innerText = "";
+        fb.style.backgroundColor = "transparent";
+        document.getElementById("qNumDisplay").innerText =
+          quizState.questionNum;
+
+        quizState.currentQ =
+          quizState.sessionQuestions[quizState.questionNum - 1];
+        quizState.currentQ.scored = false;
+
+        document.getElementById("internalSlider").value = 0;
+        document.getElementById("emergentSlider").value = 0;
+        document.getElementById("valInside").innerText = "0°";
+        document.getElementById("valExit").innerText = "0°";
+
+        if (currentMode === "quiz") drawQuiz();
+      }
+
+      function drawQuiz() {
+        if (currentMode !== "quiz") return;
+
+        const cw = quizCanvas.width;
+        const ch = quizCanvas.height;
+        const cx = cw / 2;
+        const cy = ch / 2 + 30;
+
+        qCtx.fillStyle = "#221F22";
+        qCtx.fillRect(0, 0, cw, ch);
+
+        const q = quizState.currentQ;
+        if (!q) return;
+
+        drawShape(qCtx, q.shape, cx, cy, q.rotRad, q.vertices);
+
+        let ro = { x: cx + q.ox, y: cy - 220 };
+        let rd1 = { x: Math.cos(q.angleRad), y: Math.sin(q.angleRad) };
+        let hit1 = intersectRotatedShape(
+          ro,
+          rd1,
+          q.shape,
+          cx,
+          cy,
+          q.rotRad,
+          q.vertices,
+        );
+
+        if (!hit1) return; // Failsafe
+
+        qCtx.shadowColor = "#FF0000";
+        qCtx.shadowBlur = 20;
+        qCtx.strokeStyle = "#FF3333";
+        qCtx.lineWidth = 4;
+        qCtx.beginPath();
+        qCtx.moveTo(ro.x, ro.y);
+        qCtx.lineTo(hit1.pt.x, hit1.pt.y);
+        qCtx.stroke();
+        qCtx.stroke();
+        qCtx.shadowBlur = 0;
+
+        qCtx.fillStyle = "#8B0000";
+        qCtx.save();
+        qCtx.translate(ro.x, ro.y);
+        qCtx.rotate(Math.atan2(rd1.y, rd1.x));
+        qCtx.fillRect(-30, -15, 40, 30);
+        qCtx.shadowColor = "#FF0000";
+        qCtx.shadowBlur = 15;
+        qCtx.fillStyle = "#FF3333";
+        qCtx.fillRect(10, -8, 10, 16);
+        qCtx.restore();
+
+        // Straight reference 1 (Faded Red)
+        qCtx.strokeStyle = "rgba(255, 51, 51, 0.4)";
+        qCtx.setLineDash([4, 4]);
+        qCtx.lineWidth = 2;
+        qCtx.beginPath();
+        qCtx.moveTo(hit1.pt.x, hit1.pt.y);
+        qCtx.lineTo(hit1.pt.x + rd1.x * 150, hit1.pt.y + rd1.y * 150);
+        qCtx.stroke();
+        qCtx.setLineDash([]);
+
+        let internalBend = parseFloat(
+          document.getElementById("internalSlider").value,
+        );
+        let rd2 = rotateVector(rd1, internalBend);
+        let ro2 = { x: hit1.pt.x + rd2.x * 0.1, y: hit1.pt.y + rd2.y * 0.1 };
+        let hit2 = intersectRotatedShape(
+          ro2,
+          rd2,
+          q.shape,
+          cx,
+          cy,
+          q.rotRad,
+          q.vertices,
+        );
+
+        drawAngleArc(qCtx, hit1.pt, hit1.n, rd1, rd2, "#FF3333", "#FF3333");
+
+        if (hit2) {
+          qCtx.shadowColor = "#FF0000";
+          qCtx.shadowBlur = 15;
+          qCtx.strokeStyle = "#FF3333";
+          qCtx.lineWidth = 3;
+          qCtx.beginPath();
+          qCtx.moveTo(hit1.pt.x, hit1.pt.y);
+          qCtx.lineTo(hit2.pt.x, hit2.pt.y);
+          qCtx.stroke();
+          qCtx.shadowBlur = 0;
+
+          // Straight reference 2 (Faded Red)
+          qCtx.strokeStyle = "rgba(255, 51, 51, 0.4)";
+          qCtx.setLineDash([4, 4]);
+          qCtx.lineWidth = 2;
+          qCtx.beginPath();
+          qCtx.moveTo(hit2.pt.x, hit2.pt.y);
+          qCtx.lineTo(hit2.pt.x + rd2.x * 150, hit2.pt.y + rd2.y * 150);
+          qCtx.stroke();
+          qCtx.setLineDash([]);
+
+          let exitBend = parseFloat(
+            document.getElementById("emergentSlider").value,
+          );
+          let rd3 = rotateVector(rd2, exitBend);
+
+          qCtx.shadowColor = "#FF0000";
+          qCtx.shadowBlur = 20;
+          qCtx.strokeStyle = "#FF3333";
+          qCtx.lineWidth = 4;
+          qCtx.beginPath();
+          qCtx.moveTo(hit2.pt.x, hit2.pt.y);
+          qCtx.lineTo(hit2.pt.x + rd3.x * 400, hit2.pt.y + rd3.y * 400);
+          qCtx.stroke();
+          qCtx.stroke();
+          qCtx.shadowBlur = 0;
+
+          drawAngleArc(qCtx, hit2.pt, hit2.n, rd2, rd3, "#FF3333", "#FF3333");
+        } else {
+          qCtx.shadowColor = "#FF0000";
+          qCtx.shadowBlur = 20;
+          qCtx.strokeStyle = "#FF3333";
+          qCtx.lineWidth = 4;
+          qCtx.beginPath();
+          qCtx.moveTo(hit1.pt.x, hit1.pt.y);
+          qCtx.lineTo(hit1.pt.x + rd2.x * 200, hit1.pt.y + rd2.y * 200);
+          qCtx.stroke();
+          qCtx.stroke();
+          qCtx.shadowBlur = 0;
+        }
+      }
+
+      function handleQuizAction() {
+        const btn = document.getElementById("quizBtn");
+        const fb = document.getElementById("quizFeedback");
+
+        if (quizState.stage === "answering") {
+          quizState.stage = "reviewing";
+          btn.innerText = "Next Question";
+
+          const q = quizState.currentQ;
+          const cw = quizCanvas.width;
+          const ch = quizCanvas.height;
+          const cx = cw / 2;
+          const cy = ch / 2 + 30;
+
+          let ro = { x: cx + q.ox, y: cy - 220 };
+          let rd1 = { x: Math.cos(q.angleRad), y: Math.sin(q.angleRad) };
+          let hit1 = intersectRotatedShape(
+            ro,
+            rd1,
+            q.shape,
+            cx,
+            cy,
+            q.rotRad,
+            q.vertices,
+          );
+
+          let internalBend = parseFloat(
+            document.getElementById("internalSlider").value,
+          );
+          let rd2 = rotateVector(rd1, internalBend);
+
+          let n1_in = { x: -hit1.n.x, y: -hit1.n.y };
+          let a_straight1 = angleBetween(rd1, n1_in);
+          let a_user1 = angleBetween(rd2, n1_in);
+
+          let cross_straight1 = rd1.x * n1_in.y - rd1.y * n1_in.x;
+          let cross_user1 = rd2.x * n1_in.y - rd2.y * n1_in.x;
+          let sameSide1 = cross_straight1 * cross_user1 >= 0;
+
+          let towardsNormal = sameSide1 && a_user1 < a_straight1 - 0.1;
+
+          let ro2 = { x: hit1.pt.x + rd2.x * 0.1, y: hit1.pt.y + rd2.y * 0.1 };
+          let hit2 = intersectRotatedShape(
+            ro2,
+            rd2,
+            q.shape,
+            cx,
+            cy,
+            q.rotRad,
+            q.vertices,
+          );
+
+          let awayFromNormal = false;
+          let sameSide2 = false;
+
+          if (hit2) {
+            let exitBend = parseFloat(
+              document.getElementById("emergentSlider").value,
+            );
+            let rd3 = rotateVector(rd2, exitBend);
+
+            let n2_out = { x: -hit2.n.x, y: -hit2.n.y };
+
+            let a_straight2 = angleBetween(rd2, n2_out);
+            let a_user2 = angleBetween(rd3, n2_out);
+
+            let cross_straight2 = rd2.x * n2_out.y - rd2.y * n2_out.x;
+            let cross_user2 = rd3.x * n2_out.y - rd3.y * n2_out.x;
+            sameSide2 = cross_straight2 * cross_user2 >= 0;
+
+            awayFromNormal = sameSide2 && a_user2 > a_straight2 + 0.1;
+          }
+
+          if (towardsNormal && awayFromNormal) {
+            if (!q.scored) {
+              quizState.score++;
+              q.scored = true;
+            }
+            fb.innerHTML =
+              "Correct! Inside bends <strong>towards</strong> the normal.<br>Outside bends <strong>away</strong> from the normal.";
+            fb.style.color = "var(--bg-color)";
+            fb.style.backgroundColor = "var(--accent-green)";
+          } else {
+            let err = "";
+
+            if (!sameSide1) {
+              err +=
+                "Inside ray crossed the normal line! Light will not do that.<br>";
+            } else if (!towardsNormal) {
+              err +=
+                "Inside ray must bend TOWARDS the normal line (smaller angle).<br>";
+            }
+
+            if (!hit2) {
+              err += "Ray missed the exit surface entirely!<br>";
+            } else {
+              if (!sameSide2) {
+                err +=
+                  "Exit ray crossed the normal line! Light will not do that.<br>";
+              } else if (!awayFromNormal) {
+                err +=
+                  "Exit ray must bend AWAY from the normal line (greater angle).<br>";
+              }
+            }
+
+            err +=
+              "<span style='font-size: 0.9em; font-weight: normal; margin-top: 5px; display: inline-block;'>Adjust sliders to try again, or click Next Question to skip.</span>";
+
+            fb.innerHTML = err;
+            fb.style.color = "var(--accent-red)";
+            fb.style.backgroundColor = "rgba(255, 97, 136, 0.2)";
+          }
+          drawQuiz();
+        } else if (quizState.stage === "reviewing") {
+          if (quizState.questionNum >= quizState.maxQuestions) {
+            quizState.stage = "finished";
+            btn.innerText = "Play Again";
+            fb.innerText = "Level Complete!";
+            fb.style.color = "var(--accent-yellow)";
+            fb.style.backgroundColor = "transparent";
+            document.getElementById("scoreDisplay").innerText =
+              `Final Score: ${quizState.score} / ${quizState.maxQuestions}`;
+          } else {
+            quizState.questionNum++;
+            generateQuestion();
+          }
+        } else if (quizState.stage === "finished") {
+          startQuiz();
+        }
+      }
+    </script>
+  </body>
+</html>
