@@ -391,6 +391,10 @@
               Biconcave Lens
             </button>
           </div>
+          <div style="margin-top: 15px; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="showTangentLab" onchange="if(currentMode === 'review') drawReview();" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-yellow); margin: 0;"/>
+            <label for="showTangentLab" style="font-size: 0.9em; color: #b5b4b6; cursor: pointer; margin: 0;">Show Tangents on Curved Shapes</label>
+          </div>
         </div>
 
         <div class="panel" style="border-left-color: var(--accent-orange)">
@@ -1000,6 +1004,18 @@
         drawArcSegment({ x: -n.x, y: -n.y }, rayOut, outColor, 35);
       }
 
+      function drawTangent(ctx, pt, n) {
+        let tDir = { x: -n.y, y: n.x };
+        ctx.strokeStyle = "#ffd866"; // Monokai Pro Yellow
+        ctx.setLineDash([15, 5]);
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.moveTo(pt.x - tDir.x * 60, pt.y - tDir.y * 60);
+        ctx.lineTo(pt.x + tDir.x * 60, pt.y + tDir.y * 60);
+        ctx.stroke();
+        ctx.setLineDash([]);
+      }
+
       // --- BANK GENERATION ---
       function generateBanks() {
         const standardShapes = ["rect", "convex", "concave"];
@@ -1300,6 +1316,10 @@
               let rd2 = { x: ref1.x, y: ref1.y };
 
               if (isCenterRay) {
+                let showTangent = document.getElementById("showTangentLab") && document.getElementById("showTangentLab").checked;
+                if (showTangent && (lensType === 'convex' || lensType === 'concave')) {
+                  drawTangent(rCtx, hit1.pt, hit1.n);
+                }
                 drawAngleArc(
                   rCtx,
                   hit1.pt,
@@ -1352,6 +1372,10 @@
                 rCtx.shadowBlur = 0;
 
                 if (isCenterRay) {
+                  let showTangent = document.getElementById("showTangentLab") && document.getElementById("showTangentLab").checked;
+                  if (showTangent && (lensType === 'convex' || lensType === 'concave')) {
+                    drawTangent(rCtx, hit2.pt, hit2.n);
+                  }
                   drawAngleArc(
                     rCtx,
                     hit2.pt,
@@ -1597,15 +1621,7 @@
 
         let showTangent = document.getElementById("showTangentCheckbox") && document.getElementById("showTangentCheckbox").checked;
         if (showTangent && (q.shape === 'convex' || q.shape === 'concave')) {
-          let tDir = { x: -hit1.n.y, y: hit1.n.x };
-          qCtx.strokeStyle = "var(--accent-yellow)";
-          qCtx.setLineDash([4, 4]);
-          qCtx.lineWidth = 1.5;
-          qCtx.beginPath();
-          qCtx.moveTo(hit1.pt.x - tDir.x * 60, hit1.pt.y - tDir.y * 60);
-          qCtx.lineTo(hit1.pt.x + tDir.x * 60, hit1.pt.y + tDir.y * 60);
-          qCtx.stroke();
-          qCtx.setLineDash([]);
+          drawTangent(qCtx, hit1.pt, hit1.n);
         }
 
         // Straight reference 1 (Faded Red)
@@ -1637,15 +1653,7 @@
 
         if (hit2) {
           if (showTangent && (q.shape === 'convex' || q.shape === 'concave')) {
-            let tDir = { x: -hit2.n.y, y: hit2.n.x };
-            qCtx.strokeStyle = "var(--accent-yellow)";
-            qCtx.setLineDash([4, 4]);
-            qCtx.lineWidth = 1.5;
-            qCtx.beginPath();
-            qCtx.moveTo(hit2.pt.x - tDir.x * 60, hit2.pt.y - tDir.y * 60);
-            qCtx.lineTo(hit2.pt.x + tDir.x * 60, hit2.pt.y + tDir.y * 60);
-            qCtx.stroke();
-            qCtx.setLineDash([]);
+            drawTangent(qCtx, hit2.pt, hit2.n);
           }
 
           qCtx.shadowColor = "#FF0000";
