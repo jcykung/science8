@@ -493,6 +493,11 @@
             />
           </div>
 
+          <div style="margin-bottom: 10px; display: flex; align-items: center; gap: 8px;">
+            <input type="checkbox" id="showTangentCheckbox" onchange="if(currentMode === 'quiz') drawQuiz();" style="cursor: pointer; width: 16px; height: 16px; accent-color: var(--accent-yellow); margin: 0;"/>
+            <label for="showTangentCheckbox" style="font-size: 0.9em; color: #b5b4b6; cursor: pointer; margin: 0;">Show Tangents on Curved Shapes</label>
+          </div>
+
           <button id="quizBtn" class="action-btn" onclick="handleQuizAction()">
             Check Answer
           </button>
@@ -983,6 +988,9 @@
             );
             if (!hit1 || hit1.pt.y > cy + 150 || hit1.pt.y < cy - 150) continue;
 
+            let incidentAngle1 = angleBetween({x: -rd.x, y: -rd.y}, hit1.n);
+            if (incidentAngle1 < 10) continue;
+
             let ref1 = refract(rd.x, rd.y, hit1.n.x, hit1.n.y, 1.0, 1.5);
             if (ref1.tir) continue;
             let ro2 = {
@@ -1075,6 +1083,9 @@
             vertices,
           );
           if (!hit1 || hit1.pt.y > cy + 150 || hit1.pt.y < cy - 150) continue;
+
+          let incidentAngle1 = angleBetween({x: -rd.x, y: -rd.y}, hit1.n);
+          if (incidentAngle1 < 10) continue;
 
           let ref1 = refract(rd.x, rd.y, hit1.n.x, hit1.n.y, 1.0, 1.5);
           if (ref1.tir) continue;
@@ -1535,6 +1546,19 @@
         qCtx.fillRect(10, -8, 10, 16);
         qCtx.restore();
 
+        let showTangent = document.getElementById("showTangentCheckbox") && document.getElementById("showTangentCheckbox").checked;
+        if (showTangent && (q.shape === 'convex' || q.shape === 'concave')) {
+          let tDir = { x: -hit1.n.y, y: hit1.n.x };
+          qCtx.strokeStyle = "var(--accent-yellow)";
+          qCtx.setLineDash([4, 4]);
+          qCtx.lineWidth = 1.5;
+          qCtx.beginPath();
+          qCtx.moveTo(hit1.pt.x - tDir.x * 60, hit1.pt.y - tDir.y * 60);
+          qCtx.lineTo(hit1.pt.x + tDir.x * 60, hit1.pt.y + tDir.y * 60);
+          qCtx.stroke();
+          qCtx.setLineDash([]);
+        }
+
         // Straight reference 1 (Faded Red)
         qCtx.strokeStyle = "rgba(255, 51, 51, 0.4)";
         qCtx.setLineDash([4, 4]);
@@ -1563,6 +1587,18 @@
         drawAngleArc(qCtx, hit1.pt, hit1.n, rd1, rd2, "#FF3333", "#FF3333");
 
         if (hit2) {
+          if (showTangent && (q.shape === 'convex' || q.shape === 'concave')) {
+            let tDir = { x: -hit2.n.y, y: hit2.n.x };
+            qCtx.strokeStyle = "var(--accent-yellow)";
+            qCtx.setLineDash([4, 4]);
+            qCtx.lineWidth = 1.5;
+            qCtx.beginPath();
+            qCtx.moveTo(hit2.pt.x - tDir.x * 60, hit2.pt.y - tDir.y * 60);
+            qCtx.lineTo(hit2.pt.x + tDir.x * 60, hit2.pt.y + tDir.y * 60);
+            qCtx.stroke();
+            qCtx.setLineDash([]);
+          }
+
           qCtx.shadowColor = "#FF0000";
           qCtx.shadowBlur = 15;
           qCtx.strokeStyle = "#FF3333";
